@@ -1,0 +1,401 @@
+* {
+  scroll-behavior: smooth;
+}
+
+html, body {
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  width: 100%;
+}
+
+.main-content {
+  background-color: #f5f5f5;
+  display: flex;
+  min-height: 740px;
+  width: 100%;
+  margin: 0; /* Remove side margins */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  font-family: "Inter";
+}
+
+.carousel {
+  z-index: -0.5;
+  max-width: 100%;
+  width: 100vw;
+}
+
+.carousel-inner {
+  height: 30%;
+}
+
+.carousel-item {
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+}
+
+.logo {
+  height: 400px;
+  width: 400px;
+  filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.5));
+}
+
+.college-top {
+  margin-top: -5px;
+  margin-left: -10px;
+}
+
+/* .college-heading {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  top: 400;
+  right: 500;
+  align-items: center;
+  gap: 30px;
+  margin-left: 20px;
+  z-index: 2;
+} */
+
+.hero-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.college-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding-top: 20px; /* Adjust for spacing */
+  z-index: 2;
+  text-align: center;
+  height: 100%;
+}
+
+.invisible-section {
+  background-color: rgb(245, 239, 239);
+  width: 100%;
+  padding: 10px; /* Add some padding */
+  height: max-content;
+}
+
+.breadcrumb {
+  display: flex;
+  justify-content: start;
+  margin-bottom: 10px; /* Add some space below the breadcrumb */
+  font-size: 14px; /* Adjust font size */
+  color: #000; /* Change font color */
+  gap: 20px;
+  margin-left: 40px;
+  height: 10%;
+}
+
+.breadcrumb a {
+  color: #e9e2e2; /* Change link color */
+  text-decoration: none; /* Remove underline */
+  background-color: #BD0F03;
+  transform: skew(20deg);
+  padding: 10px;
+  border: 1px solid #BD0F03;
+}
+
+.breadcrumb a span{
+  transform: skew(-20deg); 
+  display: inline-block;
+}
+
+.breadcrumb a:hover {
+  background-color: #d86b63;
+  transition: 0.5s ease-in-out;
+}
+
+.breadcrumb .curr{
+  background-color: #ffffff;
+  color: #BD0F03;
+}
+
+.college-header {
+  font-size: 60px; /* Adjust font size */
+  font-family: "Poppins";
+  font-weight: 700; /* Make the font bold */
+  margin-bottom: 10px; /* Add some space below the header */
+  color: white; /* Seashell */
+  text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5); /* Add text shadow */
+}
+.container{
+  margin-bottom: 20px;
+}
+.college-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins";
+  margin-top: 30px;
+  font-size: 16px; /* Adjust font size */
+  line-height: 1.5; /* Adjust line height */
+  color: rgb(96, 93, 93);
+}
+
+.carousel img {
+  height: 1080px;
+  width: 100%;
+  max-width: 100vw;
+  filter: blur(5px);
+}
+
+.entry-content-wrapper {
+  width: 80%;
+}
+
+.entry-content p {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.entry-content li {
+  font-size: 18px;
+  line-height: 2.0;
+}
+
+/* College Goals */
+.college-goals {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.college-goals p {
+  font-size: 30px;
+}
+
+.college-goals li {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #e0e0e0;
+}
+
+.card ol {
+  color: #ddd; /* Light gray for list items */
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* End of College Goals */
+
+/* programs offered */
+.programs-offered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 10px;
+  padding: 40px 0;
+  border-bottom: 2px solid rgb(82, 80, 80);
+}
+
+.programs-offered {
+  display: flex;
+  justify-content: end;
+  gap: 50px;
+}
+
+.programs-offered a {
+  text-decoration: none;
+  color: rgb(96, 93, 93);
+}
+
+.programs-offered a:hover {
+  color: #b22222;
+  text-decoration: underline;
+}
+
+.programs-offered ul {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mild-emphasis {
+  font-weight: 600; /* Medium weight, weaker than <strong> */
+  color: #555; /* Slightly dimmer color */
+}
+
+/* End of programs offered */
+
+/* Undergrad Programs */
+.undergrad-programs {
+  margin-top: 10px;
+}
+
+.undergrad-programs h3 {
+  text-align: center;
+}
+
+.undergrad-programs div {
+  border-bottom: 2px solid rgb(82, 80, 80);
+}
+
+/* End of UnderGrad programs */
+
+/* Grad Programs */
+.grad-programs {
+  margin-top: 10px;
+}
+
+.grad-programs div {
+  border-bottom: 2px solid rgb(82, 80, 80);
+}
+
+.grad-programs h3 {
+  text-align: center;
+}
+
+/* Flex Container */
+.flex-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.card-container {
+  perspective: 1000px;
+  display: inline-block;
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.card {
+  width: 450px; /* Increase width by 40% */
+  height: 600px; /* Further increase height */
+  border: 1px solid #b22222; /* Change border color to red */
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.card-container .card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.card-front {
+  background-size: cover;
+  background-position: center;
+}
+
+.card-back {
+  background: #b22222; /* Red background */
+  color: white;
+  transform: rotateY(180deg);
+}
+
+.card h3 {
+  position: relative;
+  z-index: 2;
+  font-size: 24px;
+  font-family: "Poppins";
+  font-weight: 700;
+  color: #fff; /* Change text color to white */
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.college-goals p {
+  font-size: 22px;
+  font-family: "Inter";
+  color: #fff; /* Change text color to white */
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.flex-box {
+  border: 1px solid #b22222; /* Change border color to red */
+  padding: 20px;
+  width: 30%;
+  height: 300px; /* Increase height */
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.7); /* Low opacity background */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  perspective: 1000px; /* Perspective for 3D effect */
+}
+
+.flex-box-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-box.flipped .flex-box-inner {
+  transform: rotateY(180deg);
+}
+
+.flex-box-front,
+.flex-box-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-box-front {
+  background-size: cover;
+  background-position: center;
+}
+
+.flex-box-back {
+  transform: rotateY(180deg);
+  background-color: #fff;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.flex-box h3 {
+  position: relative;
+  z-index: 2;
+  font-size: 24px;
+  font-family: "Poppins";
+  font-weight: 700;
+  color: #b22222; /* Change text color to red */
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* End of Grad Programs */

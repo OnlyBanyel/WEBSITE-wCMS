@@ -1,0 +1,46 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden; 
+    gap: 100px;
+    width: 100%;
+}
+
+.container-breadcrumb{
+    display: flex;
+    justify-content: start;
+    width: 100%;
+    margin: 20px 0;
+}
+.banner {
+    width: 100vw;
+    max-width: 1200px; 
+    height: 160px;
+    background: linear-gradient(rgba(179, 33, 52, 0.7), rgba(179, 33, 52, 0.7)), 
+                url('../imgs/banner-img.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    position: relative;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.left {
+    align-self: flex-start;
+    margin-left: -10vw;
+}
+
+.right {
+    align-self: flex-end;
+    margin-right: -10vw;
+}
+
