@@ -44,7 +44,7 @@ if (empty($_SESSION['account'])){
       <img src="../../imgs/CA-proc.png" class="logo-item" alt="ccs logo">
       <h2>College of Architecture</h2>
             </div></a>
-            <a href="#"><div class="college-container">
+            <a href="CSM.php"><div class="college-container">
       <img src="../../imgs/CSM-proc.png" class="logo-item" alt="ccs logo">
       <h2>College of Science and Mathematics</h2>
             </div></a>
