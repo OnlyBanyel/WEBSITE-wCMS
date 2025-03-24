@@ -1,32 +1,34 @@
 <?php
 require_once '../classes/db_connection.class.php';
+require_once '../classes/pages.class.php';
+
 $dbObj = new Database;
-$conn = $dbObj->connect();
+$ccsPage = new Pages;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sectionID = $_POST['sectionID'] ?? null;
     $elementType = $_POST['elementType'] ?? null;
     $value = $_POST['value'] ?? null;
-    
+
     if (!$sectionID || !$elementType || $value === null) {
-        echo json_encode(['success' => false, 'message' => 'Missing required parameters.']);
+        echo json_encode(["status" => "error", "message" => "Missing required fields."]);
         exit;
     }
 
-    // Determine the column to update based on element type
+    // Determine the column to update
     $column = ($elementType === 'text') ? 'content' : 'imagePath';
-    
-    try {
-        $sql = "UPDATE page_sections SET $column = :value WHERE sectionID = :sectionID";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':value', $value);
-        $stmt->bindParam(':sectionID', $sectionID);
-        $stmt->execute();
-        
-        echo json_encode(['success' => true, 'message' => 'Element updated successfully.', 'updatedData' => [$column => $value]]);
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+
+    // Prepare and execute the update query
+    $updateSQL = "UPDATE page_sections SET $column = :value WHERE sectionID = :sectionID";
+    $stmt = $dbObj->connect()->prepare($updateSQL);
+    $stmt->bindParam(":value", $value);
+    $stmt->bindParam(":sectionID", $sectionID);
+
+    if ($stmt->execute()) {
+        echo json_encode(["status" => "success", "message" => "Element updated successfully."]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Failed to update element."]);
     }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+    echo json_encode(["status" => "error", "message" => "Invalid request method."]);
 }

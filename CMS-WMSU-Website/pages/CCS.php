@@ -5,25 +5,22 @@ require_once '../classes/pages.class.php';
 $dbObj = new Database;
 $ccsPage = new Pages;
 
-
 if (empty($_SESSION['account'])){ 
     header('Location: login-form.php');
     exit;
 }
 else{
-
     $pageID = 3;
     $subpageID = 1;
 
     // Fetch fresh data from the database
-    $_SESSION['ccsPage'] = $ccsPage->fetchPageData($pageID, $subpageID);
-    $_SESSION['ccsPage']['CarouselElement'] = $ccsPage->fetchSectionsByIndicator('Carousel Element');
-    $_SESSION['ccsPage']['genInfoFront'] = $ccsPage->fetchSectionsByIndicator('General-Info');
-    $_SESSION['ccsPage']['genInfoBack'] = $ccsPage->fetchSectionsByIndicator('General-Info-Back');
-    $_SESSION['ccsPage']['department'] = $ccsPage->fetchSectionsByIndicator('Departments');
-    $_SESSION['ccsPage']['AccordionCourses'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses');
-    $_SESSION['ccsPage']['AccordionCoursesUndergrad'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses Undergrad');
-    $_SESSION['ccsPage']['AccordionCoursesGrad'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses Grad');
+    $_SESSION['ccsPage']['CarouselElement'] = $ccsPage->fetchSectionsByIndicator('Carousel Element', $pageID, $subpageID);
+    $_SESSION['ccsPage']['genInfoFront'] = $ccsPage->fetchSectionsByIndicator('General-Info', $pageID, $subpageID);
+    $_SESSION['ccsPage']['genInfoBack'] = $ccsPage->fetchSectionsByIndicator('General-Info-Back', $pageID, $subpageID);
+    $_SESSION['ccsPage']['department'] = $ccsPage->fetchSectionsByIndicator('Departments', $pageID, $subpageID);
+    $_SESSION['ccsPage']['AccordionCourses'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses', $pageID, $subpageID);
+    $_SESSION['ccsPage']['AccordionCoursesUndergrad'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses Undergrad', $pageID, $subpageID);
+    $_SESSION['ccsPage']['AccordionCoursesGrad'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses Grad', $pageID, $subpageID);
 
     // Update session data
     $pageData = $_SESSION['ccsPage'];
@@ -140,7 +137,6 @@ foreach ($dataAssoc as $section => $sectionData) {
     echo "</div>";
 ?>
 
-
 <script>
    $(document).ready(function() {
     <?php foreach ($tableIds as $id) { ?>
@@ -158,27 +154,85 @@ foreach ($dataAssoc as $section => $sectionData) {
         var rowId = input.data('id');
         var column = input.data('column');
 
-        console.log("Row ID:", rowId, "Column:", column, "Value:", newValue)
+        console.log("Row ID:", rowId, "Column:", column, "Value:", newValue);
 
         $.ajax({
             url: '../functions/updateData.php',
             type: 'POST',
+            dataType: 'json', // Ensure JSON response is expected
             data: {
                 id: rowId,
                 value: newValue,
                 column: column
             },
             success: function(response) {
-                console.log("Updated Successfully:", response);
-                input.val(response.updatedData[column]); 
+                if (response.status === "success") {
+                    console.log("Updated Successfully:", response);
+                    
+                    // Update the input field with the new value from the server
+                    input.val(response.updatedData[column]);
 
-                // setTimeout(function() {
-                //     location.reload();
-                // }, 500);
+                    // Optionally highlight the updated row
+                    input.closest('tr').css("background-color", "#d4edda");
+
+                } else {
+                    console.error("Update Failed:", response.message);
+                    alert("Error: " + response.message);
+                }
             },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                alert("An error occurred while updating data.");
+            }
+        });
+    });
 
-            error: function() {
-                alert("Error updating data.");
+    // Load modal content via AJAX
+    $('.add-modal').on('click', function(e) {
+        e.preventDefault();
+        var section = $(this).data('section');
+        var sectionId = $(this).data('section-id');
+        var allowedElements = $(this).data('allowed-elements');
+
+        $.ajax({
+            url: '../functions/loadModalContent.php',
+            type: 'GET',
+            data: {
+                section: section,
+                sectionId: sectionId,
+                allowedElements: allowedElements
+            },
+            success: function(response) {
+                $('#modalContent').html(response);
+                $('#addModal').modal('show');
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                alert("An error occurred while loading modal content.");
+            }
+        });
+    });
+
+    // Handle form submission inside modal
+    $('#addModal').on('submit', 'form', function(e) {
+        e.preventDefault();
+        var form = $(this);
+
+        $.ajax({
+            url: '../functions/save_element.php',
+            type: 'POST',
+            data: form.serialize(),
+            success: function(response) {
+                if (response.status === "success") {
+                    alert("Element added successfully!");
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                alert("An error occurred while saving the element.");
             }
         });
     });
