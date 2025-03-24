@@ -9,7 +9,7 @@ table.dataTable {
 
 .container {
     display: grid; /* Use grid layout */
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    grid-template-columns: repeat(2, 1fr); /* 3 columns */
     gap: 20px; /* Adjust gap between items as needed */
 }
 
