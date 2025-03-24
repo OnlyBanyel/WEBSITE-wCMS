@@ -1,6 +1,6 @@
 <?php
 
-require_once "../../classes/pages.class.php"; 
+require_once "../../CMS-WMSU-Website/classes/pages.class.php"; 
 $csmPage = new Pages;
 
 /** @region Carousel */
@@ -27,61 +27,67 @@ $csmPage = new Pages;
 
 
 /** @region Card Front */
-        $cardFrontItemsSQL = "
+        $genInfoItemsSQL = "
             SELECT * FROM page_sections 
             WHERE subpage = 3 
-            AND indicator = 'Card Element Front' 
-            AND description IN ('card-front-img', 'card-front-title');
+            AND indicator = 'General-Info' 
+            AND description IN ('geninfo-front-img', 'geninfo-front-title');
         ";
 
-        $cardFrontItems = $csmPage->execQuery($cardFrontItemsSQL);
+        $genInfoItems = $csmPage->execQuery($genInfoItemsSQL);
 
-        foreach ($cardFrontItems as $item) {
-        if ($item["description"] == "card-front-img") {
-            $cardFrontimgs[] = $item['imagePath'];
+        foreach ($genInfoItems as $item) {
+        if ($item["description"] == "geninfo-front-img") {
+            $genInfoImgs[] = $item['imagePath'];
         }
-        if ($item["description"] == "card-front-title") {
-            $cardFrontTitle[] = $item['content'];
+        if ($item["description"] == "geninfo-front-title") {
+            $genInfoTitles[] = $item['content'];
         }
     }
 /** @engregion */
 
 /** @region Card Back */
-    $CardBackItemsSQL = "
+    $genInfoBackItemsSQL = "
         SELECT * FROM page_sections 
         WHERE subpage = 3 
-        AND indicator = 'Card Element Back' 
-        AND description IN ('card-back-head', 'CG-list-item', 'CM-list-item', 'CV-list-item');
+        AND indicator = 'General-Info-Back' 
+        AND description IN ('geninfo-back-head', 'CG-list-item', 'CM-list-item', 'CV-list-item');
     ";
 
-    $cardBackHead = [];
-    $cardBackCGList = [];
-    $cardBackCMList = [];
-    $cardBackCVList = [];
+    $genInfoBackItems = [];
+    $genInfoBackCGList = [];
+    $genInfoBackCMList = [];
+    $genInfoBackCVList = [];
 
-    $cardBackItems = $csmPage->execQuery($CardBackItemsSQL);
+    $genInfoBackItems = $csmPage->execQuery($genInfoBackItemsSQL);
 
-    foreach ($cardBackItems as $item) {
-    if ($item["description"] == "card-back-head") {
-        $cardBackHead[] = $item['content'];
+    foreach ($genInfoBackItems as $item) {
+    if ($item["description"] == "geninfo-back-head") {
+        $genInfoBackHead[] = $item['content'];
     }
-    if ($item["description"] == "CG-list-item") {
-        $cardBackCGList[] = $item['content'];
+    if ($item["description"] == "CG-list-item" ) {
+        $genInfoBackCGList[] = $item['content'];
     }
     if ($item["description"] == "CM-list-item") {
-        $cardBackCMList[] = $item['content'];
+        $genInfoBackCMList[] = $item['content'];
     }
     if ($item["description"] == "CV-list-item") {
-        $cardBackCVList[] = $item['content'];
+        $genInfoBackCVList[] = $item['content'];
     }
 
-    $cardBackLists = [
-    0 => $cardBackCGList,
-    1 => $cardBackCMList,
-    2 => $cardBackCVList
+    $genInfoBackLists = [
+    0 => $genInfoBackCGList,
+    1 => $genInfoBackCMList,
+    2 => $genInfoBackCVList
     ];
     }
 /** @endregion*/
+
+$departmentsSQL = "
+    SELECT * from page_sections WHERE subpage = 3 AND indicator = 'departments' AND description = 'department-name';
+";
+
+$departments = $csmPage->execQuery($departmentsSQL);
 
 /** @region Accordion Courses */
     $accordionCoursesSQL = "
@@ -171,35 +177,36 @@ $csmPage = new Pages;
           </div> <!-- End of carousel -->
         </div>
     </div>
+    <div class="gen-info-container">
+        <div class="gen-info-col-1">
+        <?php for ($i = 0; $i < count($genInfoTitles); $i ++){
+            ?>
+                <h4 class="gen-info-heading"> <?php echo $genInfoTitles[$i] ?></h4>
+                <p class="gen-info-top-content"><?php echo $genInfoBackHead[$i]?></p>
+                <?php foreach ($genInfoBackLists[$i] as $item) {
+                                  echo "<li class='gen-info-content'>" . $item . "</li>";
+                                }  ?>
 
-      <div class="flex-container">
-        <div class="card-container">
+                        <br>
+            <?php } ?>
+        </div>
+        <div class="gen-info-col-2">
+            <img src="<?php echo $genInfoImgs[0]?>" alt="">
+        </div>
+    </div>
+    
+    
 
-        <?php for ($i = 0; $i < count($cardFrontimgs); $i++) { ?>
-            <div class="card">
-                <div class="card-front card-1" 
-                    style="background-image: linear-gradient(rgba(255, 152, 152, 0.6), rgba(255, 0, 0, 0.6)), url('<?php echo $cardFrontimgs[$i];?>'); background-size: cover; background-position: center;">
-                    <h3><?php echo $cardFrontTitle[$i]; ?></h3>
+    <div class="department">
+      <p class="title-header">Departments</p>
+            <div class="dept">
+                <?php 
+                $i = 0;
+                foreach ($departments as $items){?>
+                    <a href="javascript:void(0);"><div class="deptimg" style="background: linear-gradient(rgba(189, 15, 3, 0.7), rgba(189, 15, 3, 0.7)), url('<?php echo $genInfoImgs[$i];?>') no-repeat center center;
+                    background-size: cover;"></div><span><?php echo $items['content']; ?></span></a>
+                    <?php $i++;} ?>
                 </div>
-                <div class="card-back">
-                    <div class="college-goals">
-                        <p><?php echo $cardBackHead[$i]?></p>
-                        <ol>
-                            <?php 
-                                foreach ($cardBackLists[$i] as $item) {
-                                  echo "<li>" . $item . "</li>";
-                                }  
-                            ?>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        <?php } ?>
-    </div> <!-- End of college-top -->
-  </div>
-
-    <div class="activities">
-      <p>HERE LIES THE ACTIVITIES OF THE COLLEGES</p>
     </div>
 
 

@@ -105,6 +105,7 @@ foreach ($dataAssoc as $section => $sectionData) {
                             <th>Type</th>
                             <th>Content</th>
                             <th>Description</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -120,6 +121,7 @@ foreach ($dataAssoc as $section => $sectionData) {
                                     value="<?php echo ($data2['elemType'] === 'text') ? ($data2['content'] ?? '') : ($data2['imagePath'] ?? ''); ?>">
                             </td>
                             <td><?php echo $data2['description'] ?? ''; ?></td>
+                            <td> <a href="../functions/deleteVal.php?id=<?php echo $data2['sectionID']; ?>"><button type="button" class="btn btn-danger"><span class="cil-contrast"></span> Delete</button></a></td>
                         </tr>
                         <?php } ?>
                     </tbody>

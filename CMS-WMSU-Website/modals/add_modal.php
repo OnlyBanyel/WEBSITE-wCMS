@@ -1,8 +1,14 @@
 <?php
 if (isset($_POST['section']) && isset($_POST['allowedElements'])) {
     $section = $_POST['section'];
-    $allowedElements = json_decode($_POST['allowedElements'], true); // Ensure JSON parsing
+    $allowedElements = $_POST['allowedElements'];
 
+    // Ensure JSON decoding only if it's a string
+    if (is_string($allowedElements)) {
+        $allowedElements = json_decode($allowedElements, true);
+    }
+
+    // Verify it is now an array
     if (!is_array($allowedElements)) {
         echo 'Invalid elements data';
         exit;

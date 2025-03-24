@@ -63,6 +63,7 @@ $(document).ready(function() {
             url: "../functions/save_content.php",
             type: "POST",
             data: {
+                
                 elementType: elementType,
                 value: value.toString(),
                 indicator: indicator,
@@ -75,7 +76,7 @@ $(document).ready(function() {
                 console.log("Server Response:", response);
                 if (response.status === "success") {
                     alert("Element saved successfully!");
-                    location.reload();
+                    location.reload();  
                 } else {
                     alert("Error: " + response.message);
                 }

@@ -197,15 +197,19 @@ require_once __DIR__ . "/db_connection.class.php";
             return true;
         }
         
-        
-        
-
         function getRowByIndicator($indicator) {
             $sql = "SELECT * FROM page_sections WHERE indicator = :indicator LIMIT 1";
             $qry = $this->db->connect()->prepare($sql);
             $qry->bindParam(":indicator", $indicator);
             $qry->execute();
             return $qry->fetch(PDO::FETCH_ASSOC);
+        }
+        
+        function deleteVal($sectionID){
+            $sql = "DELETE FROM page_sections WHERE sectionID = :sectionID";
+            $qry = $this->db->connect()->prepare($sql);
+            $qry->bindParam(':sectionID', $sectionID);
+            return $qry->execute();
         }
     }
 
