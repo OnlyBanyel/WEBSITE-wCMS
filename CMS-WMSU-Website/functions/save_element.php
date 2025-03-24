@@ -6,11 +6,12 @@ $dbObj = new Database;
 $ccsPage = new Pages;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $sectionID = $_POST['sectionID'] ?? null;
     $elementType = $_POST['elementType'] ?? null;
     $value = $_POST['value'] ?? null;
+    $indicator = $_POST['indicator'] ?? null;
+    $description = $_POST['description'] ?? null;
 
-    if (!$sectionID || !$elementType || $value === null) {
+    if (!$elementType || $value === null || !$indicator || !$description) {
         echo json_encode(["status" => "error", "message" => "Missing required fields."]);
         exit;
     }
@@ -18,17 +19,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Determine the column to update
     $column = ($elementType === 'text') ? 'content' : 'imagePath';
 
-    // Prepare and execute the update query
-    $updateSQL = "UPDATE page_sections SET $column = :value WHERE sectionID = :sectionID";
-    $stmt = $dbObj->connect()->prepare($updateSQL);
-    $stmt->bindParam(":value", $value);
-    $stmt->bindParam(":sectionID", $sectionID);
+    // Insert the new content
+    $result = $ccsPage->insertSectionContent($column, $value, $indicator, $description, $elementType);
 
-    if ($stmt->execute()) {
-        echo json_encode(["status" => "success", "message" => "Element updated successfully."]);
+    if ($result) {
+        echo json_encode(["status" => "success", "message" => "Element inserted successfully."]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Failed to update element."]);
+        echo json_encode(["status" => "error", "message" => "Failed to insert element."]);
     }
 } else {
     echo json_encode(["status" => "error", "message" => "Invalid request method."]);
 }
+?>

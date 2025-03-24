@@ -2,19 +2,15 @@ $(document).ready(function() {
     // Open the first modal when clicking "Add Elements"
     $(document).on("click", ".add-modal", function(e) {
         e.preventDefault();
-
-        var sectionID = $(this).data("section-id"); 
         var sectionName = $(this).data("section");
         var allowedElements = $(this).data("allowed-elements");
-
         if (typeof allowedElements === "string") {
             allowedElements = JSON.parse(allowedElements);
         }
-
         $.ajax({
             url: "../modals/add_modal.php",
             type: "POST",
-            data: { sectionID: sectionID, section: sectionName, allowedElements: allowedElements },
+            data: { section: sectionName, allowedElements: JSON.stringify(allowedElements) }, // Fix: Proper JSON encoding
             success: function(response) {
                 $("#modalContent").html(response);
                 $("#addModal").modal("show"); // Open first modal
@@ -27,22 +23,14 @@ $(document).ready(function() {
 
     // Open the second modal inside the first modal
     $(document).on("click", ".open-second-modal", function() {
-        var sectionID = $(this).data("section-id");
+        var sectionName = $(this).data("section");
         var elementType = $(this).data("type");
         var elementDesc = $(this).data("desc");
-
-        console.log("Clicked Element Type:", elementType);
-        console.log("Clicked Element Description:", elementDesc);
-        console.log("Section ID:", sectionID);
 
         $.ajax({
             url: "../modals/add_content_modal.php",
             type: "POST",
-            data: { 
-                sectionID: sectionID, 
-                elementType: elementType, 
-                elementDesc: elementDesc 
-            },
+            data: { section: sectionName, elementType: elementType, elementDesc: elementDesc }, // Fix: Matching PHP variable names
             success: function(response) {
                 $("#modalContent").html(response); // Replace modal content
             },
@@ -53,30 +41,48 @@ $(document).ready(function() {
     });
 
     // Save element (either content or imagePath) when clicking "Save"
-    $(document).on("click", "#saveElement", function() {
-        var sectionID = $("#elementForm").data("section-id");
-        var elementType = $("#elementForm").data("type");
-        var value = $("#elementInput").val();
-
+    $(document).off("click", "#saveElement").on("click", "#saveElement", function () {
+        let elementType = $("#elementForm").data("type");
+        let value = $("#elementInput").val();
+        let indicator = $("#indicator").val();
+        let description = $("#description").val();
+        let pageID = $('#pageID').val();
+        let subpageID = $('#subpageID').val();
+    
+        if (!indicator || !description) {
+            console.error("Missing indicator or description!");
+            return;
+        }
+    
+        console.log("Element Type:", elementType);
+        console.log("Value:", value);
+        console.log("Indicator:", indicator);
+        console.log("Description:", description);
+    
         $.ajax({
-            url: "../functions/save_element.php",
+            url: "../functions/save_content.php",
             type: "POST",
             data: {
-                sectionID: sectionID,
                 elementType: elementType,
-                value: value
+                value: value,
+                indicator: indicator,
+                description: description,
+                pageID: pageID,
+                subpageID: subpageID
             },
-            success: function(response) {
-                var result = JSON.parse(response);
-                if (result.success) {
-                    alert("Element updated successfully.");
-                    $("#addModal").modal("hide");
+            dataType: "json",
+            success: function (response) {
+                console.log("Server Response:", response);
+                if (response.status === "success") {
+                    alert("Element saved successfully!");
+                    location.reload();
                 } else {
-                    alert("Error: " + result.message);
+                    alert("Error: " + response.message);
                 }
             },
-            error: function() {
-                alert("Error saving data.");
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error, xhr.responseText);
+                alert("An error occurred while saving the element.");
             }
         });
     });

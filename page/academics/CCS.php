@@ -177,7 +177,6 @@ $departments = $ccsPage->execQuery($departmentsSQL);
           </div> <!-- End of carousel -->
         </div>
     </div>
-            <div class="gen-info-header-container"><span class='title-header'>College Information</span></div>
     <div class="gen-info-container">
         <div class="gen-info-col-1">
         <?php for ($i = 0; $i < count($genInfoBackHead); $i ++){

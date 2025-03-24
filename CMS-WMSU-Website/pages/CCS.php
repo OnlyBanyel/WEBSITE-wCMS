@@ -11,7 +11,9 @@ if (empty($_SESSION['account'])){
 }
 else{
     $pageID = 3;
+    $_SESSION['pageID'] = $pageID;
     $subpageID = 1;
+    $_SESSION['subpageID'] = $subpageID;
 
     // Fetch fresh data from the database
     $_SESSION['ccsPage']['CarouselElement'] = $ccsPage->fetchSectionsByIndicator('Carousel Element', $pageID, $subpageID);
@@ -84,7 +86,6 @@ foreach ($dataAssoc as $section => $sectionData) {
     echo "<h2>" . preg_replace('/([a-z])([A-Z])/', '$1 $2', $section) . " 
             <a class='btn btn-primary add-modal' 
             data-section='$section' 
-            data-section-id='" . ($dataGroup[0]['sectionID'] ?? '') . "' 
             data-allowed-elements='" . htmlspecialchars($allowedElements, ENT_QUOTES, 'UTF-8') . "' 
             href='#' role='button'>Add Elements</a>
         </h2>";
@@ -191,15 +192,13 @@ foreach ($dataAssoc as $section => $sectionData) {
     $('.add-modal').on('click', function(e) {
         e.preventDefault();
         var section = $(this).data('section');
-        var sectionId = $(this).data('section-id');
         var allowedElements = $(this).data('allowed-elements');
 
         $.ajax({
-            url: '../functions/loadModalContent.php',
-            type: 'GET',
+            url: '../modals/add_modal.php',
+            type: 'POST',
             data: {
                 section: section,
-                sectionId: sectionId,
                 allowedElements: allowedElements
             },
             success: function(response) {
