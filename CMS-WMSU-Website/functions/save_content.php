@@ -33,7 +33,7 @@ if (isset($_POST['elementType'], $_POST['value'], $_POST['indicator'], $_POST['d
         );
     } else {
         // Insert new section
-        $pageID = $_POST['pageID'] ?? null; // Ensure pageID is provided
+        $pageID = $_SESSION['pageID'] ?? null; // Ensure pageID is provided
         $subpageID = $_SESSION['subpageID'] ?? null;
 
         if ($pageID === null) {
@@ -41,7 +41,7 @@ if (isset($_POST['elementType'], $_POST['value'], $_POST['indicator'], $_POST['d
             exit;
         }
 
-        $result = $pagesObj->insertSectionContent($column, $value, $indicator, $description, $elemType, $pageID, $subpageID);
+        $result = $pagesObj->insertSectionContent( $value, $indicator, $description, $pageID, $subpageID);
     }
 
     if ($result) {

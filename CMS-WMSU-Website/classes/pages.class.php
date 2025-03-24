@@ -138,10 +138,40 @@ require_once __DIR__ . "/db_connection.class.php";
         }
 
         // Define the insertSectionContent function without using sectionID
-        public function insertSectionContent($column, $value, $indicator, $description, $elemType, $pageID, $subpageID = null) {
-            // 🔹 Ensure spaces between words without leading space
-            $indicator = preg_replace('/(?<!^)([A-Z])/', ' $1', $indicator);
-            
+        public function insertSectionContent($value, $indicator, $description, $pageID, $subpageID = null) {
+            // Determine element type based on indicator
+            if (stripos($indicator, 'img') !== false) {
+                $elemType = 'image';
+                $column = 'imagePath';
+            } else {
+                $elemType = 'text';
+                $column = 'content';
+            }
+        
+            // Indicators that should not be modified
+            $exceptions = ['onlinereg-section', 'General-Info-Back', 'General-Info'];
+        
+            // Special case: If indicator is "GeneralInfoItems", change it to "General-Info-Back"
+            if ($indicator === 'GeneralInfoItems') {
+                $indicator = 'General-Info-Back';
+            } 
+            // Only modify if NOT in the exceptions list
+            elseif (!in_array($indicator, $exceptions, true)) {
+                $indicator = preg_replace('/(?<!^)([A-Z])/', ' $1', $indicator); // Add spaces before uppercase letters
+            }
+        
+            // Check if pageID exists to avoid foreign key constraint error
+            $checkSql = "SELECT COUNT(*) FROM subpages WHERE subpageID = :pageID";
+            $checkQry = $this->db->connect()->prepare($checkSql);
+            $checkQry->bindParam(":pageID", $pageID);
+            $checkQry->execute();
+            $pageExists = $checkQry->fetchColumn();
+        
+            if (!$pageExists) {
+                die(json_encode(['status' => 'error', 'message' => 'pageID does not exist in pages table']));
+            }
+        
+            // Insert into the correct column dynamically
             $sql = "INSERT INTO page_sections (pageID, subpage, indicator, description, elemType, $column) 
                     VALUES (:pageID, :subpageID, :indicator, :description, :elemType, :value)";
         
@@ -151,10 +181,22 @@ require_once __DIR__ . "/db_connection.class.php";
             $qry->bindParam(":description", $description);
             $qry->bindParam(":elemType", $elemType);
             $qry->bindParam(":pageID", $pageID);
-            $qry->bindParam(":subpageID", $subpageID);
         
-            return $qry->execute();
+            // Ensure subpageID is bound properly (NULL-safe)
+            if ($subpageID === null) {
+                $qry->bindValue(":subpageID", null, PDO::PARAM_NULL);
+            } else {
+                $qry->bindParam(":subpageID", $subpageID);
+            }
+        
+            if (!$qry->execute()) {
+                error_log("SQL Error: " . json_encode($qry->errorInfo()));
+                die(json_encode(['status' => 'error', 'message' => 'Database error occurred']));
+            }
+        
+            return true;
         }
+        
         
         
 

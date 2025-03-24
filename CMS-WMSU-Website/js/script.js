@@ -64,7 +64,7 @@ $(document).ready(function() {
             type: "POST",
             data: {
                 elementType: elementType,
-                value: value,
+                value: value.toString(),
                 indicator: indicator,
                 description: description,
                 pageID: pageID,
