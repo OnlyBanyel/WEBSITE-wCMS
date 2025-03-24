@@ -1,5 +1,5 @@
 <?php
-require_once "C:/XAMPP/htdocs/WEBSITE-WCMS/CMS-WMSU-Website/tools/functions.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/WEBSITE-WCMS/CMS-WMSU-Website/tools/functions.php";
 require_once __DIR__ . "/db_connection.class.php";
 
     class Pages{
@@ -32,9 +32,10 @@ require_once __DIR__ . "/db_connection.class.php";
             $sql = "SELECT * from page_sections 
                     LEFT JOIN pages ON page_sections.pageID = pages.ID 
                     LEFT JOIN subpages ON page_sections.subpage = subpages.subpageID 
-                    WHERE pageID = :pageID AND :subpageID = subpages.subpageID";
+                    WHERE pageID = :pageID AND subpages.subpageID = :subpageID";
             $qry = $this->db->connect()->prepare($sql);
             $qry->bindParam(":subpageID", $subpageID);
+            $qry->bindParam(":pageID", $pageID);
             }
             
 

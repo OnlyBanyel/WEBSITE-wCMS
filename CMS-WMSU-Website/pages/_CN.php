@@ -3,7 +3,7 @@ session_start();
 require_once '../classes/db_connection.class.php';
 require_once '../classes/pages.class.php';
 $dbObj = new Database;
-$csmPage = new Pages;
+$cnPage = new Pages;
 
 
 if (empty($_SESSION['account'])){ 
@@ -11,29 +11,28 @@ if (empty($_SESSION['account'])){
     exit;
 }
 else{
-
     $pageID = 3;
-    $subpageID = 3;
+    $subpageID = 2;
 
     // Fetch fresh data from the database
-    $_SESSION['csmPage'] = $csmPage->fetchPageData($pageID, $subpageID);
-    $_SESSION['csmPage']['CarouselElement'] = $csmPage->fetchSectionsByIndicator('Carousel Element');
-    $_SESSION['csmPage']['genInfoFront'] = $csmPage->fetchSectionsByIndicator('General-Info');
-    $_SESSION['csmPage']['genInfoBack'] = $csmPage->fetchSectionsByIndicator('General-Info-Back');
-    $_SESSION['csmPage']['AccordionCourses'] = $csmPage->fetchSectionsByIndicator('Accordion Courses');
-    $_SESSION['csmPage']['AccordionCoursesUndergrad'] = $csmPage->fetchSectionsByIndicator('Accordion Courses Undergrad');
-    $_SESSION['csmPage']['AccordionCoursesGrad'] = $csmPage->fetchSectionsByIndicator('Accordion Courses Grad');
+    $_SESSION['cnPage'] = $cnPage->fetchPageData($pageID, $subpageID);
+    $_SESSION['cnPage']['CarouselElement'] = $cnPage->fetchSectionsByIndicator('Carousel Element');
+    $_SESSION['cnPage']['CardElementFront'] = $cnPage->fetchSectionsByIndicator('Card Element Front');
+    $_SESSION['cnPage']['CardElementBack'] = $cnPage->fetchSectionsByIndicator('Card Element Back');
+    $_SESSION['cnPage']['AccordionCourses'] = $cnPage->fetchSectionsByIndicator('Accordion Courses');
+    $_SESSION['cnPage']['AccordionCoursesUndergrad'] = $cnPage->fetchSectionsByIndicator('Accordion Courses Undergrad');
+    $_SESSION['cnPage']['AccordionCoursesGrad'] = $cnPage->fetchSectionsByIndicator('Accordion Courses Grad');
 
     // Update session data
-    $pageData = $_SESSION['csmPage'];
+    $pageData = $_SESSION['cnPage'];
 
     $sections = [
-        'CarouselElement' => $_SESSION['csmPage']['CarouselElement'],
-        'GeneralInfo' => $_SESSION['csmPage']['genInfoFront'],
-        'GeneralInfoItems' => $_SESSION['csmPage']['genInfoBack'],
-        'AccordionCourses' => $_SESSION['csmPage']['AccordionCourses'],
-        'AccordionCoursesUndergrad' => $_SESSION['csmPage']['AccordionCoursesUndergrad'],
-        'AccordionCoursesGrad' => $_SESSION['csmPage']['AccordionCoursesGrad'],
+        'CarouselElement' => $_SESSION['cnPage']['CarouselElement'],
+        'CardElementFront' => $_SESSION['cnPage']['CardElementFront'],
+        'CardElementBack' => $_SESSION['cnPage']['CardElementBack'],
+        'AccordionCourses' => $_SESSION['cnPage']['AccordionCourses'],
+        'AccordionCoursesUndergrad' => $_SESSION['cnPage']['AccordionCoursesUndergrad'],
+        'AccordionCoursesGrad' => $_SESSION['cnPage']['AccordionCoursesGrad'],
     ];
 }
 ?>
@@ -66,6 +65,7 @@ foreach ($sections as $section => $data) {
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Indicator</th>
                     <th>Type</th>
                     <th>Content</th>
                     <th>Description</th>
@@ -76,6 +76,7 @@ foreach ($sections as $section => $data) {
                 <?php foreach ($data as $data2) { ?>
                 <tr>
                     <td><?php echo $data2['sectionID'] ?? ''; ?></td>
+                    <td><?php echo $data2['indicator'] ?? ''; ?></td>
                     <td><?php echo $data2['elemType'] ?? ''; ?></td>
 
                     <td>

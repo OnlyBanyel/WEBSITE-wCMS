@@ -18,8 +18,9 @@ else{
     // Fetch fresh data from the database
     $_SESSION['ccsPage'] = $ccsPage->fetchPageData($pageID, $subpageID);
     $_SESSION['ccsPage']['CarouselElement'] = $ccsPage->fetchSectionsByIndicator('Carousel Element');
-    $_SESSION['ccsPage']['CardElementFront'] = $ccsPage->fetchSectionsByIndicator('Card Element Front');
-    $_SESSION['ccsPage']['CardElementBack'] = $ccsPage->fetchSectionsByIndicator('Card Element Back');
+    $_SESSION['ccsPage']['genInfoFront'] = $ccsPage->fetchSectionsByIndicator('General-Info');
+    $_SESSION['ccsPage']['genInfoBack'] = $ccsPage->fetchSectionsByIndicator('General-Info-Back');
+    $_SESSION['ccsPage']['department'] = $ccsPage->fetchSectionsByIndicator('Departments');
     $_SESSION['ccsPage']['AccordionCourses'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses');
     $_SESSION['ccsPage']['AccordionCoursesUndergrad'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses Undergrad');
     $_SESSION['ccsPage']['AccordionCoursesGrad'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses Grad');
@@ -29,8 +30,9 @@ else{
 
     $sections = [
         'CarouselElement' => $_SESSION['ccsPage']['CarouselElement'],
-        'CardElementFront' => $_SESSION['ccsPage']['CardElementFront'],
-        'CardElementBack' => $_SESSION['ccsPage']['CardElementBack'],
+        'GeneralInfo' => $_SESSION['ccsPage']['genInfoFront'],
+        'GeneralInfoItems' => $_SESSION['ccsPage']['genInfoBack'],
+        'Department' => $_SESSION['ccsPage']['department'],
         'AccordionCourses' => $_SESSION['ccsPage']['AccordionCourses'],
         'AccordionCoursesUndergrad' => $_SESSION['ccsPage']['AccordionCoursesUndergrad'],
         'AccordionCoursesGrad' => $_SESSION['ccsPage']['AccordionCoursesGrad'],
@@ -52,53 +54,92 @@ else{
 <?php 
 $x = 0;
 $tableIds = [];
+$dataAssoc = [];
+
+// Grouping data by section and description
 foreach ($sections as $section => $data) {
-    $x++;
     if (!empty($data) && is_array($data)) { 
-        $tableId = "datatable" . $x;
-        $tableIds[] = $tableId;
-        echo "<div class='section'>";
-        echo "<h2>" . preg_replace('/([a-z])([A-Z])/', '$1 $2', $section) . "</h2>";
-        echo "<hr class='border border-primary border-3 opacity-75'>"; 
-?>
-
-        <table id='<?php echo $tableId?>'>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Indicator</th>
-                    <th>Type</th>
-                    <th>Content</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <?php foreach ($data as $data2) { ?>
-                <tr>
-                    <td><?php echo $data2['sectionID'] ?? ''; ?></td>
-                    <td><?php echo $data2['indicator'] ?? ''; ?></td>
-                    <td><?php echo $data2['elemType'] ?? ''; ?></td>
-
-                    <td>
-                        <input type="text" 
-                            class="editable-input" 
-                            data-id="<?php echo $data2['sectionID']; ?>" 
-                            data-column="<?php echo ($data2['elemType'] === 'text') ? 'content' : 'imagePath'; ?>"
-                            value="<?php echo ($data2['elemType'] === 'text') ? ($data2['content'] ?? '') : ($data2['imagePath'] ?? ''); ?>">
-                        </td>
-
-                    <td><?php echo $data2['description'] ?? ''; ?></td>
-                </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-
-<?php
-        echo "</div>";
+        foreach ($data as $items) {
+            $desc = $items['description'];
+            $dataAssoc[$section][$desc][] = $items; // Store rows grouped by description
+        }
     }
 }
+
+// Now display grouped data
+foreach ($dataAssoc as $section => $sectionData) {
+    $x++;
+    $tableId = "datatable" . $x;
+    $tableIds[] = $tableId;
+
+    echo "<div class='section'>";
+    $allowedElementsMap = [
+        'CarouselElement' => ['carousel-logo-text', 'carousel-img'],
+        'GeneralInfo' => ['geninfo-front-img', 'geninfo-front-title'],
+        'GeneralInfoItems' => ['CG-list-item', 'CM-list-item', 'CV-list-item'],
+        'Department' => ['department-name'],
+        'AccordionCoursesUndergrad' => ['course-header', 'undergrad-course-list-items-1','undergrad-course-list-items-2'],
+        'AccordionCoursesGrad' => ['course-header', 'grad-course-list-items-3']
+    ];
+    
+    $allowedElements = json_encode($allowedElementsMap[$section] ?? []);
+
+    echo "<h2>" . preg_replace('/([a-z])([A-Z])/', '$1 $2', $section) . " 
+            <a class='btn btn-primary add-modal' 
+            data-section='$section' 
+            data-section-id='" . ($dataGroup[0]['sectionID'] ?? '') . "' 
+            data-allowed-elements='" . htmlspecialchars($allowedElements, ENT_QUOTES, 'UTF-8') . "' 
+            href='#' role='button'>Add Elements</a>
+        </h2>";
+
+    echo "<hr class='border border-primary border-3 opacity-75'>";  
 ?>
+    <div class="container">
+   <?php  foreach ($sectionData as $desc => $dataGroup) { ?>
+        <div class="description-table-wrapper"> <!-- FLEX CONTAINER -->
+            <h3 class="table-title"><?php echo preg_replace('/([a-z])([A-Z])/', '$1 $2', $desc); ?></h3>
+            
+            <div class="table-container">
+                <table id='<?php echo "table_" . str_replace(' ', '_', strtolower($desc)); ?>'>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Content</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($dataGroup as $data2) { ?>
+                        <tr>
+                            <td><?php echo $data2['sectionID'] ?? ''; ?></td>
+                            <td><?php echo $data2['elemType'] ?? ''; ?></td>
+                            <td>
+                                <input type="text"
+                                    class="editable-input"
+                                    data-id="<?php echo $data2['sectionID']; ?>"
+                                    data-column="<?php echo ($data2['elemType'] === 'text') ? 'content' : 'imagePath'; ?>"
+                                    value="<?php echo ($data2['elemType'] === 'text') ? ($data2['content'] ?? '') : ($data2['imagePath'] ?? ''); ?>">
+                            </td>
+                            <td><?php echo $data2['description'] ?? ''; ?></td>
+                        </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div> <!-- Close FLEX CONTAINER -->
+    <?php } ?>
+    </div>
+    
+    
+                </tbody>
+            </table>
+        </div>
+        <?php
+    }
+    echo "</div>";
+?>
+
 
 <script>
    $(document).ready(function() {
@@ -143,4 +184,20 @@ foreach ($sections as $section => $data) {
     });
 });
 </script>
+<script src="../js/script.js"></script>
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Element</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- AJAX-loaded content goes here -->
+            </div>
+        </div>
+    </div>
+</div>
 </body>

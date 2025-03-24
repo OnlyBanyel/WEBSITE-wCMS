@@ -1,15 +1,70 @@
 <head>
-  <?php require_once "head.php"; ?>
+    
+  <?php require_once "head.php"; 
+
+    require_once dirname(__DIR__) . "/CMS-WMSU-Website/classes/pages.class.php";
+        
+
+$genElements = new Pages;
+
+/** @region navbar */
+    $navBarItemsSQL = "
+    SELECT * FROM generalelements WHERE indicator = 'Navbar' AND description !='academics-items';
+    ";
+    $navBarListItemsSQL = "
+    SELECT elementID, linkFor, content, linking.description, link FROM generalelements LEFT JOIN linking ON elementID = linkFor WHERE generalelements.indicator = 'Navbar' OR generalelements.indicator = 'Subnav';
+    ";
+
+    $subPageListItemsSQL = "
+    SELECT * FROM subpages;
+    ";
+
+
+    $navBarItems = $genElements->execQuery($navBarItemsSQL);
+    $navBarListItems = $genElements->execQuery($navBarListItemsSQL);
+    $subPageListItems = $genElements->execQuery($subPageListItemsSQL);
+    
+    foreach ($navBarItems as $items){
+        if ($items['description'] == 'navbar-logo'){
+            $navbarLogo = $items['imagePath'];
+        }
+        if ($items['description'] == 'navbar-header'){
+            $navbarHeader = $items['content'];
+        }
+        if ($items['description'] == 'navbar-tagline'){
+            $navbarTagline = $items['content'];
+        }
+    }
+    $navBarListItem = [];
+
+    foreach ($navBarListItems as $items){
+            $navBarListItem[$items['elementID']] =[
+                'elementID'=> $items['elementID'],
+                'linkFor' => $items['linkFor'],
+                'content' => $items['content'],
+                'link' => $items['link'],
+                'description' => $items['description']
+            ];
+        
+    }
+
+
+
+
+
+    
+/** @endregion */
+?>
 </head>
 <nav>
     <section class="nav-cont">
         <div class="WMSU-Logo-cont">
-            <img src="/WMSU-HOMEPAGE/imgs/WMSU-Logo.png" alt="" class="WMSU-Logo">
+            <img src="<?php echo $navbarLogo?>" alt="" class="WMSU-Logo">
             <div class="logo-text">
                 <div class="nav-logo-line"></div>
                 <div class="nav-title-cont">
-                    <div class="nav-logo-title inter-bold">WESTERN MINDANAO STATE UNIVERSITY</div>
-                    <div class="nav-logo-subtitle montserrat-regular">A Smart Research University by 2040</div>
+                    <div class="nav-logo-title inter-bold"><?php echo $navbarHeader ?></div>
+                    <div class="nav-logo-subtitle montserrat-regular"><?php echo $navbarTagline ?></div>
                 </div>
             </div>
         </div>
@@ -66,7 +121,7 @@
                     </div>
                 </div>
             </div>
-            <a class="inter-extralight" id="Academic" href="">ACADEMIC <img src="../imgs/Expand Arrow.png" alt=""></a>
+            <a class="inter-extralight" id="Academic" href="">ACADEMICS <img src="../imgs/Expand Arrow.png" alt=""></a>
             <div id="Academic-dropdown" class="nav-dropdown">
                 <div class="dropdown-cont">
                 <div class="dropdown-title">
@@ -76,26 +131,43 @@
                             <div class="two-columns">
                             
                                 <div class="dropdown-col-1">
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/law.php'; ?>">College of Law</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/agriculture.php'; ?>">College of Agriculture</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/architecture.php'; ?>">College of Architecture</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/liberalArts.php'; ?>">College of Liberal Arts</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/nursing.php'; ?>">College of Nursing</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/asianAndIslamic.php'; ?>">College of Asian and Islamic Studies</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/CSM.php'; ?>">College of Science and Mathematics</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/CCS.php'; ?>">College of Computing Studies</a></p>
+                                    <?php 
+                                       $i = 1;
+                                       $lastIndex = 0;
+                                        foreach ($subPageListItems as $items){
+                                            if ($items['pagesID'] != 3){
+                                                continue;
+                                            }
+                                         ?>
+                                            <p class="inter-light"><a href="<?php echo $items['subPagePath'] ?>"><?php echo $items['subPageName']?></a></p>
+                                          
+                                        <?php $i++;
+                                        $lastIndex = $items['subpageID'] + 1;
+                                        if ($i == 9) break;
+                                        }
+                                    ?>
                                 </div>
                                 <div class="dropdown-col-2">
-                            
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/forestryAndEnvironmental.php'; ?>">College of Forestry and Environmental Studies</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/crim.php'; ?>">College of Criminal Justice Education</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/homeEcon.php'; ?>">College of Home Economics</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/engineering.php'; ?>">College of Engineering</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/medicine.php'; ?>">College of Medicine</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/publicAdmin.php'; ?>">College of Public Administration and Development Studies</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/sportsScience.php'; ?>">College of Sports Science and Physical Education</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/socialWork.php'; ?>">College of Social Work and Community Development</a></p>
-                                    <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/academics/teachingEd.php'; ?>">College of Teaching Education</a></p>
+                                    <?php 
+                                          $i = 1;
+                                          $found = false;
+                                          
+                                          foreach ($subPageListItems as $items) {
+                                              // Wait until we reach lastIndex
+                                              if (!$found) {
+                                                  if ($items['subpageID'] != $lastIndex) {
+                                                      continue;
+                                                  }
+                                                  $found = true;
+                                              }
+                                          
+                                              ?>
+                                              <p class="inter-light"><a href="<?php echo $items['subPagePath']; ?>"><?php echo $items['subPageName']; ?></a></p>
+                                              <?php                                          
+                                              $i++;
+                                              if ($i == 10) break;
+                                          }
+                                  ?>
                                 </div>
                             </div>
 
@@ -113,28 +185,58 @@
                             <h6 class="inter-bold">EXTERNAL STUDIES UNIT</h6>
                             <div class="two-columns">                                
                                 <div class="dropdown-col-1">
-                                    <p class="inter-light"><a href="#">WMSU ESU - Alicia</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Aurora</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Diplahan</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Imelda</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Ipil</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Mabuhay</a></p>
+                                <?php 
+                                       $i = 0;
+                                        foreach ($navBarListItem as $items){
+                                            if ($items['description'] != 'esu-list-items'){
+                                                continue;
+                                            }
+                                         ?>
+                                            <p class="inter-light"><a href="<?php echo $items['link'] ?>"><?php echo $items['content']?></a></p>
+                                          
+                                        <?php $i++;
+                                        $lastIndex = $items['elementID'] + 1;
+                                        if ($i == 6) break;
+                                        }
+                                    ?>
+                                
                                 </div>
                                 <div class="dropdown-col-2">
-                                    <p class="inter-light"><a href="#">WMSU ESU - Molave</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Naga</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Olutanga</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Pagadian City</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Siay</a></p>
-                                    <p class="inter-light"><a href="#">WMSU ESU - Tungawan</a></p>
+                                <?php 
+                                          $i = 0;
+                                          $found = false;
+                                          
+                                          foreach ($navBarListItem as $items) {
+                                              if (!$found) {
+                                                  if ($items['elementID'] != $lastIndex) {
+                                                      continue;
+                                                  }
+                                                  $found = true;
+                                              }
+                                          
+                                              ?>
+                                              <p class="inter-light"><a href="<?php echo $items['link']; ?>"><?php echo $items['content']; ?></a></p>
+                                              <?php                                          
+                                              $i++;
+                                              if ($i == 6) break;
+                                          }
+                                  ?>
                                 </div>
                             </div>
                         </div>
                         <div class="nav-divider"></div>
                         <div class="dropdown-content">
                             <h6 class="inter-bold">ADMISSIONS</h6>
-                            <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/admissions/admissionGuide.php'; ?>">Admission Guide</a></p>
-                            <p class="inter-light"><a href="<?php echo 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE/page/admissions/enrollmentProced.php'; ?>">Enrollment Procedure</a></p>
+                            <?php 
+                                foreach ($navBarListItems as $items){
+                                    if ($items['description'] == 'admissions-list-items'){
+                                        ?>
+                                        <p class="inter-light"><a href="<?php echo $items['link']?>"><?php echo $items['content']?></a></p>
+
+                                <?php
+                                    }
+                                }
+                            ?>
                         </div>
 
                     </div>

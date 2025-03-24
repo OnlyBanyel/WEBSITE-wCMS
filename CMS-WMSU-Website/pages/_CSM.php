@@ -11,15 +11,14 @@ if (empty($_SESSION['account'])){
     exit;
 }
 else{
-
     $pageID = 3;
     $subpageID = 3;
 
     // Fetch fresh data from the database
     $_SESSION['csmPage'] = $csmPage->fetchPageData($pageID, $subpageID);
     $_SESSION['csmPage']['CarouselElement'] = $csmPage->fetchSectionsByIndicator('Carousel Element');
-    $_SESSION['csmPage']['genInfoFront'] = $csmPage->fetchSectionsByIndicator('General-Info');
-    $_SESSION['csmPage']['genInfoBack'] = $csmPage->fetchSectionsByIndicator('General-Info-Back');
+    $_SESSION['csmPage']['CardElementFront'] = $csmPage->fetchSectionsByIndicator('Card Element Front');
+    $_SESSION['csmPage']['CardElementBack'] = $csmPage->fetchSectionsByIndicator('Card Element Back');
     $_SESSION['csmPage']['AccordionCourses'] = $csmPage->fetchSectionsByIndicator('Accordion Courses');
     $_SESSION['csmPage']['AccordionCoursesUndergrad'] = $csmPage->fetchSectionsByIndicator('Accordion Courses Undergrad');
     $_SESSION['csmPage']['AccordionCoursesGrad'] = $csmPage->fetchSectionsByIndicator('Accordion Courses Grad');
@@ -29,8 +28,8 @@ else{
 
     $sections = [
         'CarouselElement' => $_SESSION['csmPage']['CarouselElement'],
-        'GeneralInfo' => $_SESSION['csmPage']['genInfoFront'],
-        'GeneralInfoItems' => $_SESSION['csmPage']['genInfoBack'],
+        'CardElementFront' => $_SESSION['csmPage']['CardElementFront'],
+        'CardElementBack' => $_SESSION['csmPage']['CardElementBack'],
         'AccordionCourses' => $_SESSION['csmPage']['AccordionCourses'],
         'AccordionCoursesUndergrad' => $_SESSION['csmPage']['AccordionCoursesUndergrad'],
         'AccordionCoursesGrad' => $_SESSION['csmPage']['AccordionCoursesGrad'],
@@ -66,6 +65,7 @@ foreach ($sections as $section => $data) {
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Indicator</th>
                     <th>Type</th>
                     <th>Content</th>
                     <th>Description</th>
@@ -76,6 +76,7 @@ foreach ($sections as $section => $data) {
                 <?php foreach ($data as $data2) { ?>
                 <tr>
                     <td><?php echo $data2['sectionID'] ?? ''; ?></td>
+                    <td><?php echo $data2['indicator'] ?? ''; ?></td>
                     <td><?php echo $data2['elemType'] ?? ''; ?></td>
 
                     <td>

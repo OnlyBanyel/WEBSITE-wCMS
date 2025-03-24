@@ -452,32 +452,51 @@ html, body {
 
 /* End of Grad Programs */
 
-
 .dept {
   display: flex;
   justify-content: center;
-  margin-bottom: 10px; /* Add some space below the breadcrumb */
-  font-size: 19px; /* Adjust font size */
-  color: #000; /* Change font color */
+  align-items: center;
+  margin-bottom: 10px; /* Add some space below */
+  font-size: 19px;
+  color: #000;
   gap: 5px;
   margin-left: 40px;
   height: 30%;
+  position: relative;
+  overflow: visible;
 }
 
-
 .dept a {
-  color: #e9e2e2; /* Change link color */
-  text-decoration: none; /* Remove underline */
-  background-size: cover; /* Make the image cover the element */
+  position: relative; /* Ensure child `.deptimg` can be positioned */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e9e2e2;
+  text-decoration: none;
   transform: skew(20deg);
   padding: 50px;
   width: 30%;
   border: 1px solid #BD0F03;
+  overflow: hidden; /* Ensure background image doesn’t leak out */
 }
 
-.dept a span{
-  transform: skew(-20deg); 
+.deptimg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120%; /* Make it larger than the container */
+  height: 120%;
+  background-size: cover;
+  background-position: center;
+  transform: skew(-20deg) scale(1.2); /* Fix image skew & make it larger */
+  z-index: -1; /* Place it behind text */
+}
+
+.dept a span {
+  transform: skew(-20deg);
   display: inline-block;
+  position: relative;
+  z-index: 2; /* Ensure text is above image */
 }
 
 .dept a:hover {
@@ -485,7 +504,7 @@ html, body {
   transition: 0.5s ease-in-out;
 }
 
-.dept .curr{
+.dept .curr {
   background-color: #ffffff;
   color: #BD0F03;
 }

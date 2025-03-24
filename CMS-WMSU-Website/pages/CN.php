@@ -11,14 +11,16 @@ if (empty($_SESSION['account'])){
     exit;
 }
 else{
+
     $pageID = 3;
     $subpageID = 2;
 
     // Fetch fresh data from the database
     $_SESSION['cnPage'] = $cnPage->fetchPageData($pageID, $subpageID);
     $_SESSION['cnPage']['CarouselElement'] = $cnPage->fetchSectionsByIndicator('Carousel Element');
-    $_SESSION['cnPage']['CardElementFront'] = $cnPage->fetchSectionsByIndicator('Card Element Front');
-    $_SESSION['cnPage']['CardElementBack'] = $cnPage->fetchSectionsByIndicator('Card Element Back');
+    $_SESSION['cnPage']['genInfoFront'] = $cnPage->fetchSectionsByIndicator('General-Info');
+    $_SESSION['cnPage']['genInfoBack'] = $cnPage->fetchSectionsByIndicator('General-Info-Back');
+    $_SESSION['cnPage']['department'] = $cnPage->fetchSectionsByIndicator('Departments');
     $_SESSION['cnPage']['AccordionCourses'] = $cnPage->fetchSectionsByIndicator('Accordion Courses');
     $_SESSION['cnPage']['AccordionCoursesUndergrad'] = $cnPage->fetchSectionsByIndicator('Accordion Courses Undergrad');
     $_SESSION['cnPage']['AccordionCoursesGrad'] = $cnPage->fetchSectionsByIndicator('Accordion Courses Grad');
@@ -28,8 +30,9 @@ else{
 
     $sections = [
         'CarouselElement' => $_SESSION['cnPage']['CarouselElement'],
-        'CardElementFront' => $_SESSION['cnPage']['CardElementFront'],
-        'CardElementBack' => $_SESSION['cnPage']['CardElementBack'],
+        'GeneralInfo' => $_SESSION['cnPage']['genInfoFront'],
+        'GeneralInfoItems' => $_SESSION['cnPage']['genInfoBack'],
+        'Department' => $_SESSION['cnPage']['department'],
         'AccordionCourses' => $_SESSION['cnPage']['AccordionCourses'],
         'AccordionCoursesUndergrad' => $_SESSION['cnPage']['AccordionCoursesUndergrad'],
         'AccordionCoursesGrad' => $_SESSION['cnPage']['AccordionCoursesGrad'],
@@ -51,53 +54,74 @@ else{
 <?php 
 $x = 0;
 $tableIds = [];
+$dataAssoc = [];
+
+// Grouping data by section and description
 foreach ($sections as $section => $data) {
-    $x++;
     if (!empty($data) && is_array($data)) { 
-        $tableId = "datatable" . $x;
-        $tableIds[] = $tableId;
-        echo "<div class='section'>";
-        echo "<h2>" . preg_replace('/([a-z])([A-Z])/', '$1 $2', $section) . "</h2>";
-        echo "<hr class='border border-primary border-3 opacity-75'>"; 
-?>
-
-        <table id='<?php echo $tableId?>'>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Indicator</th>
-                    <th>Type</th>
-                    <th>Content</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <?php foreach ($data as $data2) { ?>
-                <tr>
-                    <td><?php echo $data2['sectionID'] ?? ''; ?></td>
-                    <td><?php echo $data2['indicator'] ?? ''; ?></td>
-                    <td><?php echo $data2['elemType'] ?? ''; ?></td>
-
-                    <td>
-                        <input type="text" 
-                            class="editable-input" 
-                            data-id="<?php echo $data2['sectionID']; ?>" 
-                            data-column="<?php echo ($data2['elemType'] === 'text') ? 'content' : 'imagePath'; ?>"
-                            value="<?php echo ($data2['elemType'] === 'text') ? ($data2['content'] ?? '') : ($data2['imagePath'] ?? ''); ?>">
-                        </td>
-
-                    <td><?php echo $data2['description'] ?? ''; ?></td>
-                </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-
-<?php
-        echo "</div>";
+        foreach ($data as $items) {
+            $desc = $items['description'];
+            $dataAssoc[$section][$desc][] = $items; // Store rows grouped by description
+        }
     }
 }
+
+// Now display grouped data
+foreach ($dataAssoc as $section => $sectionData) {
+    $x++;
+    $tableId = "datatable" . $x;
+    $tableIds[] = $tableId;
+
+    echo "<div class='section'>";
+    echo "<h2>" . preg_replace('/([a-z])([A-Z])/', '$1 $2', $section) . "</h2>";
+    echo "<hr class='border border-primary border-3 opacity-75'>";  
 ?>
+    <div class="container">
+   <?php  foreach ($sectionData as $desc => $dataGroup) { ?>
+        <div class="description-table-wrapper"> <!-- FLEX CONTAINER -->
+            <h3 class="table-title"><?php echo preg_replace('/([a-z])([A-Z])/', '$1 $2', $desc); ?></h3>
+            
+            <div class="table-container">
+                <table id='<?php echo "table_" . str_replace(' ', '_', strtolower($desc)); ?>'>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Content</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($dataGroup as $data2) { ?>
+                        <tr>
+                            <td><?php echo $data2['sectionID'] ?? ''; ?></td>
+                            <td><?php echo $data2['elemType'] ?? ''; ?></td>
+                            <td>
+                                <input type="text"
+                                    class="editable-input"
+                                    data-id="<?php echo $data2['sectionID']; ?>"
+                                    data-column="<?php echo ($data2['elemType'] === 'text') ? 'content' : 'imagePath'; ?>"
+                                    value="<?php echo ($data2['elemType'] === 'text') ? ($data2['content'] ?? '') : ($data2['imagePath'] ?? ''); ?>">
+                            </td>
+                            <td><?php echo $data2['description'] ?? ''; ?></td>
+                        </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div> <!-- Close FLEX CONTAINER -->
+    <?php } ?>
+    </div>
+    
+    
+                </tbody>
+            </table>
+        </div>
+        <?php
+    }
+    echo "</div>";
+?>
+
 
 <script>
    $(document).ready(function() {

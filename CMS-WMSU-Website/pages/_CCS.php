@@ -3,7 +3,7 @@ session_start();
 require_once '../classes/db_connection.class.php';
 require_once '../classes/pages.class.php';
 $dbObj = new Database;
-$csmPage = new Pages;
+$ccsPage = new Pages;
 
 
 if (empty($_SESSION['account'])){ 
@@ -13,27 +13,27 @@ if (empty($_SESSION['account'])){
 else{
 
     $pageID = 3;
-    $subpageID = 3;
+    $subpageID = 1;
 
     // Fetch fresh data from the database
-    $_SESSION['csmPage'] = $csmPage->fetchPageData($pageID, $subpageID);
-    $_SESSION['csmPage']['CarouselElement'] = $csmPage->fetchSectionsByIndicator('Carousel Element');
-    $_SESSION['csmPage']['genInfoFront'] = $csmPage->fetchSectionsByIndicator('General-Info');
-    $_SESSION['csmPage']['genInfoBack'] = $csmPage->fetchSectionsByIndicator('General-Info-Back');
-    $_SESSION['csmPage']['AccordionCourses'] = $csmPage->fetchSectionsByIndicator('Accordion Courses');
-    $_SESSION['csmPage']['AccordionCoursesUndergrad'] = $csmPage->fetchSectionsByIndicator('Accordion Courses Undergrad');
-    $_SESSION['csmPage']['AccordionCoursesGrad'] = $csmPage->fetchSectionsByIndicator('Accordion Courses Grad');
+    $_SESSION['ccsPage'] = $ccsPage->fetchPageData($pageID, $subpageID);
+    $_SESSION['ccsPage']['CarouselElement'] = $ccsPage->fetchSectionsByIndicator('Carousel Element');
+    $_SESSION['ccsPage']['genInfoFront'] = $ccsPage->fetchSectionsByIndicator('General-Info');
+    $_SESSION['ccsPage']['genInfoBack'] = $ccsPage->fetchSectionsByIndicator('General-Info-Back');
+    $_SESSION['ccsPage']['AccordionCourses'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses');
+    $_SESSION['ccsPage']['AccordionCoursesUndergrad'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses Undergrad');
+    $_SESSION['ccsPage']['AccordionCoursesGrad'] = $ccsPage->fetchSectionsByIndicator('Accordion Courses Grad');
 
     // Update session data
-    $pageData = $_SESSION['csmPage'];
+    $pageData = $_SESSION['ccsPage'];
 
     $sections = [
-        'CarouselElement' => $_SESSION['csmPage']['CarouselElement'],
-        'GeneralInfo' => $_SESSION['csmPage']['genInfoFront'],
-        'GeneralInfoItems' => $_SESSION['csmPage']['genInfoBack'],
-        'AccordionCourses' => $_SESSION['csmPage']['AccordionCourses'],
-        'AccordionCoursesUndergrad' => $_SESSION['csmPage']['AccordionCoursesUndergrad'],
-        'AccordionCoursesGrad' => $_SESSION['csmPage']['AccordionCoursesGrad'],
+        'CarouselElement' => $_SESSION['ccsPage']['CarouselElement'],
+        'GeneralInfo' => $_SESSION['ccsPage']['genInfoFront'],
+        'GeneralInfoItems' => $_SESSION['ccsPage']['genInfoBack'],
+        'AccordionCourses' => $_SESSION['ccsPage']['AccordionCourses'],
+        'AccordionCoursesUndergrad' => $_SESSION['ccsPage']['AccordionCoursesUndergrad'],
+        'AccordionCoursesGrad' => $_SESSION['ccsPage']['AccordionCoursesGrad'],
     ];
 }
 ?>
@@ -58,7 +58,8 @@ foreach ($sections as $section => $data) {
         $tableId = "datatable" . $x;
         $tableIds[] = $tableId;
         echo "<div class='section'>";
-        echo "<h2>" . preg_replace('/([a-z])([A-Z])/', '$1 $2', $section) . "</h2>";
+        echo "<h2>" . preg_replace('/([a-z])([A-Z])/', '$1 $2', $section) . "</h2>"; ?>
+        <?php
         echo "<hr class='border border-primary border-3 opacity-75'>"; 
 ?>
 
