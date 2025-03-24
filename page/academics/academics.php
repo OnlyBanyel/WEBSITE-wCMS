@@ -6,6 +6,7 @@ $acadSubpagesObj = new Pages;
 $acadSubpages = $acadSubpagesObj->fetchSubpages(3);
 
 
+
 ?>
 <head>
     <?php require_once "../../__includes/head.php"; ?>

@@ -1,8 +1,6 @@
 <?php
 
-$baseUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE';
-require_once "Q:/XAMPP/htdocs/WMSU-HOMEPAGE/CMS-WMSU-Website/classes/pages.class.php"; 
-
+require_once "../../CMS-WMSU-Website/classes/pages.class.php"; 
 $ccsPage = new Pages;
 
 /** @region Carousel */
@@ -67,7 +65,7 @@ $ccsPage = new Pages;
     if ($item["description"] == "card-back-head") {
         $cardBackHead[] = $item['content'];
     }
-    if ($item["description"] == "CG-list-item") {
+    if ($item["description"] == "CG-list-item" ) {
         $cardBackCGList[] = $item['content'];
     }
     if ($item["description"] == "CM-list-item") {
@@ -84,6 +82,12 @@ $ccsPage = new Pages;
     ];
     }
 /** @endregion*/
+
+$departmentsSQL = "
+    SELECT * from page_sections WHERE subpage = 1 AND indicator = 'departments' AND description = 'department-name';
+";
+
+$departments = $ccsPage->execQuery($departmentsSQL);
 
 /** @region Accordion Courses */
     $accordionCoursesSQL = "
@@ -173,35 +177,38 @@ $ccsPage = new Pages;
           </div> <!-- End of carousel -->
         </div>
     </div>
+            <div class="gen-info-header-container"><span class='title-header'>College Information</span></div>
+    <div class="gen-info-container">
+        <div class="gen-info-col-1">
+        <?php for ($i = 0; $i < count($cardBackHead); $i ++){
+            ?>
+                <h4 class="gen-info-heading"> <?php echo $cardFrontTitle[$i] ?></h4>
+                <p class="gen-info-top-content"><?php echo $cardBackHead[$i]?></p>
+                <?php foreach ($cardBackLists[$i] as $item) {
+                                  echo "<li class='gen-info-content'>" . $item . "</li>";
+                                }  ?>
 
-      <div class="flex-container">
-        <div class="card-container">
+                        <br>
+            <?php } ?>
+        </div>
+        <div class="gen-info-col-2">
+            <img src="../../imgs/ccs2.jpg" alt="">
+        </div>
+    </div>
+    
+    
 
-        <?php for ($i = 0; $i < count($cardFrontimgs); $i++) { ?>
-            <div class="card">
-                <div class="card-front card-1" 
-                    style="background-image: linear-gradient(rgba(255, 152, 152, 0.6), rgba(255, 0, 0, 0.6)), url('<?php echo $cardFrontimgs[$i];?>'); background-size: cover; background-position: center;">
-                    <h3><?php echo $cardFrontTitle[$i]; ?></h3>
+    <div class="department">
+      <p class="title-header">Departments</p>
+            <div class="dept">
+                <
+                <?php 
+                $i = 0;
+                foreach ($departments as $items){?>
+                    <a href="javascript:void(0);" style="background: linear-gradient(rgba(189, 15, 3, 0.7), rgba(189, 15, 3, 0.7)), url('<?php echo $cardFrontimgs[$i];?>') no-repeat center center;
+    background-size: cover;"><span><?php echo $items['content']; ?></span></a>
+                    <?php $i++;} ?>
                 </div>
-                <div class="card-back">
-                    <div class="college-goals">
-                        <p><?php echo $cardBackHead[$i]?></p>
-                        <ol>
-                            <?php 
-                                foreach ($cardBackLists[$i] as $item) {
-                                  echo "<li>" . $item . "</li>";
-                                }  
-                            ?>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        <?php } ?>
-    </div> <!-- End of college-top -->
-  </div>
-
-    <div class="activities">
-      <p>HERE LIES THE ACTIVITIES OF THE COLLEGES</p>
     </div>
 
 

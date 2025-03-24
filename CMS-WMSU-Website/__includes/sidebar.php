@@ -19,7 +19,7 @@
 
     <li class="nav-title">Main Webpages</li>
     <li class="nav-item">
-      <a class="nav-link" href="#">
+      <a class="nav-link" href="../pages/homepage.php">
         <i class="nav-icon cil-speedometer"></i> Homepage
         <span class="badge bg-primary ms-auto">NEW</span>
       </a>
@@ -31,7 +31,7 @@
       </a>
     </li>
     <li class="nav-item">
-      <a class="nav-link active" id='academics' href="../pages/academics-page.php">
+      <a class="nav-link" id='academics' href="../pages/academics-page.php">
         <i class="nav-icon cil-speedometer"></i> Academics Page
         <span class="badge bg-primary ms-auto">NEW</span>
       </a>

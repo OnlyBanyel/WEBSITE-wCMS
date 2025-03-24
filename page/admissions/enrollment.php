@@ -10,10 +10,11 @@
 
 <section class="header"><?php require_once '../../__includes/navbar.php'?></section>
 
-<main>
-  <div class="breadcrumb-container">
+<div class="breadcrumb-container">
 <?php require_once '../../__includes/subnav_academics.php' ?>
 </div>
+<main>
+ 
 <div class="intro-admission">
 <div class="banner">Enrollment Procedure</div>
 <div class="container-instruction">

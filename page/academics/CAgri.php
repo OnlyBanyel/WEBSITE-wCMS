@@ -1,7 +1,6 @@
 <?php
 
-$baseUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/WMSU-HOMEPAGE';
-require_once "Q:/XAMPP/htdocs/WMSU-HOMEPAGE/CMS-WMSU-Website/classes/pages.class.php"; 
+require_once "../../classes/pages.class.php"; 
 
 $agriPage = new Pages;
 

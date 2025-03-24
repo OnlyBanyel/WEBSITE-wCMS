@@ -1,5 +1,5 @@
 <?php
-require_once "../tools/functions.php";
+require_once "C:/XAMPP/htdocs/WEBSITE-WCMS/CMS-WMSU-Website/tools/functions.php";
 require_once __DIR__ . "/db_connection.class.php";
 
     class Pages{
@@ -13,21 +13,30 @@ require_once __DIR__ . "/db_connection.class.php";
             $this->db = new Database;
         }
 
+        function fetchGenElements(){
+            $sql = "SELECT * from generalelements";
+        }
+
         function fetchPageData($pageID, $subpageID = null){
 
             if ($subpageID == null){
             $sql = "SELECT * from page_sections 
                     LEFT JOIN pages ON page_sections.pageID = pages.ID 
                     WHERE pageID = :pageID";
-            }else{
-            $sql = "SELECT * from page_sections 
-                    LEFT JOIN pages ON page_sections.pageID = pages.ID 
-                    LEFT JOIN subpages ON page_sections.subpage = subpages.subpageID 
-                    WHERE pageID = :pageID AND page_sections.subpage = subpages.subpageID";
-            }
+
             $qry = $this->db->connect()->prepare($sql);
 
             $qry->bindParam(":pageID", $pageID);
+            }
+            else{
+            $sql = "SELECT * from page_sections 
+                    LEFT JOIN pages ON page_sections.pageID = pages.ID 
+                    LEFT JOIN subpages ON page_sections.subpage = subpages.subpageID 
+                    WHERE pageID = :pageID AND :subpageID = subpages.subpageID";
+            $qry = $this->db->connect()->prepare($sql);
+            $qry->bindParam(":subpageID", $subpageID);
+            }
+            
 
             if ($qry->execute())
             {
@@ -36,6 +45,22 @@ require_once __DIR__ . "/db_connection.class.php";
                 $this->pageData = [];
             }
         return $this->pageData;
+        }
+
+        function fetchSubpages($pageID){
+            $sql = "SELECT * from subpages WHERE pagesID = :pageID";
+            $qry = $this->db->connect()->prepare($sql);
+            $qry->bindParam(':pageID', $pageID);
+
+            if ($qry->execute()){
+                $data = $qry->fetchAll(PDO::FETCH_ASSOC);
+            }
+            else{
+                $data = null;
+            }
+
+        return $data;
+
         }
 
         public function fetchSectionsByIndicator($indicator): array {
@@ -70,10 +95,16 @@ require_once __DIR__ . "/db_connection.class.php";
             return $qry->fetch(PDO::FETCH_ASSOC);
         }
 
-
-
-
-
+        function execQuery($sql) {
+            $qry = $this->db->connect()->prepare($sql);
+            if ($qry->execute())
+            {
+            $data = $qry->fetchAll(PDO::FETCH_ASSOC);
+            }else{
+                $data = Null;
+            }
+        return $data;
+        }
 
 
     }

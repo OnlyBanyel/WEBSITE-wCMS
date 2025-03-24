@@ -166,6 +166,58 @@ html, body {
   line-height: 2.0;
 }
 
+.title-header{
+  text-align: center;
+  color: #8B0000;
+  font-size: 3.54994rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.gen-info-heading{
+  color: #8B0000;
+  font-size: 2.32294rem;
+  font-weight: bold;
+}
+.gen-info-top-content{
+  color: #000000;
+  font-size: 1.323rem;
+  font-weight: bold;
+  }
+
+.gen-info-content{
+  color: #6a6a6a;
+  font-size: 1.0rem;
+}
+.gen-info-header-container{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: #e9e2e2;
+}
+.gen-info-container{
+  display: flex;
+  height: 20%;
+  width: 100%;
+  background-color: #e9e2e2;
+  padding: 0 20px;
+}
+
+
+.gen-info-col-1{
+  width: 50%;
+  height: 100%
+}
+.gen-info-col-2 > img{
+  width: 100%;  /* Ensures the image takes the full width of its container */
+  height: 100%; /* Maintains aspect ratio */
+  object-fit: cover; /* Ensures the image covers the container */
+  display: block; /* Prevents unwanted inline spacing */
+}
+.gen-info-col-2{
+  width: 50%;
+}
+
 /* College Goals */
 .college-goals {
   display: flex;
@@ -399,3 +451,41 @@ html, body {
 }
 
 /* End of Grad Programs */
+
+
+.dept {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px; /* Add some space below the breadcrumb */
+  font-size: 19px; /* Adjust font size */
+  color: #000; /* Change font color */
+  gap: 5px;
+  margin-left: 40px;
+  height: 30%;
+}
+
+
+.dept a {
+  color: #e9e2e2; /* Change link color */
+  text-decoration: none; /* Remove underline */
+  background-size: cover; /* Make the image cover the element */
+  transform: skew(20deg);
+  padding: 50px;
+  width: 30%;
+  border: 1px solid #BD0F03;
+}
+
+.dept a span{
+  transform: skew(-20deg); 
+  display: inline-block;
+}
+
+.dept a:hover {
+  background-color: #d86b63;
+  transition: 0.5s ease-in-out;
+}
+
+.dept .curr{
+  background-color: #ffffff;
+  color: #BD0F03;
+}
