@@ -215,7 +215,6 @@ require_once __DIR__ . "/db_connection.class.php";
                 $data = null;
             }
             return $data;
-            bom
         }
     }
 
