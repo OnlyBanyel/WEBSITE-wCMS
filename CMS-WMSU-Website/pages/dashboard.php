@@ -24,7 +24,8 @@ if (empty($_SESSION['account'])){
     <!-- siddebar -->
      <?php require_once '../__includes/sidebar.php'; ?>
 <body>
-    
-
+    <h2>Welcome <?php
+    echo $_SESSION['account']['firstName']?>!</h2>
+    <section id="main-content-section"></section>
 </body>
 </html>

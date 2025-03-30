@@ -36,9 +36,6 @@ foreach ($homeNewsItems as $items){
     if ($items['description'] == 'news-content'){
         $newsContent[] = $items['content'];
     }
-    if ($items['description'] == 'news-content'){
-        $newsContent[] = $items['content'];
-    }
 }
 
 foreach ($researchArchItems as $items){

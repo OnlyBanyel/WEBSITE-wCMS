@@ -39,15 +39,29 @@ require_once __DIR__ . "/db_connection.class.php";
         }
         
         function fetchAccount(){
-            $sql = "SELECT * from accounts WHERE email = :email";
+            $sql = "SELECT * from accounts LEFT JOIN subpages ON subpage_assigned = subpageID WHERE email = :email";
             $qry = $this->db->connect()->prepare($sql);
 
             $qry->bindParam(":email", $this->email);
 
             if ($qry->execute()){
-                $data = $qry->fetchAll(PDO::FETCH_ASSOC);
+                $data = $qry->fetch(PDO::FETCH_ASSOC);
                 return $data;
             }
+        }
+
+        function fetchCollegeData($subpage_assigned){
+            $sql = "SELECT * from page_sections WHERE subpage = :subpage_assigned";
+            $qry = $this->db->connect()->prepare($sql);
+
+            $qry->bindParam(":subpage_assigned", $subpage_assigned);
+
+            if ($qry->execute()){
+                $data = $qry->fetchAll(PDO::FETCH_ASSOC);
+            }else{
+                $data = null;
+            }
+            return $data;
         }
     }
 

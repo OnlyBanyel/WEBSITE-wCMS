@@ -20,6 +20,10 @@ if ((isset($_POST['submit'])) && ($_SERVER['REQUEST_METHOD'] === 'POST')){
     if(empty($emailErr) && empty($passwordErr)){
       if ($loginObj->auth()){
         $_SESSION['account'] = $loginObj->fetchAccount();
+        if ($_SESSION['account']['role_id'] == 2 && isset($_SESSION['account']['subpage_assigned'])){
+            $subpage_assigned = $_SESSION['account']['subpage_assigned'];
+            $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage_assigned);
+        }
         header('Location: dashboard.php');
         exit;}
     }

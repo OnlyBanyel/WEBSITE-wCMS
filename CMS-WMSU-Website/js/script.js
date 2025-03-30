@@ -1,4 +1,21 @@
 $(document).ready(function() {
+
+    $(".dynamic-load").click(function(e){
+        e.preventDefault
+
+        var file = $(this).data('file');
+        $.ajax({
+            url: file, // Fetch from content.php
+            type: "GET",
+            success: function(response) {
+                $("#main-content-section").html(response); // Render inside the div
+            },
+            error: function() {
+                $("#main-content-section").html("<p style='color:red;'>Failed to load content.</p>");
+            }
+        });
+    });
+
     // Open the first modal when clicking "Add Elements"
     $(document).on("click", ".add-modal", function(e) {
         e.preventDefault();

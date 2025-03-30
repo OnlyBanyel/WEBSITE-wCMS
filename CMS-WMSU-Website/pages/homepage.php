@@ -9,7 +9,9 @@ if (empty($_SESSION['account'])) {
     header('Location: login-form.php');
     exit;
 } else {
-    $pageID = 1;
+    
+    $_SESSION['pageID'] = $pageID = 1;
+    $_SESSION['subpageID'] = null;
     
     // Fetch fresh data from the database
     $_SESSION['homePage']['WmsuNews'] = $homePage->fetchSectionsByIndicator('Wmsu News', $pageID, NULL);
@@ -18,16 +20,7 @@ if (empty($_SESSION['account'])) {
     $_SESSION['homePage']['PresCorner'] = $homePage->fetchSectionsByIndicator('Pres Corner', $pageID, NULL);
     $_SESSION['homePage']['Services'] = $homePage->fetchSectionsByIndicator('Services', $pageID, NULL);
     
-    // Update session data
-    $pageData = $_SESSION['homePage'];
-
-    $sections = [
-        'WmsuNews' => $_SESSION['homePage']['WmsuNews'], 
-        'ResearchArchives' => $_SESSION['homePage']['ResearchArchives'],
-        'AboutWMSU' => $_SESSION['homePage']['AboutWMSU'],
-        'PresCorner' => $_SESSION['homePage']['PresCorner'],
-        'Services' => $_SESSION['homePage']['Services'],
-    ];
+    $sections = $_SESSION['homePage'];
 }
 ?>
 
@@ -36,7 +29,7 @@ if (empty($_SESSION['account'])) {
 <?php require_once '../__includes/head.php' ?>
 <link rel="stylesheet" href="../css/academics-page.css">
 </head>
-    
+
 <?php require_once '../__includes/navbar.php'?>
 <?php require_once '../__includes/sidebar.php'; ?>
 
@@ -47,24 +40,39 @@ $x = 0;
 $tableIds = [];
 $dataAssoc = [];
 
-// Grouping data by section and description
+$allowedElementsMap = [
+    'WmsuNews' => ['news-title', 'news-img', 'news-content'],
+    'ResearchArchives' => ['archive-title', 'archive-content'],
+    'AboutWMSU' => ['about-title', 'about-content'],
+    'PresCorner' => ['president-message'],
+    'Services' => ['service-name', 'service-description']
+];
+
+// Group data by section and description
 foreach ($sections as $section => $data) {
     if (!empty($data) && is_array($data)) { 
         foreach ($data as $items) {
             $desc = $items['description'];
-            $dataAssoc[$section][$desc][] = $items; // Store rows grouped by description
+            $dataAssoc[$section][$desc][] = $items;
         }
     }
 }
 
-// Now display grouped data
+// Display grouped data
 foreach ($dataAssoc as $section => $sectionData) {
     $x++;
     $tableId = "datatable" . $x;
     $tableIds[] = $tableId;
-
+    
+    $allowedElements = json_encode($allowedElementsMap[$section] ?? []);
+    
     echo "<div class='section'>";
-    echo "<h2>" . preg_replace('/([a-z])([A-Z])/', '$1 $2', $section) . "</h2>";
+    echo "<h2>" . preg_replace('/([a-z])([A-Z])/', '$1 $2', $section) . " 
+            <a class='btn btn-primary add-modal' 
+            data-section='$section' 
+            data-allowed-elements='" . htmlspecialchars($allowedElements, ENT_QUOTES, 'UTF-8') . "' 
+            href='#' role='button'>Add Elements</a>
+          </h2>";
     echo "<hr class='border border-primary border-3 opacity-75'>";  
 ?>
     <div class="container">
@@ -80,6 +88,7 @@ foreach ($dataAssoc as $section => $sectionData) {
                             <th>Type</th>
                             <th>Content</th>
                             <th>Description</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,6 +104,7 @@ foreach ($dataAssoc as $section => $sectionData) {
                                     value="<?php echo ($data2['elemType'] === 'text') ? ($data2['content'] ?? '') : ($data2['imagePath'] ?? ''); ?>">
                             </td>
                             <td><?php echo $data2['description'] ?? ''; ?></td>
+                            <td> <a href="../functions/deleteVal.php?id=<?php echo $data2['sectionID']; ?>"><button type="button" class="btn btn-danger">Delete</button></a></td>
                         </tr>
                         <?php } ?>
                     </tbody>
@@ -110,22 +120,11 @@ foreach ($dataAssoc as $section => $sectionData) {
 
 <script>
    $(document).ready(function() {
-    <?php foreach ($tableIds as $id) { ?>
-        $('#<?php echo $id; ?>').DataTable({
-            "autoWidth": false,
-            "paging": true,
-            "ordering": false,
-            "info": false
-        });
-    <?php } ?>
-
     $('.editable-input').on('blur', function(){
         var input = $(this);
         var newValue = input.val().trim();
         var rowId = input.data('id');
         var column = input.data('column');
-
-        console.log("Row ID:", rowId, "Column:", column, "Value:", newValue);
 
         $.ajax({
             url: '../functions/updateHomePage.php',
@@ -138,22 +137,19 @@ foreach ($dataAssoc as $section => $sectionData) {
             },
             success: function(response) {
                 if (response.status === "success") {
-                    console.log("Updated Successfully:", response);
                     input.val(response.updatedData[column]);
                     input.closest('tr').css("background-color", "#d4edda");
                 } else {
-                    console.error("Update Failed:", response.message);
                     alert("Error: " + response.message);
                 }
             },
-            error: function(xhr, status, error) {
-                console.error("AJAX Error:", status, error);
+            error: function() {
                 alert("An error occurred while updating data.");
             }
         });
     });
 });
 </script>
-<script src="../js/script.js"></script>
 
+<script src="../js/script.js"></script>
 </body>

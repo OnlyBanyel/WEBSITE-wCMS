@@ -1,8 +1,7 @@
 <?php
 
-require_once "../../classes/pages.class.php"; 
-
-$agriPage = new Pages;
+require_once "../../CMS-WMSU-Website/classes/pages.class.php"; 
+$cAgriPage = new Pages;
 
 /** @region Carousel */
     $carouselItemsSQL = "
@@ -11,7 +10,7 @@ $agriPage = new Pages;
         AND indicator = 'Carousel Element' 
         AND description IN ('carousel-logo', 'carousel-logo-text', 'carousel-img');
     ";
-    $carouselItems = $agriPage->execQuery($carouselItemsSQL);
+    $carouselItems = $cAgriPage->execQuery($carouselItemsSQL);
 
     foreach ($carouselItems as $item) {
     if ($item["description"] == "carousel-logo-text") {
@@ -28,106 +27,115 @@ $agriPage = new Pages;
 
 
 /** @region Card Front */
-        $cardFrontItemsSQL = "
+        $genInfoItemsSQL = "
             SELECT * FROM page_sections 
             WHERE subpage = 4 
-            AND indicator = 'Card Element Front' 
-            AND description IN ('card-front-img', 'card-front-title');
+            AND indicator = 'General-Info' 
+            AND description IN ('geninfo-front-img', 'geninfo-front-title');
         ";
 
-        $cardFrontItems = $agriPage->execQuery($cardFrontItemsSQL);
+        $genInfoItems = $cAgriPage->execQuery($genInfoItemsSQL);
 
-        foreach ($cardFrontItems as $item) {
-        if ($item["description"] == "card-front-img") {
-            $cardFrontimgs[] = $item['imagePath'];
+        foreach ($genInfoItems as $item) {
+        if ($item["description"] == "geninfo-front-img") {
+            $genInfoImgs[] = $item['imagePath'];
         }
-        if ($item["description"] == "card-front-title") {
-            $cardFrontTitle[] = $item['content'];
+        if ($item["description"] == "geninfo-front-title") {
+            $genInfoTitles[] = $item['content'];
         }
     }
 /** @engregion */
 
 /** @region Card Back */
-    $CardBackItemsSQL = "
+    $genInfoBackItemsSQL = "
         SELECT * FROM page_sections 
         WHERE subpage = 4 
-        AND indicator = 'Card Element Back' 
-        AND description IN ('card-back-head', 'CG-list-item', 'CM-list-item', 'CV-list-item');
+        AND indicator = 'General-Info-Back' 
+        AND description IN ('geninfo-back-head', 'CG-list-item', 'CM-list-item', 'CV-list-item');
     ";
 
-    $cardBackHead = [];
-    $cardBackCGList = [];
-    $cardBackCMList = [];
-    $cardBackCVList = [];
+    $genInfoBackItems = [];
+    $genInfoBackCGList = [];
+    $genInfoBackCMList = [];
+    $genInfoBackCVList = [];
 
-    $cardBackItems = $agriPage->execQuery($CardBackItemsSQL);
+    $genInfoBackItems = $cAgriPage->execQuery($genInfoBackItemsSQL);
 
-    foreach ($cardBackItems as $item) {
-    if ($item["description"] == "card-back-head") {
-        $cardBackHead[] = $item['content'];
+    foreach ($genInfoBackItems as $item) {
+    if ($item["description"] == "geninfo-back-head") {
+        $genInfoBackHead[] = $item['content'];
     }
-    if ($item["description"] == "CG-list-item") {
-        $cardBackCGList[] = $item['content'];
+    if ($item["description"] == "CG-list-item" ) {
+        $genInfoBackCGList[] = $item['content'];
     }
     if ($item["description"] == "CM-list-item") {
-        $cardBackCMList[] = $item['content'];
+        $genInfoBackCMList[] = $item['content'];
     }
     if ($item["description"] == "CV-list-item") {
-        $cardBackCVList[] = $item['content'];
+        $genInfoBackCVList[] = $item['content'];
     }
 
-    $cardBackLists = [
-    0 => $cardBackCGList,
-    1 => $cardBackCMList,
-    2 => $cardBackCVList
+    $genInfoBackLists = [
+    0 => $genInfoBackCGList,
+    1 => $genInfoBackCMList,
+    2 => $genInfoBackCVList
     ];
     }
 /** @endregion*/
 
+$departmentsSQL = "
+    SELECT * from page_sections WHERE subpage = 4 AND indicator = 'departments' AND description = 'department-name';
+";
+
+$departments = $cAgriPage->execQuery($departmentsSQL);
+
 /** @region Accordion Courses */
-    $accordionCoursesSQL = "
-        SELECT * FROM page_sections 
-        WHERE subpage = 4 
-        AND indicator IN ('Accordion Courses', 'Accordion Courses Undergrad', 'Accordion Courses Grad');
-    ";
+$accordionCoursesSQL = "
+SELECT * FROM page_sections 
+WHERE subpage = 4 
+AND indicator IN ('Accordion Courses', 'Accordion Courses Undergrad', 'Accordion Courses Grad');
+";
 
-    $programHeaders = [];
-    $undergradCourses = [];
-    $gradCourses = [];
-    $currentCourse = null;
+$programHeaders = [];
+$undergradCourses = [];
+$gradCourses = [];
+$currentUndergrad = null;
+$currentGrad = null;
 
-    // ✅ Execute the query
-    $accordionCourses = $agriPage->execQuery($accordionCoursesSQL);
+// ✅ Execute the query
+$accordionCourses = $cAgriPage->execQuery($accordionCoursesSQL);
 
-    foreach ($accordionCourses as $item) {
-        // Store Program Headers
-        if ($item["description"] == "program-header") {
-            $programHeaders[] = $item['content'];
-        }
+foreach ($accordionCourses as $item) {
+// Store Program Headers
+if ($item["description"] == "program-header") {
+    $programHeaders[] = $item['content'];
+}
 
-        // ✅ Identify Course Type (Undergrad or Grad)
-        $isUndergrad = $item["indicator"] === "Accordion Courses Undergrad";
-        $isGrad = $item["indicator"] === "Accordion Courses Grad";
+// ✅ Identify Course Type (Undergrad or Grad)
+$isUndergrad = $item["indicator"] === "Accordion Courses Undergrad";
+$isGrad = $item["indicator"] === "Accordion Courses Grad";
 
-        // ✅ Store Course Headers
-        if ($item["description"] == "course-header") {
-            $currentCourse = $item['content'];
-            if ($isUndergrad) {
-                $undergradCourses[$currentCourse] = ["outcomes" => []];
-            } elseif ($isGrad) {
-                $gradCourses[$currentCourse] = ["outcomes" => []];
-            }
-        }
-
-        // ✅ Store Course Outcomes (Matching -1, -2, etc.)
-        if (preg_match('/undergrad-course-list-items-\d+$/', $item["description"]) && $isUndergrad && $currentCourse !== null) {
-            $undergradCourses[$currentCourse]["outcomes"][] = $item['content'];
-        }
-
-        if (preg_match('/grad-course-list-items-\d+$/', $item["description"]) && $isGrad && $currentCourse !== null) {
-            $gradCourses[$currentCourse]["outcomes"][] = $item['content'];
-        }
+// ✅ Store Course Headers & Reset Properly
+if ($item["description"] == "course-header") {
+    if ($isUndergrad) {
+        $currentUndergrad = $item['content'];
+        $undergradCourses[$currentUndergrad] = ["outcomes" => []];
+    } elseif ($isGrad) {
+        $currentGrad = $item['content'];
+        $gradCourses[$currentGrad] = ["outcomes" => []];
     }
+}
+
+// ✅ Ensure Outcomes Are Stored Under Correct Course
+if ($isUndergrad && isset($currentUndergrad) && preg_match('/undergrad-course-list-items-\d+$/', $item["description"])) {
+    $undergradCourses[$currentUndergrad]["outcomes"][] = $item['content'];
+}
+
+if ($isGrad && isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["description"])) {
+    $gradCourses[$currentGrad]["outcomes"][] = $item['content'];
+}
+}
+
 
 
 
@@ -172,35 +180,36 @@ $agriPage = new Pages;
           </div> <!-- End of carousel -->
         </div>
     </div>
+    <div class="gen-info-container">
+        <div class="gen-info-col-1">
+        <?php for ($i = 0; $i < count($genInfoTitles); $i ++){
+            ?>
+                <h4 class="gen-info-heading"> <?php echo $genInfoTitles[$i] ?></h4>
+                <p class="gen-info-top-content"><?php echo $genInfoBackHead[$i]?></p>
+                <?php foreach ($genInfoBackLists[$i] as $item) {
+                                  echo "<li class='gen-info-content'>" . $item . "</li>";
+                                }  ?>
 
-      <div class="flex-container">
-        <div class="card-container">
+                        <br>
+            <?php } ?>
+        </div>
+        <div class="gen-info-col-2">
+            <img src="<?php echo $genInfoImgs[1]?>" alt="">
+        </div>
+    </div>
+    
+    
 
-        <?php for ($i = 0; $i < count($cardFrontimgs); $i++) { ?>
-            <div class="card">
-                <div class="card-front card-1" 
-                    style="background-image: linear-gradient(rgba(255, 152, 152, 0.6), rgba(255, 0, 0, 0.6)), url('<?php echo $cardFrontimgs[$i];?>'); background-size: cover; background-position: center;">
-                    <h3><?php echo $cardFrontTitle[$i]; ?></h3>
+    <div class="department">
+      <p class="title-header">Departments</p>
+            <div class="dept">
+                <?php 
+                $i = 0;
+                foreach ($departments as $items){?>
+                    <a href="javascript:void(0);"><div class="deptimg" style="background: linear-gradient(rgba(189, 15, 3, 0.7), rgba(189, 15, 3, 0.7)), url('<?php echo $genInfoImgs[$i];?>') no-repeat center center;
+                    background-size: cover;"></div><span><?php echo $items['content']; ?></span></a>
+                    <?php $i++;} ?>
                 </div>
-                <div class="card-back">
-                    <div class="college-goals">
-                        <p><?php echo $cardBackHead[$i]?></p>
-                        <ol>
-                            <?php 
-                                foreach ($cardBackLists[$i] as $item) {
-                                  echo "<li>" . $item . "</li>";
-                                }  
-                            ?>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        <?php } ?>
-    </div> <!-- End of college-top -->
-  </div>
-
-    <div class="activities">
-      <p>HERE LIES THE ACTIVITIES OF THE COLLEGES</p>
     </div>
 
 
