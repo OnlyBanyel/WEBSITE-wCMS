@@ -7,7 +7,7 @@ $ccsPage = new Pages;
     $carouselItemsSQL = "
         SELECT * FROM page_sections 
         WHERE subpage = 1 
-        AND indicator = 'Carousel Element' 
+        AND indicator = 'College Profile' 
         AND description IN ('carousel-logo', 'carousel-logo-text', 'carousel-img');
     ";
     $carouselItems = $ccsPage->execQuery($carouselItemsSQL);
@@ -30,7 +30,7 @@ $ccsPage = new Pages;
         $genInfoItemsSQL = "
             SELECT * FROM page_sections 
             WHERE subpage = 1 
-            AND indicator = 'General-Info' 
+            AND indicator = 'College Overview' 
             AND description IN ('geninfo-front-img', 'geninfo-front-title');
         ";
 
@@ -50,7 +50,7 @@ $ccsPage = new Pages;
     $genInfoBackItemsSQL = "
         SELECT * FROM page_sections 
         WHERE subpage = 1 
-        AND indicator = 'General-Info-Back' 
+        AND indicator = 'College Overview' 
         AND description IN ('geninfo-back-head', 'CG-list-item', 'CM-list-item', 'CV-list-item');
     ";
 
@@ -93,7 +93,7 @@ $departments = $ccsPage->execQuery($departmentsSQL);
 $accordionCoursesSQL = "
 SELECT * FROM page_sections 
 WHERE subpage = 1 
-AND indicator IN ('Accordion Courses', 'Accordion Courses Undergrad', 'Accordion Courses Grad');
+AND indicator = 'Courses and Programs';
 ";
 
 $programHeaders = [];
@@ -112,30 +112,27 @@ if ($item["description"] == "program-header") {
 }
 
 // ✅ Identify Course Type (Undergrad or Grad)
-$isUndergrad = $item["indicator"] === "Accordion Courses Undergrad";
-$isGrad = $item["indicator"] === "Accordion Courses Grad";
+$isUndergrad = $item["description"] === "course-header-undergrad";
+$isGrad = $item["description"] === "course-header-grad";
 
 // ✅ Store Course Headers & Reset Properly
-if ($item["description"] == "course-header") {
-    if ($isUndergrad) {
-        $currentUndergrad = $item['content'];
-        $undergradCourses[$currentUndergrad] = ["outcomes" => []];
-    } elseif ($isGrad) {
-        $currentGrad = $item['content'];
-        $gradCourses[$currentGrad] = ["outcomes" => []];
-    }
+if ($isUndergrad) {
+    $currentUndergrad = $item['content'];
+    $undergradCourses[$currentUndergrad] = ["outcomes" => []];
+} elseif ($isGrad) {
+    $currentGrad = $item['content'];
+    $gradCourses[$currentGrad] = ["outcomes" => []];
 }
 
 // ✅ Ensure Outcomes Are Stored Under Correct Course
-if ($isUndergrad && isset($currentUndergrad) && preg_match('/undergrad-course-list-items-\d+$/', $item["description"])) {
+if (isset($currentUndergrad) && preg_match('/undergrad-course-list-items-\d+$/', $item["description"])) {
     $undergradCourses[$currentUndergrad]["outcomes"][] = $item['content'];
 }
 
-if ($isGrad && isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["description"])) {
+if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["description"])) {
     $gradCourses[$currentGrad]["outcomes"][] = $item['content'];
 }
 }
-
 
 
 /** @endregion */

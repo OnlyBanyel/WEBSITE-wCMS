@@ -64,12 +64,20 @@ require_once __DIR__ . "/db_connection.class.php";
 
         }
 
-        public function fetchSectionsByIndicator($indicator, $subpageID): array {
+        public function fetchSectionsByIndicator($indicator, $pageID, $subpageID = null): array {
             $sql = "SELECT * FROM page_sections WHERE pageID = :pageID AND indicator = :indicator";
+            
+            if ($subpageID !== null) {
+                $sql .= " AND subpage = :subpageID";
+            }
         
             $qry = $this->db->connect()->prepare($sql);
+            $qry->bindParam(":pageID", $pageID);
             $qry->bindParam(":indicator", $indicator);
-            $qry->bindParam(":subpageID", $subpageID);
+            
+            if ($subpageID !== null) {
+                $qry->bindParam(":subpageID", $subpageID);
+            }
         
             if ($qry->execute()) {
                 return $qry->fetchAll(PDO::FETCH_ASSOC);
@@ -207,8 +215,8 @@ require_once __DIR__ . "/db_connection.class.php";
         function fetchColleges(){
             $sql = "SELECT subpageID, subPageName FROM subpages";
             $qry = $this->db->connect()->prepare($sql);
-            
-            if($qry->execute()){
+
+            if ($qry->execute()){
                 $data = $qry->fetchAll(PDO::FETCH_ASSOC);
             }
             else{

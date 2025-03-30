@@ -26,8 +26,8 @@ require_once __DIR__ . "/db_connection.class.php";
         }
 
         function addAccount(){
-            $sql = "INSERT INTO accounts (email, password, role_id, subpage_assigned)
-                    VALUES (:email, :password, :role_id, :subpage_assigned);";
+            $sql = "INSERT INTO accounts (email, password, pageID, role_id, subpage_assigned)
+                    VALUES (:email, :password, 3, :role_id, :subpage_assigned);";
             $qry = $this->db->connect()->prepare($sql);
             $hashpass = password_hash($this->password, PASSWORD_DEFAULT);
             $qry->bindParam(":email", $this->email);

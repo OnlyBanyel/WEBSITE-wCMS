@@ -9,6 +9,10 @@ $(document).ready(function() {
             type: "GET",
             success: function(response) {
                 $("#main-content-section").html(response); // Render inside the div
+
+                if ($("#main-content-section").find("#carouselExampleSlidesOnly").length > 0) {
+                    $("#carouselExampleSlidesOnly").carousel();
+                }
             },
             error: function() {
                 $("#main-content-section").html("<p style='color:red;'>Failed to load content.</p>");
