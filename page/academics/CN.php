@@ -1,16 +1,16 @@
 <?php
 
 require_once "../../CMS-WMSU-Website/classes/pages.class.php"; 
-$cnPage = new Pages;
+$ccsPage = new Pages;
 
 /** @region Carousel */
     $carouselItemsSQL = "
         SELECT * FROM page_sections 
         WHERE subpage = 2 
-        AND indicator = 'Carousel Element' 
+        AND indicator = 'College Profile' 
         AND description IN ('carousel-logo', 'carousel-logo-text', 'carousel-img');
     ";
-    $carouselItems = $cnPage->execQuery($carouselItemsSQL);
+    $carouselItems = $ccsPage->execQuery($carouselItemsSQL);
 
     foreach ($carouselItems as $item) {
     if ($item["description"] == "carousel-logo-text") {
@@ -30,11 +30,11 @@ $cnPage = new Pages;
         $genInfoItemsSQL = "
             SELECT * FROM page_sections 
             WHERE subpage = 2 
-            AND indicator = 'General-Info' 
+            AND indicator = 'College Overview' 
             AND description IN ('geninfo-front-img', 'geninfo-front-title');
         ";
 
-        $genInfoItems = $cnPage->execQuery($genInfoItemsSQL);
+        $genInfoItems = $ccsPage->execQuery($genInfoItemsSQL);
 
         foreach ($genInfoItems as $item) {
         if ($item["description"] == "geninfo-front-img") {
@@ -50,7 +50,7 @@ $cnPage = new Pages;
     $genInfoBackItemsSQL = "
         SELECT * FROM page_sections 
         WHERE subpage = 2 
-        AND indicator = 'General-Info-Back' 
+        AND indicator = 'College Overview' 
         AND description IN ('geninfo-back-head', 'CG-list-item', 'CM-list-item', 'CV-list-item');
     ";
 
@@ -59,7 +59,7 @@ $cnPage = new Pages;
     $genInfoBackCMList = [];
     $genInfoBackCVList = [];
 
-    $genInfoBackItems = $cnPage->execQuery($genInfoBackItemsSQL);
+    $genInfoBackItems = $ccsPage->execQuery($genInfoBackItemsSQL);
 
     foreach ($genInfoBackItems as $item) {
     if ($item["description"] == "geninfo-back-head") {
@@ -87,13 +87,13 @@ $departmentsSQL = "
     SELECT * from page_sections WHERE subpage = 2 AND indicator = 'departments' AND description = 'department-name';
 ";
 
-$departments = $cnPage->execQuery($departmentsSQL);
+$departments = $ccsPage->execQuery($departmentsSQL);
 
 /** @region Accordion Courses */
 $accordionCoursesSQL = "
 SELECT * FROM page_sections 
 WHERE subpage = 2 
-AND indicator IN ('Accordion Courses', 'Accordion Courses Undergrad', 'Accordion Courses Grad');
+AND indicator = 'Courses and Programs';
 ";
 
 $programHeaders = [];
@@ -103,7 +103,7 @@ $currentUndergrad = null;
 $currentGrad = null;
 
 // ✅ Execute the query
-$accordionCourses = $cnPage->execQuery($accordionCoursesSQL);
+$accordionCourses = $ccsPage->execQuery($accordionCoursesSQL);
 
 foreach ($accordionCourses as $item) {
 // Store Program Headers
@@ -112,26 +112,24 @@ if ($item["description"] == "program-header") {
 }
 
 // ✅ Identify Course Type (Undergrad or Grad)
-$isUndergrad = $item["indicator"] === "Accordion Courses Undergrad";
-$isGrad = $item["indicator"] === "Accordion Courses Grad";
+$isUndergrad = $item["description"] === "course-header-undergrad";
+$isGrad = $item["description"] === "course-header-grad";
 
 // ✅ Store Course Headers & Reset Properly
-if ($item["description"] == "course-header") {
-    if ($isUndergrad) {
-        $currentUndergrad = $item['content'];
-        $undergradCourses[$currentUndergrad] = ["outcomes" => []];
-    } elseif ($isGrad) {
-        $currentGrad = $item['content'];
-        $gradCourses[$currentGrad] = ["outcomes" => []];
-    }
+if ($isUndergrad) {
+    $currentUndergrad = $item['content'];
+    $undergradCourses[$currentUndergrad] = ["outcomes" => []];
+} elseif ($isGrad) {
+    $currentGrad = $item['content'];
+    $gradCourses[$currentGrad] = ["outcomes" => []];
 }
 
 // ✅ Ensure Outcomes Are Stored Under Correct Course
-if ($isUndergrad && isset($currentUndergrad) && preg_match('/undergrad-course-list-items-\d+$/', $item["description"])) {
+if (isset($currentUndergrad) && preg_match('/undergrad-course-list-items-\d+$/', $item["description"])) {
     $undergradCourses[$currentUndergrad]["outcomes"][] = $item['content'];
 }
 
-if ($isGrad && isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["description"])) {
+if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["description"])) {
     $gradCourses[$currentGrad]["outcomes"][] = $item['content'];
 }
 }
@@ -180,7 +178,7 @@ if ($isGrad && isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/'
     </div>
     <div class="gen-info-container">
         <div class="gen-info-col-1">
-        <?php for ($i = 0; $i < count($genInfoTitles); $i ++){
+        <?php for ($i = 0; $i < count($genInfoBackHead); $i ++){
             ?>
                 <h4 class="gen-info-heading"> <?php echo $genInfoTitles[$i] ?></h4>
                 <p class="gen-info-top-content"><?php echo $genInfoBackHead[$i]?></p>

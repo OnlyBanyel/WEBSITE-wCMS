@@ -51,6 +51,11 @@
     margin-top: -20px
 }
 
+.logoImage, .itemImage{
+    margin-left: 36%;
+}
+
+
 .edit-content > form > input[type="text"] {
     border: none;
     background-color: inherit;
@@ -61,7 +66,7 @@
 .img-container > img {
     align-self: flex-start;
     height: 10rem;
-    width: 15rem;
+    width: 13rem;
     border-radius: 5px; /* Optional: Adds rounded corners */
 }
 
@@ -153,3 +158,60 @@
     width: 30% !important;
 }
 
+
+.dept {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px; /* Add some space below */
+    font-size: 19px;
+    color: #000;
+    gap: 5px;
+    margin-left: 40px;
+    height: 30%;
+    position: relative;
+    overflow: visible;
+  }
+  
+  .dept a {
+    position: relative; /* Ensure child `.deptimg` can be positioned */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e9e2e2;
+    text-decoration: none;
+    transform: skew(20deg);
+    padding: 50px;
+    width: 30%;
+    border: 1px solid #BD0F03;
+    overflow: hidden; /* Ensure background image doesn’t leak out */
+  }
+  
+  .deptimg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120%; /* Make it larger than the container */
+    height: 120%;
+    background-size: cover;
+    background-position: center;
+    transform: skew(-20deg) scale(1.2); /* Fix image skew & make it larger */
+    z-index: -1; /* Place it behind text */
+  }
+  
+  .dept a span {
+    transform: skew(-20deg);
+    display: inline-block;
+    position: relative;
+    z-index: 2; /* Ensure text is above image */
+  }
+  
+  .dept a:hover {
+    background-color: #d86b63;
+    transition: 0.5s ease-in-out;
+  }
+  
+  .dept .curr {
+    background-color: #ffffff;
+    color: #BD0F03;
+  }

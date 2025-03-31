@@ -224,6 +224,29 @@ require_once __DIR__ . "/db_connection.class.php";
             }
             return $data;
         }
+
+        function uploadLogo($destPath, $subpage){
+            $sql = "UPDATE page_sections SET imagePath = :destPath WHERE subpage = :subpage AND description = 'carousel-logo'";
+            $qry = $this->db->connect()->prepare($sql);
+            $qry->bindParam(':destPath', $destPath);
+            $qry->bindParam(':subpage', $subpage);
+
+            return $qry->execute();
+        }
+
+        function uploadProfileImgs($destPath, $sectionID, $subpage){
+            $sql = "UPDATE page_sections 
+            SET imagePath = :destPath 
+            WHERE subpage = :subpage 
+              AND sectionID = :sectionID 
+              AND description = 'carousel-img'";
+            $qry = $this->db->connect()->prepare($sql);
+            $qry->bindParam(':destPath', $destPath);
+            $qry->bindParam(':sectionID', $sectionID);
+            $qry->bindParam(':subpage', $subpage);
+
+            return $qry->execute();
+        }
     }
 
 ?>

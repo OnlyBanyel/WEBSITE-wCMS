@@ -1,24 +1,42 @@
 $(document).ready(function() {
 
-    $(".dynamic-load").click(function(e){
-        e.preventDefault
-
-        var file = $(this).data('file');
-        $.ajax({
-            url: file, // Fetch from content.php
-            type: "GET",
-            success: function(response) {
-                $("#main-content-section").html(response); // Render inside the div
-
-                if ($("#main-content-section").find("#carouselExampleSlidesOnly").length > 0) {
-                    $("#carouselExampleSlidesOnly").carousel();
-                }
-            },
-            error: function() {
-                $("#main-content-section").html("<p style='color:red;'>Failed to load content.</p>");
-            }
-        });
-    });
+       // Restore active page from localStorage on page load
+       var savedPage = localStorage.getItem("activePage");
+       if (savedPage) {
+           loadPage(savedPage);
+       }
+   
+       $(".dynamic-load").click(function (e) {
+           e.preventDefault(); // Prevent default link behavior
+           var file = $(this).data("file");
+   
+           // Save active page in localStorage
+           localStorage.setItem("activePage", file);
+   
+           // Load the page
+           loadPage(file);
+       });
+   
+       function loadPage(file) {
+           $(".dynamic-load").removeClass("active"); // Remove active class from all
+           $(".dynamic-load[data-file='" + file + "']").addClass("active"); // Add active class
+   
+           $.ajax({
+               url: file,
+               type: "GET",
+               success: function (response) {
+                   $("#main-content-section").html(response);
+                   // If carousel exists, reinitialize Bootstrap's carousel
+                   if ($("#main-content-section").find("#carouselExampleSlidesOnly").length > 0) {
+                       $("#carouselExampleSlidesOnly").carousel();
+                   }
+               },
+               error: function () {
+                   $("#main-content-section").html("<p style='color:red;'>Failed to load content.</p>");
+               },
+           });
+       }
+    
 
     // Open the first modal when clicking "Add Elements"
     $(document).on("click", ".add-modal", function(e) {
@@ -108,4 +126,72 @@ $(document).ready(function() {
             }
         });
     });
+
+    $(document).on("submit", "#editLogoForm", function (e) {
+        e.preventDefault(); // Prevent default form submission
+
+        var formData = new FormData(this); // Get form data
+        var currentPage = $(".dynamic-load.active").data("file"); // Get the currently loaded page
+    
+        $.ajax({
+            url: "../page-functions/uploadLogo.php", // PHP file handling upload
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: "json", // Expect JSON response
+            success: function (response) {
+                if (response.success) {
+                    alert("Logo updated successfully!");
+    
+                    // Reload the current dynamic page
+                    if (currentPage) {
+                        $("#main-content-section").load(currentPage + " #main-content-section > *");
+                    }
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function () {
+                alert("Upload failed. Try again.");
+            },
+        });
+    });
+    $(document).on("submit", "form[id^='profileImgForm-']", function (e) {
+        e.preventDefault();
+    
+        var formData = new FormData(this);
+        var currentPage = $(".dynamic-load.active").data("file");
+        var form = $(this); // Store reference to the form
+        formData.append("imageIndex", form.find("input[name='imageIndex']").val());
+    
+        $.ajax({
+            url: "../page-functions/uploadProfileImgs.php",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    alert("Image updated successfully!");
+    
+                    // Update the image **inside the same form**
+                    form.find("img").attr("src", response.newPath);
+    
+                    // Reload the dynamic page (optional, only if necessary)
+                    if (currentPage) {
+                        $("#main-content-section").load(currentPage + " #main-content-section > *");
+                    }
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function () {
+                alert("Upload failed. Try again.");
+            },
+        });
+    });
+    
+
 });
