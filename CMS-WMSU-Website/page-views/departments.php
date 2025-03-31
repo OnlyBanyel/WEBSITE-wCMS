@@ -15,7 +15,7 @@ foreach ($_SESSION['collegeData'] as $data) {
 }
 
 foreach ($collegeOverview as $imgs){
-    if ($imgs == 'geninfo-front-img'){
+    if ($imgs['description'] == 'geninfo-front-img'){
     $genInfoImgs[] = $imgs['imagePath'];
 }
 }
@@ -32,4 +32,22 @@ foreach ($collegeOverview as $imgs){
                     background-size: cover;"></div><span><?php echo $items['content']; ?></span></a>
                     <?php $i++;} ?>
                 </div>
+</div>
+
+
+    <div class="edit-department-container">
+            <?php 
+                $i = 0;
+                foreach ($departments as $items){?>
+        <div class="edit-item-container">
+  
+                        <h2><?php echo $items['content']?></h2>
+                        <input type="text" name="deptName" class="deptName" id="deptName" value="<?php echo $items['content']?>">
+                        <br>
+                        <div class="img-container">
+                            <img src="<?php echo $genInfoImgs[$i] ?>" alt="">
+                        </div>
+                        <input type="file" name="" id="">
+        </div>
+        <?php $i++; } ?>
     </div>
