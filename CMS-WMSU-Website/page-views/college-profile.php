@@ -4,6 +4,7 @@ require_once "../classes/pages.class.php";
 $collegeProfileObj = new Pages;
 $collegeProfile = [];
 $CollegeProfileItems = [];
+$collegeProfileLogo = [];
 
 foreach($_SESSION['collegeData'] as $data){
     if ($data['indicator'] == 'College Profile'){
@@ -11,9 +12,10 @@ foreach($_SESSION['collegeData'] as $data){
     }
 }
 
+
 foreach ($collegeProfile as $item) {
     if ($item["description"] == "carousel-logo-text") {
-    $CollegeProfileLogo = $item['content'];
+    $CollegeProfileLogo = $item;
         }
     if ($item["description"] == "carousel-logo") {
     $CollegeProfileLogoImage = $item['imagePath'];
@@ -22,7 +24,10 @@ foreach ($collegeProfile as $item) {
     $CollegeProfileItems[] = $item;
         }
     }
+
 ?>
+
+
 
 
 <div class="everything-container">
@@ -31,7 +36,7 @@ foreach ($collegeProfile as $item) {
         <div class="carousel-wrapper">
                 <div class="college-heading">
                     <img src="<?php echo $CollegeProfileLogoImage ?>" class="logo" alt="CCS Logo">
-                    <h2 class="college-header"><?php echo $CollegeProfileLogo ?></h2>
+                    <h2 class="college-header"><?php echo $CollegeProfileLogo['content'] ?></h2>
                 </div>
 
                 <!-- Carousel -->
@@ -81,9 +86,8 @@ foreach ($collegeProfile as $item) {
                                 Change College Name
                             </div>
                             <div class="divider-line"></div>
-                        <form action="#" method="POST" id="editnameForm" class="column-1-form">
-            
-                                        <input type="text" id='collegeName' value="<?php echo $CollegeProfileLogo?>">
+                        <form action="" method="POST" name="editnameForm" id="editnameForm" class="column-1-form">
+                                        <input type="text" name='collegeName' id='collegeName' data-textID="<?php echo $CollegeProfileLogo['sectionID']?>" value="<?php echo $CollegeProfileLogo['content']?>">
                                         <br>
                                         <input type="submit" name="submitName" class='btn btn-success' value="Submit">
                         </form>

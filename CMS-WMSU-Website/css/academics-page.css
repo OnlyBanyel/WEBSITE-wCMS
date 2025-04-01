@@ -226,6 +226,15 @@
     padding: 20px;
     gap: 30px;
   }
+  .courses-offered-container{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    height: auto;
+    border: 1px red solid;
+    padding: 20px;
+  }
 
   .edit-item-container{
     display: flex;
@@ -242,10 +251,71 @@
 .edit-item-container > h2{
     color: rgb(182, 181, 181);
 }
-.edit-item-container > .deptName{
+.departmentForm > .deptName{
     border: none;
     background-color: inherit;
     height: 10%;
     width:25%;
     color: white;
+    margin-bottom: 40px;
+}
+.row-container > .img-container{
+    width: 15%;
+}
+
+.row-container{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.col-in-row-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.col-in-row-container > .changeDeptImg{
+    width: 25%;
+}
+
+.courses-item-container{
+    background-color: #ad190e;
+    padding: 20px;
+    height: 100%;
+    width: 100%;
+    border-radius: 20px;
+    color: white;
+
+}
+
+
+.outcomes-container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.courses-item-container form > input{
+    border: none;
+    background-color: inherit;
+    color: white;
+}
+.courseTitle{
+    width: 25%;
+}
+.outcomes-container > li > input{
+    width: 60%;
+    border: none;
+    background-color: inherit;
+    color: white;
+}
+
+.btn-container{
+    display: flex;
+    align-items: flex-end;
+    justify-content: end;
+    width: 100%;
+}
+.submitCourse{
+    padding: 50px;
 }

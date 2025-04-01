@@ -247,6 +247,34 @@ require_once __DIR__ . "/db_connection.class.php";
 
             return $qry->execute();
         }
+        function uploadDeptImgs($destPath, $sectionID, $subpage){
+            $sql = "UPDATE page_sections 
+            SET imagePath = :destPath 
+            WHERE subpage = :subpage 
+              AND sectionID = :sectionID 
+              AND description = 'geninfo-front-img'";
+            $qry = $this->db->connect()->prepare($sql);
+            $qry->bindParam(':destPath', $destPath);
+            $qry->bindParam(':sectionID', $sectionID);
+            $qry->bindParam(':subpage', $subpage);
+
+            return $qry->execute();
+        }
+
+        function changeContent($textID, $subpage, $value){
+            $sql = "UPDATE page_sections SET content = :value 
+                    WHERE subpage = :subpage
+                    AND sectionID = :textID";
+            $qry = $this->db->connect()->prepare($sql);
+            $qry->bindParam(':value', $value);
+            $qry->bindParam(':subpage', $subpage);
+            $qry->bindParam(':textID', $textID);
+
+            return $qry->execute();
+        }
+
+
+        
     }
 
 ?>
