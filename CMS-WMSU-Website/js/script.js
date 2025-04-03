@@ -337,5 +337,114 @@ $(document).ready(function() {
         });
     });
     
+    $(document).on("submit", "form[id^='overviewImg-']", function (e) {
+        e.preventDefault();
+    
+        var formData = new FormData(this);
+        var currentPage = $(".dynamic-load.active").data("file");
+        var form = $(this); // Store reference to the form
+        formData.append("imageIndex", form.find("input[name='overviewImgIndex']").val());
+    
+        $.ajax({
+            url: "../page-functions/uploadOverviewImg.php",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    alert("Image updated successfully!");
+    
+                    // Update the image **inside the same form**
+                    form.find("img").attr("src", response.newPath);
+    
+                    // Reload the dynamic page (optional, only if necessary)
+                    if (currentPage) {
+                        loadPage(currentPage);
+                    }
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function () {
+                alert("Upload failed. Try again.");
+            },
+        });
+    });
+
+
+    $(document).on('submit', "form[id$='-overviewItems']", function (e) {
+        e.preventDefault(); // Prevent default form submission
+    
+        console.log("Form Submitted!"); // Debugging log
+    
+        var formData = new FormData(this); // Create FormData from the form
+        var form = $(this); // Store reference to the form
+        var overviewTitle = form.find("input.overviewTitle").val(); // Get overview title
+        var overviewSectionID = form.find("input.overviewTitle").data("overviewsectionid"); // Get sectionID
+    
+        console.log("Overview Title:", overviewTitle);
+        console.log("Overview Section ID:", overviewSectionID);
+    
+        formData.append("overviewTitle", overviewTitle); // Append title
+        formData.append("overviewSectionID", overviewSectionID);
+    
+        // Collect overview top content
+        form.find(".overview-top-content").each(function () {
+            var topContent = $(this).val();
+            var sectionID = $(this).data("sectionid");
+            formData.append("overviewTopContent", topContent);
+            formData.append("topContentSectionID", sectionID);
+        });
+    
+        // Collect outcomes dynamically as an array
+        let outcomesArray = [];
+        form.find("input[type='text'][name$='-outcomes']").each(function () {
+            outcomesArray.push({
+                content: $(this).val(),
+                sectionID: $(this).data("sectionid"),
+            });
+        });
+    
+        // Convert outcomes array to JSON and append to FormData
+        formData.append("outcomes", JSON.stringify(outcomesArray));
+    
+        // Debugging: Log all FormData values
+        console.log("Final FormData:");
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+    
+        var currentPage = $(".dynamic-load.active").data("file"); // Get current page
+    
+        $.ajax({
+            url: "../page-functions/updateOverviewItem.php",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function (response) {
+                console.log("Server Response:", response);
+    
+                if (response.success) {
+                    alert("Overview updated successfully!");
+                    if (currentPage) {
+                        loadPage(currentPage);
+                    }
+                } else {
+                    console.error("Update failed:", response.errors || response.message);
+                    alert("Error: " + (response.message || "Something went wrong. Check console for details."));
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX error:", error, "Response Text:", xhr.responseText);
+                alert("Update Failed. Try again.");
+            },
+        });
+    });
+    
+    
 
 });
