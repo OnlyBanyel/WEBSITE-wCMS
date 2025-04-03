@@ -261,20 +261,78 @@ require_once __DIR__ . "/db_connection.class.php";
             return $qry->execute();
         }
 
-        function changeContent($textID, $subpage, $value){
+        public function changeContent($sectionID, $subpage, $value, $indicator = null, $description = null) {
             $sql = "UPDATE page_sections SET content = :value 
                     WHERE subpage = :subpage
-                    AND sectionID = :textID";
+                    AND sectionID = :sectionID";
+            
+            if ($indicator !== null) {
+                $sql .= " AND indicator = :indicator";
+            }
+            if ($description !== null) {
+                $sql .= " AND description = :description";
+            }
+            
             $qry = $this->db->connect()->prepare($sql);
             $qry->bindParam(':value', $value);
             $qry->bindParam(':subpage', $subpage);
-            $qry->bindParam(':textID', $textID);
-
+            $qry->bindParam(':sectionID', $sectionID);
+            
+            if ($indicator !== null) {
+                $qry->bindParam(':indicator', $indicator);
+            }
+            if ($description !== null) {
+                $qry->bindParam(':description', $description);
+            }
+            
             return $qry->execute();
         }
 
+        function deleteItem($sectionID, $subpage){
+            $sql = "DELETE FROM page_sections WHERE sectionID = :sectionID AND subpage = :subpage";
+            $qry = $this->db->connect()->prepare($sql);
+            $qry->bindParam(':sectionID', $sectionID);
+            $qry->bindParam(':subpage', $subpage);
+        }
 
+        public function addContent($subpage, $indicator, $elemType, $content, $imagePath, $description) {
+            $sql = "INSERT INTO page_sections 
+                    (pageID, subpage, indicator, elemType, content, imagePath, description, createdAt, updatedAt) 
+                    VALUES 
+                    (3, :subpage, :indicator, :elemType, :content, :imagePath, :description, NOW(), NOW())";
+            
+            $qry = $this->db->connect()->prepare($sql);
+            
+            $qry->bindParam(':subpage', $subpage);
+            $qry->bindParam(':indicator', $indicator);
+            $qry->bindParam(':elemType', $elemType);
+            $qry->bindParam(':content', $content);
+            $qry->bindParam(':imagePath', $imagePath);
+            $qry->bindParam(':description', $description);
+            
+            return ($qry->execute());
         
+        }
+
+        public function deleteContent($sectionID, $subpage) {
+            try {
+                $db = $this->db->connect();
+                
+                $sql = "DELETE FROM page_sections 
+                        WHERE sectionID = :sectionID 
+                        AND subpage = :subpage";
+                
+                $qry = $db->prepare($sql);
+                $qry->bindParam(':sectionID', $sectionID);
+                $qry->bindParam(':subpage', $subpage);
+                
+                return $qry->execute();
+                
+            } catch (PDOException $e) {
+                error_log("Database Error: " . $e->getMessage());
+                return false;
+            }
+        }
     }
 
 ?>

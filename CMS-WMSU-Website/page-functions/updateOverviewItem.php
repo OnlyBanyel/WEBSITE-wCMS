@@ -17,7 +17,14 @@ if (isset($_POST['overviewTitle']) && isset($_POST['overviewSectionID'])) {
     $overviewSectionID = $_POST['overviewSectionID'];
     $subpage = $_SESSION['account']['subpage_assigned'];
 
-    $outcomes = isset($_POST['outcomes']) && is_array($_POST['outcomes']) ? $_POST['outcomes'] : [];
+    // Decode outcomes JSON
+    $outcomes = [];
+    if (isset($_POST['outcomes'])) {
+        $outcomes = json_decode($_POST['outcomes'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $errors[] = "Invalid outcomes format.";
+        }
+    }
 
     // Try updating overview title
     $updateTitle = $pagesObj->changeContent($overviewSectionID, $subpage, $overviewTitle);
@@ -40,10 +47,29 @@ if (isset($_POST['overviewTitle']) && isset($_POST['overviewSectionID'])) {
     $updateOutcomes = true;
     foreach ($outcomes as $outcome) {
         if (isset($outcome['content']) && isset($outcome['sectionID'])) {
-            $outcomeUpdate = $pagesObj->changeContent($outcome['sectionID'], $subpage, $outcome['content']);
-            if (!$outcomeUpdate) {
-                $errors[] = "Failed to update outcome (SectionID: {$outcome['sectionID']}).";
-                $updateOutcomes = false;
+            // Handle new items (negative sectionID)
+            if (isset($outcome['isNew']) && $outcome['isNew']) {
+                // Add new content - you'll need to implement addContent() in your Pages class
+                $newSectionID = $pagesObj->addContent(
+                    $subpage,
+                    'College Overview', // Adjust indicator as needed
+                    'text',
+                    $outcome['content'],
+                    null,
+                    'CG-list-item' // Adjust description as needed
+                );
+                
+                if (!$newSectionID) {
+                    $errors[] = "Failed to create new outcome.";
+                    $updateOutcomes = false;
+                }
+            } else {
+                // Update existing content
+                $outcomeUpdate = $pagesObj->changeContent($outcome['sectionID'], $subpage, $outcome['content']);
+                if (!$outcomeUpdate) {
+                    $errors[] = "Failed to update outcome (SectionID: {$outcome['sectionID']}).";
+                    $updateOutcomes = false;
+                }
             }
         } else {
             $errors[] = "Outcome missing required fields.";

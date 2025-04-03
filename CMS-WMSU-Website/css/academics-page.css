@@ -296,6 +296,7 @@
 }
 
 .courses-item-container form > input{
+    width: 40%;
     border: none;
     background-color: inherit;
     color: white;
