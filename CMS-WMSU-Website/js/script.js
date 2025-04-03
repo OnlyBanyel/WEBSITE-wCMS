@@ -287,52 +287,50 @@ $(document).ready(function() {
     });
 
     $(document).on('submit', "form[id$='-items']", function(e) {
-        e.preventDefault(); // Prevent default form submission
-    
-        console.log("Form Submitted!"); // Debugging log
-    
-        var formData = new FormData(this); // Create FormData from the form
-        var courseTitle = $(this).find("input.courseTitle").val(); // Get course title
-        var titleSectionID = $(this).find("input.courseTitle").data("titlesectionid"); // Get the sectionID from the courseTitle input
-        console.log("Course Title:", courseTitle); // Log course title
-        console.log("Title Section ID:", titleSectionID); // Log the sectionID for the course title
-    
-        formData.append("courseTitle", courseTitle); // Append course title to FormData
-        formData.append("titleSectionID", titleSectionID); // Append the sectionID for the course title
-    
-        // Collect all outcomes dynamically with their sectionID
+        e.preventDefault();
+        
+        var formData = new FormData(this);
+        var courseTitle = $(this).find("input.courseTitle").val();
+        var titleSectionID = $(this).find("input.courseTitle").data("titlesectionid");
+        
+        formData.append("courseTitle", courseTitle);
+        formData.append("titleSectionID", titleSectionID);
+        
+        // Collect all outcomes
         $(this).find(".outcomes-container input[type='text']").each(function(index) {
-            var outcomeValue = $(this).val(); // Get the outcome value
-            var sectionID = $(this).data("sectionid"); // Get the sectionID from data-attribute
-            formData.append("outcomes[" + index + "][content]", outcomeValue); // Append content
-            formData.append("outcomes[" + index + "][sectionID]", sectionID); // Append sectionID
+            var outcomeValue = $(this).val();
+            var isNew = $(this).data("is-new") || false;
+            var sectionID = $(this).data("sectionid") || null;
+            
+            formData.append("outcomes[" + index + "][content]", outcomeValue);
+            formData.append("outcomes[" + index + "][isNew]", isNew);
+            if (sectionID) {
+                formData.append("outcomes[" + index + "][sectionID]", sectionID);
+            }
         });
-    
-        var currentPage = $(".dynamic-load.active").data("file"); // Get current active page
-    
+        
+        var currentPage = $(".dynamic-load.active").data("file");
+        
         $.ajax({
-            url: "../page-functions/updateCourse.php", // PHP file handling form submission
+            url: "../page-functions/updateCourse.php",
             type: 'POST',
             data: formData,
-            contentType: false, // Don't set content-type header, as we are sending FormData
-            processData: false, // Prevent jQuery from transforming the data into a query string
-            dataType: "json", // Expecting JSON response
+            contentType: false,
+            processData: false,
+            dataType: "json",
             success: function(response) {
-                console.log("Response:", response); // Log server response
-    
                 if (response.success) {
-                    alert("Course updated successfully!"); // Success message
-    
-                    // Reload the current dynamic page content to reflect the changes
+                    alert("Course updated successfully!");
                     if (currentPage) {
                         loadPage(currentPage);
                     }
                 } else {
-                    alert("Error: " + response.message); // Show error if something went wrong
+                    alert("Error: " + (response.message || "Update failed") + 
+                          (response.errors ? "\nDetails: " + response.errors.join(", ") : ""));
                 }
             },
-            error: function() {
-                alert("Update Failed. Try again."); // Handle errors
+            error: function(xhr, status, error) {
+                alert("Update Failed: " + error);
             },
         });
     });
@@ -375,21 +373,18 @@ $(document).ready(function() {
 
 
     $(document).on('submit', "form[id$='-overviewItems']", function (e) {
-        e.preventDefault(); // Prevent default form submission
-    
-        console.log("Form Submitted!"); // Debugging log
-    
-        var formData = new FormData(this); // Create FormData from the form
-        var form = $(this); // Store reference to the form
-        var overviewTitle = form.find("input.overviewTitle").val(); // Get overview title
-        var overviewSectionID = form.find("input.overviewTitle").data("overviewsectionid"); // Get sectionID
-    
-        console.log("Overview Title:", overviewTitle);
-        console.log("Overview Section ID:", overviewSectionID);
-    
-        formData.append("overviewTitle", overviewTitle); // Append title
+        e.preventDefault();
+        
+        console.log("Form Submitted!");
+        
+        var formData = new FormData(this);
+        var form = $(this);
+        var overviewTitle = form.find("input.overviewTitle").val();
+        var overviewSectionID = form.find("input.overviewTitle").data("overviewsectionid");
+        
+        formData.append("overviewTitle", overviewTitle);
         formData.append("overviewSectionID", overviewSectionID);
-    
+        
         // Collect overview top content
         form.find(".overview-top-content").each(function () {
             var topContent = $(this).val();
@@ -397,27 +392,26 @@ $(document).ready(function() {
             formData.append("overviewTopContent", topContent);
             formData.append("topContentSectionID", sectionID);
         });
-    
-        // Collect outcomes dynamically as an array
+        
+        // Collect outcomes with new items marked
         let outcomesArray = [];
         form.find("input[type='text'][name$='-outcomes']").each(function () {
             outcomesArray.push({
                 content: $(this).val(),
                 sectionID: $(this).data("sectionid"),
+                isNew: $(this).data("sectionid") < 0 // Mark if negative (new item)
             });
         });
-    
-        // Convert outcomes array to JSON and append to FormData
+        
         formData.append("outcomes", JSON.stringify(outcomesArray));
-    
-        // Debugging: Log all FormData values
+        
         console.log("Final FormData:");
         for (let [key, value] of formData.entries()) {
             console.log(`${key}: ${value}`);
         }
-    
-        var currentPage = $(".dynamic-load.active").data("file"); // Get current page
-    
+        
+        var currentPage = $(".dynamic-load.active").data("file");
+        
         $.ajax({
             url: "../page-functions/updateOverviewItem.php",
             type: "POST",
@@ -427,7 +421,7 @@ $(document).ready(function() {
             dataType: "json",
             success: function (response) {
                 console.log("Server Response:", response);
-    
+                
                 if (response.success) {
                     alert("Overview updated successfully!");
                     if (currentPage) {
@@ -444,7 +438,87 @@ $(document).ready(function() {
             },
         });
     });
+
+    $(document).on('click', '.remove-outcome', function() {
+        const button = $(this);
+        const listItem = button.closest('li');
+        const currentPage = $(".dynamic-load.active").data("file");
+        
+        // For new items (not yet saved to DB)
+        if (button.data("is-new") || !button.data("sectionid")) {
+            listItem.remove();
+            return;
+        }
+        
+        // Existing items need server deletion
+        if (confirm('Are you sure you want to delete this outcome permanently?')) {
+            $.ajax({
+                url: '../page-functions/removeItem.php',
+                type: 'POST',
+                data: { 
+                    sectionID: button.data("sectionid"),
+                    currentPage: currentPage
+                },
+                success: function (response) {
+                    console.log("Server Response:", response);
+                    
+                    if (response.success) {
+                        alert("Deleted successfully!");
+                        if (currentPage) {
+                            loadPage(currentPage);
+                        }
+                    } else {
+                        console.error("Update failed:", response.errors || response.message);
+                        alert("Error: " + (response.message || "Something went wrong. Check console for details."));
+                    }
+                },
+            });
+        }
+    });
+
+    $(document).on('click', '.add-outcome', function(e) {
+        e.preventDefault();
+        const form = $(this).closest('.overview-form');
+        const outcomesList = form.find('.outcomes-list');
+        const formName = form.attr('name');
+        const nextIndex = outcomesList.find('li').length + 1;
+        
+        // Generate a temporary ID for new items (negative number)
+        const tempSectionID = -Math.floor(Math.random() * 1000000);
+        
+        const newOutcome = $(`
+            <li>
+                <input type="text" 
+                       name="${formName}-${nextIndex}-outcomes" 
+                       id="${formName}-${nextIndex}-outcomes" 
+                       data-sectionid="${tempSectionID}" 
+                       value="">
+                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="${tempSectionID}">×</button>
+            </li>
+        `);
+        
+        outcomesList.append(newOutcome);
+    });
     
-    
+    $(document).on('click', '.courses-item-container .add-outcome', function(e) {
+        e.preventDefault();
+        const form = $(this).closest('form');
+        const outcomesContainer = form.find('.outcomes-container');
+        const formName = form.attr('name');
+        const nextIndex = outcomesContainer.find('li').length + 1;
+        
+        const newOutcome = $(`
+            <li>
+                <input type="text" 
+                       name="${formName}-outcomes-${nextIndex}" 
+                       id="${formName}-outcomes-${nextIndex}" 
+                       data-is-new="true" 
+                       value="">
+                <button type="button" class="remove-outcome btn btn-danger">×</button>
+            </li>
+        `);
+        
+        outcomesContainer.append(newOutcome);
+    });
 
 });

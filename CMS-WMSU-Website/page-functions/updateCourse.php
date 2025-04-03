@@ -1,51 +1,93 @@
 <?php
 session_start();
-require_once '../classes/login.class.php'; // Login object for college data fetching
-require_once '../classes/pages.class.php'; // Pages object for course data handling
+require_once '../classes/login.class.php';
+require_once '../classes/pages.class.php';
 
-$loginObj = new Login(); // Instantiate the Login object
-$pagesObj = new Pages(); // Instantiate the Pages object
+$loginObj = new Login();
+$pagesObj = new Pages();
 
-// Check if courseTitle, titleSectionID, and outcomes are set
-if (isset($_POST['courseTitle']) && isset($_POST['outcomes']) && isset($_POST['titleSectionID'])) {
-    $courseTitle = $_POST['courseTitle'];  // Get the course title
-    $titleSectionID = $_POST['titleSectionID']; // Get the sectionID for the course title
-    $subpage = $_SESSION['account']['subpage_assigned']; // Get the subpage assigned to the user
+header('Content-Type: application/json');
 
-    // Ensure outcomes is an array
-    $outcomes = is_array($_POST['outcomes']) ? $_POST['outcomes'] : [];
+if (isset($_POST['courseTitle']) && isset($_POST['titleSectionID'])) {
+    $courseTitle = $_POST['courseTitle'];
+    $titleSectionID = $_POST['titleSectionID'];
+    $subpage = $_SESSION['account']['subpage_assigned'];
+    
+    // Get the original course type from database (more reliable than form ID)
+    $originalCourse = $pagesObj->getRowById($titleSectionID);
+    $isUndergrad = ($originalCourse['description'] === 'course-header-undergrad');
+    $courseType = $isUndergrad ? 'undergrad' : 'grad';
 
-    // Update the course title with the provided course title and sectionID
-    $updateTitle = $pagesObj->changeContent($titleSectionID, $subpage, $courseTitle);
+    // Update course title (keep original description)
+    $updateTitle = $pagesObj->changeContent(
+        $titleSectionID, 
+        $subpage, 
+        $courseTitle
+    );
 
-    // Initialize outcome update flag
-    $updateOutcomes = true;
+    if (!$updateTitle) {
+        echo json_encode(["success" => false, "message" => "Failed to update course title"]);
+        exit;
+    }
 
-    // Loop through outcomes to update each one with content and sectionID
-    foreach ($outcomes as $outcome) {
-        // Ensure that each outcome contains both content and sectionID
-        if (isset($outcome['content']) && isset($outcome['sectionID'])) {
-            // Update outcome using the sectionID and the new content
-            $updateOutcomes = $pagesObj->changeContent($outcome['sectionID'], $subpage, $outcome['content']);
-        } else {
-            $updateOutcomes = false; // If any outcome is missing required data, stop the update
-            break;
+    // Get course number by counting existing courses of same type
+    $allCourses = $pagesObj->fetchSectionsByIndicator('Courses and Programs', 3, $subpage);
+    $courseNumber = 1;
+    foreach ($allCourses as $course) {
+        if ($course['description'] === 'course-header-'.$courseType) {
+            if ($course['sectionID'] == $titleSectionID) break;
+            $courseNumber++;
         }
     }
 
-    // If both the title and outcomes are updated successfully
-    if ($updateTitle && $updateOutcomes) {
-        // Optionally, update course data in session
-        $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
+    // Process outcomes
+    $updateOutcomes = true;
+    $errors = [];
+    
+    if (isset($_POST['outcomes']) && is_array($_POST['outcomes'])) {
+        foreach ($_POST['outcomes'] as $outcome) {
+            if (isset($outcome['content'])) {
+                if (isset($outcome['isNew']) && $outcome['isNew']) {
+                    // Add new outcome
+                    $newSectionID = $pagesObj->addContent(
+                        $subpage,
+                        'Courses and Programs',
+                        'text',
+                        $outcome['content'],
+                        null,
+                        $courseType . '-course-list-items-' . $courseNumber
+                    );
+                    
+                    if (!$newSectionID) {
+                        $errors[] = "Failed to create new outcome";
+                        $updateOutcomes = false;
+                    }
+                } else {
+                    // Update existing outcome
+                    if (isset($outcome['sectionID'])) {
+                        $outcomeUpdate = $pagesObj->changeContent(
+                            $outcome['sectionID'],
+                            $subpage,
+                            $outcome['content']
+                        );
+                        
+                        if (!$outcomeUpdate) {
+                            $errors[] = "Failed to update outcome ID: " . $outcome['sectionID'];
+                            $updateOutcomes = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-        // Send a success response
+    if ($updateOutcomes) {
+        $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
         echo json_encode(["success" => true]);
     } else {
-        // Send an error response if something went wrong
-        echo json_encode(["success" => false, "message" => "Failed to update course data."]);
+        echo json_encode(["success" => false, "message" => "Some updates failed", "errors" => $errors]);
     }
 } else {
-    // Send an error response if the necessary data is missing
-    echo json_encode(["success" => false, "message" => "Missing course title, sectionID, or outcomes."]);
+    echo json_encode(["success" => false, "message" => "Missing required fields"]);
 }
 ?>

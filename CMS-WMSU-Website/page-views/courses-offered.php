@@ -96,32 +96,32 @@ foreach ($coursesAndPrograms as $item) {
     <?php } ?>
 
     <h2>Undergraduate Courses</h2>
-    <?php foreach ($undergradCourses as $courseName => $courseData) { ?>
-        <div class="courses-item-container">
-            <form action="" method="POST" name="<?php echo $courseName?>-items" id="<?php echo $courseName?>-items">
-                <input type="text" name="courseTitle" data-titleSectionID="<?php echo $courseData['sectionID']?>" class="courseTitle" id="<?php echo $courseName?>" value="<?php echo $courseName ?>">
-                <div class="divider-line"></div>
-                <p><strong>Program Objectives/Outcomes:</strong></p>
-                <ul>
-                    <div class="outcomes-container">
+        <?php foreach ($undergradCourses as $courseName => $courseData) { ?>
+            <div class="courses-item-container">
+                <form action="" method="POST" name="<?php echo $courseName?>-items" id="<?php echo $courseName?>-items">
+                    <input type="text" name="courseTitle" data-titlesectionid="<?php echo $courseData['sectionID']?>" class="courseTitle" id="<?php echo $courseName?>" value="<?php echo $courseName ?>">
+                    <div class="divider-line"></div>
+                    <p><strong>Program Objectives/Outcomes:</strong></p>
+                    <ul class="outcomes-container">
                         <?php $i = 1; ?>
                         <?php foreach ($courseData["outcomes"] as $outcome) { ?>
                             <li>
                                 <input type="text" 
-                                       name="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
-                                       id="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
-                                       data-sectionID="<?php echo $outcome['sectionID']?>" 
-                                       value="<?php echo $outcome['content']?>">
+                                    name="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
+                                    id="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
+                                    data-sectionid="<?php echo $outcome['sectionID']?>" 
+                                    value="<?php echo $outcome['content']?>">
+                                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $outcome['sectionID']?>">×</button>
                             </li>
                         <?php $i++;} ?>
+                    </ul>
+                    <div class="btn-container">
+                        <button type="button" class="add-outcome btn btn-primary">Add Outcome</button>
+                        <input type="submit" value="Submit" class="submitCourse btn btn-success">
                     </div>
-                </ul>
-                <div class="btn-container">
-                    <input type="submit" value="Submit" class="submitCourse btn btn-success">
-                </div>
-            </form>
-        </div>
-    <?php } ?>
+                </form>
+            </div>
+        <?php } ?>
     <h2>Graduate Courses</h2>
     <?php foreach ($gradCourses as $courseName => $courseData) { ?>
         <div class="courses-item-container">
@@ -129,25 +129,24 @@ foreach ($coursesAndPrograms as $item) {
                 <input type="text" name="courseTitle" data-titleSectionID="<?php echo $courseData['sectionID']?>" class="courseTitle" id="<?php echo $courseName?>" value="<?php echo $courseName ?>">
                 <div class="divider-line"></div>
                 <p><strong>Program Objectives/Outcomes:</strong></p>
-                <ul>
-                    <div class="outcomes-container">
-                        <?php $i = 1; ?>
-                        <?php foreach ($courseData["outcomes"] as $outcome) { ?>
-                            <li>
-                                <input type="text" 
-                                       name="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
-                                       id="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
-                                       data-sectionID="<?php echo $outcome['sectionID']?>" 
-                                       value="<?php echo $outcome['content']?>">
-                            </li>
-                        <?php $i++;} ?>
-                    </div>
+                <ul class="outcomes-container">
+                    <?php $i = 1; ?>
+                    <?php foreach ($courseData["outcomes"] as $outcome) { ?>
+                        <li>
+                            <input type="text" 
+                                   name="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
+                                   id="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
+                                   data-sectionID="<?php echo $outcome['sectionID']?>" 
+                                   value="<?php echo $outcome['content']?>">
+                            <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $outcome['sectionID']?>">×</button>
+                        </li>
+                    <?php $i++;} ?>
                 </ul>
                 <div class="btn-container">
+                    <button type="button" class="add-outcome btn btn-primary">Add Outcome</button>
                     <input type="submit" value="Submit" class="submitCourse btn btn-success">
                 </div>
             </form>
         </div>
     <?php } ?>
-
 </div>

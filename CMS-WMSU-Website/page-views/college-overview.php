@@ -66,34 +66,33 @@ foreach ($collegeOverview as $data){
     <div class="overview-wrapper">
         
         <div class="overview-col-1">
-        <?php for ($q = 0; $q < count($genInfoBackHead); $q++){
-           ?> 
-           
-           <section class="overview-item-container">
-           <form action="" method="POST" class="overview-form" name="<?php echo $genInfoTitles[$q]['content']?>-overviewItems" id="<?php echo $genInfoTitles[$q]['content']?>-overviewItems">
-                <input type="text" name="overviewTitle" data-overviewSectionID="<?php echo $genInfoTitles[$q]['sectionID']?>" class="overviewTitle" id="<?php echo $genInfoTitles[$q]['content']?>" value="<?php echo $genInfoTitles[$q]['content'] ?>">
-                <div class="divider-line"></div>
-                <input type="text" class="overview-top-content" name="overview-top-content-<?php $q ?>" id="overview-top-content-<?php $q ?>" data-sectionID="<?php echo $genInfoBackHead[$q]['sectionID']?>" value="<?php echo $genInfoBackHead[$q]['content'] ?>">
-                
-                
-                <?php $i = 1; foreach ($genInfoBackLists[$q] as $item) { ?>
-
-                            <li>
-                                <input type="text" 
-                                       name="<?php echo $genInfoTitles[$q]['content']?>-<?php echo $i ?>-outcomes" 
-                                       id="<?php echo $genInfoTitles[$q]['content']?>-<?php echo $i ?>-outcomes" 
-                                       data-sectionID="<?php echo $item['sectionID']?>" 
-                                       value="<?php echo $item['content']?>">
-                            </li>
-                            <?php    $i++;}  ?>
-
-                      <br>
-                      <div class="btn-container">
-                    <input type="submit" value="Submit" class="submitCourse btn btn-success">
-                    </div>
-                </form>
-            </section>
-            <?php } ?>
+        <?php for ($q = 0; $q < count($genInfoBackHead); $q++) { ?> 
+<section class="overview-item-container">
+    <form action="" method="POST" class="overview-form" name="<?php echo $genInfoTitles[$q]['content']?>-overviewItems" id="<?php echo $genInfoTitles[$q]['content']?>-overviewItems">
+        <input type="text" name="overviewTitle" data-overviewsectionid="<?php echo $genInfoTitles[$q]['sectionID']?>" class="overviewTitle" id="<?php echo $genInfoTitles[$q]['content']?>" value="<?php echo $genInfoTitles[$q]['content'] ?>">
+        <div class="divider-line"></div>
+        <input type="text" class="overview-top-content" name="overview-top-content-<?php echo $q ?>" id="overview-top-content-<?php echo $q ?>" data-sectionid="<?php echo $genInfoBackHead[$q]['sectionID']?>" value="<?php echo $genInfoBackHead[$q]['content'] ?>">
+        
+        <ul class="outcomes-list">
+            <?php $i = 1; foreach ($genInfoBackLists[$q] as $item) { ?>
+                <li>
+                    <input type="text" 
+                        name="<?php echo $genInfoTitles[$q]['content']?>-<?php echo $i ?>-outcomes" 
+                        id="<?php echo $genInfoTitles[$q]['content']?>-<?php echo $i ?>-outcomes" 
+                        data-sectionid="<?php echo $item['sectionID']?>" 
+                        value="<?php echo $item['content']?>">
+                    <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']?>">×</button>
+                </li>
+            <?php $i++; } ?>
+        </ul>
+        
+        <div class="btn-container">
+            <button type="button" class="add-outcome btn btn-primary">Add Outcome</button>
+            <input type="submit" value="Submit" class="submitCourse btn btn-success">
+        </div>
+    </form>
+</section>
+<?php } ?>
 
             <section class="item-container">
             <div class="edit-content">
