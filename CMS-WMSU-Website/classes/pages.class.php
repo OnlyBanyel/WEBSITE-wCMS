@@ -247,7 +247,7 @@ require_once __DIR__ . "/db_connection.class.php";
 
             return $qry->execute();
         }
-        function uploadDeptImgs($destPath, $sectionID, $subpage){
+        function uploadImgs($destPath, $sectionID, $subpage){
             $sql = "UPDATE page_sections 
             SET imagePath = :destPath 
             WHERE subpage = :subpage 

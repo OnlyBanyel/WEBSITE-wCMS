@@ -22,7 +22,7 @@ if (isset($_FILES['deptImg']) && isset($_POST['sectionID'])) {
         $relativePath = "/WEBSITE-wCMS/imgs/" . $fileName;
 
         $pagesObj->changeContent($textID, $subpage, $value);
-        $pagesObj->uploadDeptImgs($relativePath, $sectionID, $subpage);
+        $pagesObj->uploadImgs($relativePath, $sectionID, $subpage);
         $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
 
         echo json_encode(["success" => true, "newPath" => $relativePath]);
