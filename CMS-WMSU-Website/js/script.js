@@ -93,16 +93,10 @@ $(document).ready(function() {
             return;
         }
     
-        console.log("Element Type:", elementType);
-        console.log("Value:", value);
-        console.log("Indicator:", indicator);
-        console.log("Description:", description);
-    
         $.ajax({
             url: "../functions/save_content.php",
             type: "POST",
             data: {
-                
                 elementType: elementType,
                 value: value.toString(),
                 indicator: indicator,
@@ -115,7 +109,14 @@ $(document).ready(function() {
                 console.log("Server Response:", response);
                 if (response.status === "success") {
                     alert("Element saved successfully!");
-                    location.reload();  
+                    
+                    // Get current active page and force reload
+                    var currentPage = $(".dynamic-load.active").data("file");
+                    if (currentPage) {
+                        loadPage(currentPage);
+                    } else {
+                        location.reload();
+                    }
                 } else {
                     alert("Error: " + response.message);
                 }
@@ -292,6 +293,7 @@ $(document).ready(function() {
         var formData = new FormData(this);
         var courseTitle = $(this).find("input.courseTitle").val();
         var titleSectionID = $(this).find("input.courseTitle").data("titlesectionid");
+        var currentPage = $(".dynamic-load.active").data("file");
         
         formData.append("courseTitle", courseTitle);
         formData.append("titleSectionID", titleSectionID);
@@ -309,8 +311,6 @@ $(document).ready(function() {
             }
         });
         
-        var currentPage = $(".dynamic-load.active").data("file");
-        
         $.ajax({
             url: "../page-functions/updateCourse.php",
             type: 'POST',
@@ -321,8 +321,11 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     alert("Course updated successfully!");
+                    // Force a complete reload of the current page
                     if (currentPage) {
                         loadPage(currentPage);
+                    } else {
+                        location.reload();
                     }
                 } else {
                     alert("Error: " + (response.message || "Update failed") + 
