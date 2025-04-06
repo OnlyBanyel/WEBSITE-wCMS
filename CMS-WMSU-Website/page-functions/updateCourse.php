@@ -12,16 +12,28 @@ if (isset($_POST['courseTitle']) && isset($_POST['titleSectionID'])) {
     $courseTitle = $_POST['courseTitle'];
     $titleSectionID = $_POST['titleSectionID'];
     $subpage = $_SESSION['account']['subpage_assigned'];
-    
-    // Get the original course type from database (more reliable than form ID)
+
+    // Get the original course type
     $originalCourse = $pagesObj->getRowById($titleSectionID);
+    if (!$originalCourse) {
+        echo json_encode(["success" => false, "message" => "Invalid course ID"]);
+        exit;
+    }
+
     $isUndergrad = ($originalCourse['description'] === 'course-header-undergrad');
+    $isGrad = ($originalCourse['description'] === 'course-header-grad');
+
+    if ($isUndergrad === $isGrad) {
+        echo json_encode(["success" => false, "message" => "Invalid course type"]);
+        exit;
+    }
+
     $courseType = $isUndergrad ? 'undergrad' : 'grad';
 
-    // Update course title (keep original description)
+    // Update course title
     $updateTitle = $pagesObj->changeContent(
-        $titleSectionID, 
-        $subpage, 
+        $titleSectionID,
+        $subpage,
         $courseTitle
     );
 
@@ -30,64 +42,101 @@ if (isset($_POST['courseTitle']) && isset($_POST['titleSectionID'])) {
         exit;
     }
 
-    // Get course number by counting existing courses of same type
+    // Determine course number
     $allCourses = $pagesObj->fetchSectionsByIndicator('Courses and Programs', 3, $subpage);
-    $courseNumber = 1;
-    foreach ($allCourses as $course) {
-        if ($course['description'] === 'course-header-'.$courseType) {
-            if ($course['sectionID'] == $titleSectionID) break;
-            $courseNumber++;
-        }
-    }
+    $courseNumber = 0;
 
-    // Process outcomes
-    $updateOutcomes = true;
-    $errors = [];
-    
-    if (isset($_POST['outcomes']) && is_array($_POST['outcomes'])) {
-        foreach ($_POST['outcomes'] as $outcome) {
-            if (isset($outcome['content'])) {
-                if (isset($outcome['isNew']) && $outcome['isNew']) {
-                    // Add new outcome
-                    $newSectionID = $pagesObj->addContent(
-                        $subpage,
-                        'Courses and Programs',
-                        'text',
-                        $outcome['content'],
-                        null,
-                        $courseType . '-course-list-items-' . $courseNumber
-                    );
-                    
-                    if (!$newSectionID) {
-                        $errors[] = "Failed to create new outcome";
-                        $updateOutcomes = false;
-                    }
-                } else {
-                    // Update existing outcome
-                    if (isset($outcome['sectionID'])) {
-                        $outcomeUpdate = $pagesObj->changeContent(
-                            $outcome['sectionID'],
-                            $subpage,
-                            $outcome['content']
-                        );
-                        
-                        if (!$outcomeUpdate) {
-                            $errors[] = "Failed to update outcome ID: " . $outcome['sectionID'];
-                            $updateOutcomes = false;
-                        }
-                    }
-                }
+    foreach ($allCourses as $course) {
+        if ($course['description'] === 'course-header-' . $courseType) {
+            $courseNumber++;
+            if ($course['sectionID'] == $titleSectionID) {
+                break;
             }
         }
     }
 
+    if ($courseNumber === 0) {
+        echo json_encode(["success" => false, "message" => "Failed to determine course number"]);
+        exit;
+    }
+
+    // Handle outcomes
+    $updateOutcomes = true;
+    $errors = [];
+    $outcomesData = [];
+
+    // Parse the outcomes data correctly
+    if (isset($_POST['outcomes'])) {
+        // Handle both array and JSON string formats
+        if (is_string($_POST['outcomes'])) {
+            $outcomesData = json_decode($_POST['outcomes'], true);
+        } else {
+            $outcomesData = $_POST['outcomes'];
+        }
+
+        if (is_array($outcomesData)) {
+            foreach ($outcomesData as $outcome) {
+                if (!isset($outcome['content']) || trim($outcome['content']) === '') {
+                    $errors[] = "Outcome content cannot be empty";
+                    $updateOutcomes = false;
+                    continue;
+                }
+
+                $content = trim($outcome['content']);
+                $isNew = isset($outcome['isNew']) ? (bool)$outcome['isNew'] : false;
+                $sectionID = isset($outcome['sectionID']) ? (int)$outcome['sectionID'] : null;
+
+                if ($isNew || $sectionID === null) {
+                    // Add new outcome
+                    $newID = $pagesObj->addContent(
+                        $subpage,
+                        'Courses and Programs',
+                        'text',
+                        $content,
+                        null,
+                        $courseType . '-course-list-items-' . $courseNumber
+                    );
+
+                    if (!$newID) {
+                        $errors[] = "Failed to create new outcome: " . $content;
+                        $updateOutcomes = false;
+                    }
+                } else {
+                    // Update existing outcome
+                    $result = $pagesObj->changeContent($sectionID, $subpage, $content);
+                    if (!$result) {
+                        $errors[] = "Failed to update outcome ID: $sectionID";
+                        $updateOutcomes = false;
+                    }
+                }
+            }
+        } else {
+            $errors[] = "Invalid outcomes data format";
+            $updateOutcomes = false;
+        }
+    }
+
     if ($updateOutcomes) {
+        // Refresh session data
         $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
-        echo json_encode(["success" => true]);
+        echo json_encode([
+            "success" => true,
+            "courseNumber" => $courseNumber,
+            "courseType" => $courseType
+        ]);
     } else {
-        echo json_encode(["success" => false, "message" => "Some updates failed", "errors" => $errors]);
+        echo json_encode([
+            "success" => false,
+            "message" => "Some updates failed",
+            "errors" => $errors,
+            "outcomesData" => $outcomesData // For debugging
+        ]);
     }
 } else {
-    echo json_encode(["success" => false, "message" => "Missing required fields"]);
+    echo json_encode([
+        "success" => false,
+        "message" => "Missing required fields",
+        "receivedData" => $_POST // For debugging
+    ]);
 }
 ?>
