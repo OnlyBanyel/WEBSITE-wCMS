@@ -1,5 +1,51 @@
 <?php
 $pageTitle = "Senior High School Department";
+session_start();
+require_once "../../CMS-WMSU-Website/classes/pages.class.php"; 
+$shsObj = new Pages;
+
+$strandsItemSQL = "
+    SELECT * FROM page_sections 
+    WHERE subpage = 31 
+    AND indicator = 'Strand'
+";
+
+$strands = [];
+$currentStrand = null;
+
+// Execute the query
+$strandsData = $shsObj->execQuery($strandsItemSQL);
+
+foreach ($strandsData as $item) {
+    $desc = $item["description"];
+
+    // Start a new strand group
+    if ($desc === "strand-name") {
+        $currentStrand = $item["content"];
+        $strands[$currentStrand] = [
+            "name" => $currentStrand,
+            "desc" => "",
+            "end-desc" => "",
+            "outcomes" => [],
+        ];
+    }
+
+    // Assign `strand-desc` to 'desc'
+    if ($desc === "strand-desc" && isset($currentStrand)) {
+        $strands[$currentStrand]["desc"] = $item["content"];
+    }
+
+    // Assign `strand-desc-end` to 'end-desc'
+    if ($desc === "strand-desc-end" && isset($currentStrand)) {
+        $strands[$currentStrand]["end-desc"] = $item["content"];
+    }
+
+    // Assign `strand-item-*` to outcomes
+    if (preg_match('/^strand-item-\d+$/', $desc) && isset($currentStrand)) {
+        $strands[$currentStrand]["outcomes"][] = $item["content"];
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -216,52 +262,33 @@ $pageTitle = "Senior High School Department";
                 
                 <div class="strands-container">
                     <h1>Academic Strands Offered</h1>
-                    
+
+                <?php
+                foreach ($strands as $strand){
+
+                ?>
                     <div class="strand-card" id="stem-strand">
                         <div class="strand-title">
-                            <div class="strand-icon">🔬</div>
-                            <h2>STEM (Science, Technology, Engineering, and Mathematics)</h2>
+                            <div class="strand-icon"></div>
+                            <h2><?php echo $strand['name'] ?></h2>
                         </div>
-                        <p>The STEM strand is designed for students with a strong aptitude and interest in the fields of science, technology, engineering, and mathematics. This strand prepares students for college degrees and careers related to pure and applied sciences, engineering, technology development, and mathematics.</p>
+                        <p> <?php echo $strand['desc'] ?></p>
                         
                         <h3>Core Subjects Include:</h3>
                         <ul class="subject-list">
-                            <li>Pre-Calculus</li>
-                            <li>Basic Calculus</li>
-                            <li>General Biology 1 & 2</li>
-                            <li>General Physics 1 & 2</li>
-                            <li>General Chemistry 1 & 2</li>
-                            <li>Research in Daily Life 1 & 2</li>
-                            <li>Engineering and Design Process</li>
+
+                            <?php foreach ($strand['outcomes'] as $item){ ?>
+                            <li> <?php echo $item ?></li>
+                            <?php } ?>
                         </ul>
                         
                         <p>STEM graduates are well-prepared for university programs in medicine, engineering, computer science, architecture, mathematics, and various scientific fields, as well as careers in research, technology development, and innovation.</p>
                     </div>
-                    
-                    <div class="strand-card" id="humss-strand">
-                        <div class="strand-title">
-                            <div class="strand-icon">📚</div>
-                            <h2>HUMSS (Humanities and Social Sciences)</h2>
-                        </div>
-                        <p>The HUMSS strand focuses on human behavior, culture, society, politics, and community development. This strand is designed for students interested in careers related to social sciences, communication, education, law, and public service.</p>
-                        
-                        <h3>Core Subjects Include:</h3>
-                        <ul class="subject-list">
-                            <li>Creative Writing/Creative Nonfiction</li>
-                            <li>Introduction to World Religions and Belief Systems</li>
-                            <li>Creative Writing</li>
-                            <li>Philippine Politics and Governance</li>
-                            <li>Community Engagement, Solidarity, and Citizenship</li>
-                            <li>Disciplines and Ideas in the Social Sciences</li>
-                            <li>Disciplines and Ideas in the Applied Social Sciences</li>
-                        </ul>
-                        
-                        <p>HUMSS graduates pursue degrees in fields such as psychology, sociology, political science, education, communication, law, international studies, and other liberal arts disciplines, preparing them for careers in teaching, journalism, law, social work, and public administration.</p>
-                    </div>
+                <?php } ?>
                 </div>
             </div>
             
-            <div class="text-center mt-8">
+            <div class="text-center mt-8 p-3">
                 <a href="basic.php" class="inline-block px-6 py-3 bg-[#BD0F03] text-white font-medium rounded-md hover:bg-[#8B0000] transition duration-300">Back to Basic Education</a>
             </div>
         </div>
