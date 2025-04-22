@@ -17,19 +17,31 @@ if (isset($_POST['overviewTitle']) && isset($_POST['overviewSectionID'])) {
     $overviewSectionID = $_POST['overviewSectionID'];
     $subpage = $_SESSION['account']['subpage_assigned'];
 
-    // Decode outcomes JSON
-    $outcomes = [];
-    if (isset($_POST['outcomes'])) {
-        $outcomes = json_decode($_POST['outcomes'], true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $errors[] = "Invalid outcomes format.";
-        }
-    }
+    // Check if this is a completely new item
+    $isNewItem = isset($_POST['isNewItem']) && $_POST['isNewItem'] === '1';
 
     // Try updating overview title
-    $updateTitle = $pagesObj->changeContent($overviewSectionID, $subpage, $overviewTitle);
-    if (!$updateTitle) {
-        $errors[] = "Failed to update overview title (SectionID: $overviewSectionID).";
+    if ($isNewItem || strpos($overviewSectionID, 'temp_') === 0) {
+        // Add new title
+        $newSectionID = $pagesObj->addContent(
+            $subpage,
+            'College Overview',
+            'text',
+            $overviewTitle,
+            null,
+            $overviewSectionID === 'temp_title_0' ? 'geninfo-front-title' : 
+            ($overviewSectionID === 'temp_title_1' ? 'geninfo-front-title' : 'geninfo-front-title')
+        );
+        
+        if (!$newSectionID) {
+            $errors[] = "Failed to create new overview title.";
+        }
+    } else {
+        // Update existing title
+        $updateTitle = $pagesObj->changeContent($overviewSectionID, $subpage, $overviewTitle);
+        if (!$updateTitle) {
+            $errors[] = "Failed to update overview title (SectionID: $overviewSectionID).";
+        }
     }
 
     // Try updating overview top content (if provided)
@@ -37,9 +49,37 @@ if (isset($_POST['overviewTitle']) && isset($_POST['overviewSectionID'])) {
     if (isset($_POST['overviewTopContent']) && isset($_POST['topContentSectionID'])) {
         $overviewTopContent = $_POST['overviewTopContent'];
         $topContentSectionID = $_POST['topContentSectionID'];
-        $updateTopContent = $pagesObj->changeContent($topContentSectionID, $subpage, $overviewTopContent);
-        if (!$updateTopContent) {
-            $errors[] = "Failed to update overview top content (SectionID: $topContentSectionID).";
+        
+        if ($isNewItem || strpos($topContentSectionID, 'temp_') === 0) {
+            // Add new content
+            $newTopContentID = $pagesObj->addContent(
+                $subpage,
+                'College Overview',
+                'text',
+                $overviewTopContent,
+                null,
+                'geninfo-back-head'
+            );
+            
+            if (!$newTopContentID) {
+                $errors[] = "Failed to create new overview content.";
+                $updateTopContent = false;
+            }
+        } else {
+            // Update existing content
+            $updateTopContent = $pagesObj->changeContent($topContentSectionID, $subpage, $overviewTopContent);
+            if (!$updateTopContent) {
+                $errors[] = "Failed to update overview top content (SectionID: $topContentSectionID).";
+            }
+        }
+    }
+
+    // Decode outcomes JSON
+    $outcomes = [];
+    if (isset($_POST['outcomes'])) {
+        $outcomes = json_decode($_POST['outcomes'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $errors[] = "Invalid outcomes format.";
         }
     }
 

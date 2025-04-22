@@ -48,8 +48,8 @@ require_once __DIR__ . "/db_connection.class.php";
         return $this->pageData;
         }
 
-        function fetchSubpages($pageID){
-            $sql = "SELECT * from subpages WHERE pagesID = :pageID";
+        function fetchCollegeSubpages($pageID){
+            $sql = "SELECT * from subpages WHERE pagesID = :pageID AND isCollege = 1";
             $qry = $this->db->connect()->prepare($sql);
             $qry->bindParam(':pageID', $pageID);
 
@@ -213,7 +213,7 @@ require_once __DIR__ . "/db_connection.class.php";
         }
 
         function fetchColleges(){
-            $sql = "SELECT subpageID, subPageName FROM subpages";
+            $sql = "SELECT subpageID, subPageName FROM subpages WHERE isCollege = 1";
             $qry = $this->db->connect()->prepare($sql);
 
             if ($qry->execute()){
@@ -296,23 +296,35 @@ require_once __DIR__ . "/db_connection.class.php";
         }
 
         public function addContent($subpage, $indicator, $elemType, $content, $imagePath, $description) {
-            $sql = "INSERT INTO page_sections 
-                    (pageID, subpage, indicator, elemType, content, imagePath, description, createdAt, updatedAt) 
-                    VALUES 
-                    (3, :subpage, :indicator, :elemType, :content, :imagePath, :description, NOW(), NOW())";
-            
-            $qry = $this->db->connect()->prepare($sql);
-            
-            $qry->bindParam(':subpage', $subpage);
-            $qry->bindParam(':indicator', $indicator);
-            $qry->bindParam(':elemType', $elemType);
-            $qry->bindParam(':content', $content);
-            $qry->bindParam(':imagePath', $imagePath);
-            $qry->bindParam(':description', $description);
-            
-            return ($qry->execute());
+    try {
+        $sql = "INSERT INTO page_sections 
+                (pageID, subpage, indicator, elemType, content, imagePath, description, createdAt, updatedAt) 
+                VALUES 
+                (3, :subpage, :indicator, :elemType, :content, :imagePath, :description, NOW(), NOW())";
         
+        $db = $this->db->connect();
+        $qry = $db->prepare($sql);
+        
+        $qry->bindParam(':subpage', $subpage);
+        $qry->bindParam(':indicator', $indicator);
+        $qry->bindParam(':elemType', $elemType);
+        $qry->bindParam(':content', $content);
+        $qry->bindParam(':imagePath', $imagePath);
+        $qry->bindParam(':description', $description);
+        
+        $success = $qry->execute();
+        
+        if ($success) {
+            // Return the last inserted ID
+            return $db->lastInsertId();
         }
+        
+        return false;
+    } catch (PDOException $e) {
+        error_log("Error in addContent: " . $e->getMessage());
+        return false;
+    }
+}
 
         public function deleteContent($sectionID, $subpage) {
             try {
@@ -333,6 +345,153 @@ require_once __DIR__ . "/db_connection.class.php";
                 return false;
             }
         }
+
+        function fetchContentManagers(){
+            $sql = "SELECT * 
+            FROM accounts 
+            LEFT JOIN subpages ON accounts.subpage_assigned = subpages.subpageID 
+            LEFT JOIN roles ON accounts.role_id = roles.roleID
+            WHERE accounts.role_id = 2";
+
+            $qry = $this->db->connect()->prepare($sql);
+
+            if ($qry->execute()){
+                $data = $qry->fetchAll(PDO::FETCH_ASSOC);
+            }
+            else{
+                $data = null;
+            }
+            return $data;
+
+        }
+
+       // This is just the updateAccountStatus method from the Pages class
+// Add this to your existing Pages class if it's different
+
+public function updateAccountStatus($managerId, $status) {
+    try {
+        // First, check if the manager ID exists
+        $checkSql = "SELECT COUNT(*) FROM accounts WHERE id = :id";
+        $checkQry = $this->db->connect()->prepare($checkSql);
+        $checkQry->bindParam(':id', $managerId, PDO::PARAM_INT);
+        $checkQry->execute();
+        
+        $managerExists = $checkQry->fetchColumn();
+        
+        if (!$managerExists) {
+            error_log("Manager ID does not exist: $managerId");
+            return false;
+        }
+        
+        // Now update the status
+        $sql = "UPDATE accounts SET status = :status WHERE id = :id";
+        $qry = $this->db->connect()->prepare($sql);
+        $qry->bindParam(':status', $status, PDO::PARAM_INT);
+        $qry->bindParam(':id', $managerId, PDO::PARAM_INT);
+        
+        $result = $qry->execute();
+        
+        if (!$result) {
+            $errorInfo = $qry->errorInfo();
+            error_log("SQL Error: " . print_r($errorInfo, true));
+            return false;
+        }
+        
+        // Check if any rows were affected
+        $rowCount = $qry->rowCount();
+        if ($rowCount === 0) {
+            error_log("No rows affected when updating account status for manager ID: $managerId");
+            // Still return true if the query executed successfully but no rows were affected
+            // This can happen if the status is already set to the requested value
+            return true;
+        }
+        
+        return true;
+    } catch (PDOException $e) {
+        error_log("PDO Exception in updateAccountStatus: " . $e->getMessage());
+        return false;
     }
+}
+
+/**
+ * Fetch all users for messaging
+ * 
+ * @return array The users
+ */
+public function fetchAllUsers() {
+    try {
+        $sql = "SELECT id, firstName, lastName, profileImg, role_id FROM accounts ORDER BY firstName, lastName";
+        $qry = $this->db->connect()->prepare($sql);
+        $qry->execute();
+        
+        return $qry->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error fetching users: " . $e->getMessage());
+        return [];
+    }
+}
+
+public function fetchAdminUsers() {
+    try {
+        $sql = "SELECT a.id, a.firstName, a.lastName, a.profileImg, a.role_id, r.roleName 
+                FROM accounts a 
+                LEFT JOIN roles r ON a.role_id = r.id 
+                WHERE a.role_id = 1 OR a.role_id = 2 
+                ORDER BY a.firstName, a.lastName";
+        $qry = $this->db->connect()->prepare($sql);
+        $qry->execute();
+        
+        return $qry->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error fetching admin users: " . $e->getMessage());
+        return [];
+    }
+}
+public function fetchContentManagersBySubpage($subpage_id) {
+    try {
+        $sql = "SELECT a.id, a.firstName, a.lastName, a.profileImg, a.role_id, r.roleName 
+                FROM accounts a 
+                LEFT JOIN roles r ON a.role_id = r.id 
+                WHERE a.subpage_assigned = :subpage_id 
+                ORDER BY a.firstName, a.lastName";
+        $qry = $this->db->connect()->prepare($sql);
+        $qry->bindParam(':subpage_id', $subpage_id, PDO::PARAM_INT);
+        $qry->execute();
+        
+        $managers = $qry->fetchAll(PDO::FETCH_ASSOC);
+        
+        // If no specific managers found for this subpage, fall back to admin users
+        if (empty($managers)) {
+            $sql = "SELECT a.id, a.firstName, a.lastName, a.profileImg, a.role_id, r.roleName 
+                    FROM accounts a 
+                    LEFT JOIN roles r ON a.role_id = r.id 
+                    WHERE a.role_id = 1 
+                    ORDER BY a.firstName, a.lastName";
+            $qry = $this->db->connect()->prepare($sql);
+            $qry->execute();
+            $managers = $qry->fetchAll(PDO::FETCH_ASSOC);
+        }
+        
+        return $managers;
+    } catch (PDOException $e) {
+        error_log("Error fetching content managers by subpage: " . $e->getMessage());
+        return [];
+    }   
+    }
+
+    function addCollege($collegeName, $logoPath, $pageID){
+        $sql = "INSERT INTO subpages
+        (pagesID, subPageName, subPagePath, imagePath, isCollege) 
+        VALUES 
+        (:pageID, :collegeName, '#', :logoPath, 1);";
+        $qry = $this->db->connect()->prepare($sql);
+
+        $qry->bindParam(':pageID', $pageID);
+        $qry->bindParam(':collegeName', $collegeName);
+        $qry->bindParam(':logoPath', $logoPath);
+
+        return ($qry->execute());
+    }
+}
 
 ?>

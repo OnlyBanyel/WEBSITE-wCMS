@@ -6,16 +6,17 @@ $baseUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/WEBSITE-WCMS';
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/vendors/bootstrap-5.3.3-dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/vendors/datatable-2.1.8/datatables.min.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/navbar.css">
-<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/subpages-style.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/homepage.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/fonts.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/linkages.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/footer.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/ESUCampuses.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/output.css">
 
 
 <script src="<?php echo $baseUrl; ?>/vendors/jquery-3.7.1/jquery-3.7.1.min.js"></script>
 <script src="<?php echo $baseUrl; ?>/vendors/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+<script src="<?php echo $baseUrl; ?>/vendors/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
     <?php # Lateef Fonts ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

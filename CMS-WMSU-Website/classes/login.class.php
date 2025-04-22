@@ -19,7 +19,7 @@ require_once __DIR__ . "/db_connection.class.php";
         }
 
         function auth(){
-            $sql = "SELECT email, password from accounts WHERE email = :email";
+            $sql = "SELECT email, password, status from accounts WHERE email = :email";
             $qry = $this->db->connect()->prepare($sql);
             
             $qry->bindParam(":email", $this->email);
@@ -28,7 +28,13 @@ require_once __DIR__ . "/db_connection.class.php";
             if($data = $qry->fetch()){
 
                 if (password_verify($this->password, $data['password'])){
+
+                    if($data['status'] == 1 || $data['status' == null])
+                    {
                     return $data;
+                    }else{
+                        return null;
+                    }
                 }
 
             }

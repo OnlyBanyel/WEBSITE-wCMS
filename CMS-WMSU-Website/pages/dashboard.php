@@ -1,12 +1,14 @@
 <?php 
 session_start();
-require_once '../classes/db_connection.class.php';
-$dbObj = new Database;
-
 
 if (empty($_SESSION['account'])){
     header('Location: login-form.php');
     exit;
+}
+
+if (!isset($_SESSION['lastRole']) || $_SESSION['lastRole'] != $_SESSION['account']['role_id']) {
+    echo "<script>localStorage.removeItem('activePage');</script>";
+    $_SESSION['lastRole'] = $_SESSION['account']['role_id'];
 }
 
 ?>
@@ -32,10 +34,10 @@ if (empty($_SESSION['account'])){
     .main-content {
         margin-left: 250px; /* Adjust based on sidebar width */
         padding: 20px;
+        height: 100vh;
     }
 
     .main-content-section{
-        width: 100vw;
         height: 100vh;
 }
 
@@ -43,7 +45,6 @@ if (empty($_SESSION['account'])){
 
 
     </style>
-    <link rel="stylesheet" href="../css/academics-page.css">
     
     <?php require_once '../__includes/head.php' ?>
 </head> 
@@ -64,8 +65,6 @@ if (empty($_SESSION['account'])){
 <h2>Welcome <?php
     echo $_SESSION['account']['firstName']?>!</h2>
     
-    <section id="main-content-section">
-
-    </section>
+    <section class='main-content-section'id="main-content-section"></section>
 </div>
 </html>

@@ -79,5 +79,86 @@
                 <p class="ESUCSchoolsTextRight inter-light">The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.</p>
             </div>
         </div>
+        <div class="ESUCSchoolsLeft">
+            <div class="ESUCSchoolsLeftBox">
+                <div class="ESUCSchoolsImgLeft"></div>
+                <p class="ESUCSchoolsTitle inter-black">DIPLAHAN</p>
+                <p class="ESUCSchoolsTitleOutlineLeft">DIPLAHAN</p>
+                <p class="ESUCSchoolsSubTitle inter-extralight">Zamboanga Sibugay</p>
+                <p class="ESUCSchoolsTextLeft inter-light">Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.</p>
+            </div>
+        </div>
+        <div class="ESUCSchoolsRight">
+            <div class="ESUCSchoolsRightBox">
+                <div class="ESUCSchoolsImgRight"></div>
+                <p class="ESUCSchoolsTitle inter-black">IPIL</p>
+                <p class="ESUCSchoolsTitleOutlineRight">IPIL</p>
+                <p class="ESUCSchoolsSubTitleRight inter-extralight">Zamboanga Del Sur</p>
+                <p class="ESUCSchoolsTextRight inter-light">The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.</p>
+            </div>
+        </div>
+        <div class="ESUCSchoolsLeft">
+            <div class="ESUCSchoolsLeftBox">
+                <div class="ESUCSchoolsImgLeft"></div>
+                <p class="ESUCSchoolsTitle inter-black">MABUHAY</p>
+                <p class="ESUCSchoolsTitleOutlineLeft">MABUHAY</p>
+                <p class="ESUCSchoolsSubTitle inter-extralight">Zamboanga Sibugay</p>
+                <p class="ESUCSchoolsTextLeft inter-light">Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.</p>
+            </div>
+        </div>
+        <div class="ESUCSchoolsRight">
+            <div class="ESUCSchoolsRightBox">
+                <div class="ESUCSchoolsImgRight"></div>
+                <p class="ESUCSchoolsTitle inter-black">MOLAVE</p>
+                <p class="ESUCSchoolsTitleOutlineRight">MOLAVE</p>
+                <p class="ESUCSchoolsSubTitleRight inter-extralight">Zamboanga Del Sur</p>
+                <p class="ESUCSchoolsTextRight inter-light">The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.</p>
+            </div>
+        </div>
+        <div class="ESUCSchoolsLeft">
+            <div class="ESUCSchoolsLeftBox">
+                <div class="ESUCSchoolsImgLeft"></div>
+                <p class="ESUCSchoolsTitle inter-black">NAGA</p>
+                <p class="ESUCSchoolsTitleOutlineLeft">NAGA</p>
+                <p class="ESUCSchoolsSubTitle inter-extralight">Zamboanga Sibugay</p>
+                <p class="ESUCSchoolsTextLeft inter-light">Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.</p>
+            </div>
+        </div>
+        <div class="ESUCSchoolsRight">
+            <div class="ESUCSchoolsRightBox">
+                <div class="ESUCSchoolsImgRight"></div>
+                <p class="ESUCSchoolsTitle inter-black">OLUTANGA</p>
+                <p class="ESUCSchoolsTitleOutlineRight">OLUTANGA</p>
+                <p class="ESUCSchoolsSubTitleRight inter-extralight">Zamboanga Del Sur</p>
+                <p class="ESUCSchoolsTextRight inter-light">The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.</p>
+            </div>
+        </div>
+        <div class="ESUCSchoolsLeft">
+            <div class="ESUCSchoolsLeftBox">
+                <div class="ESUCSchoolsImgLeft"></div>
+                <p class="ESUCSchoolsTitle inter-black">PAGADIAN</p>
+                <p class="ESUCSchoolsTitleOutlineLeft">PAGADIAN</p>
+                <p class="ESUCSchoolsSubTitle inter-extralight">Zamboanga Sibugay</p>
+                <p class="ESUCSchoolsTextLeft inter-light">Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.</p>
+            </div>
+        </div>
+        <div class="ESUCSchoolsRight">
+            <div class="ESUCSchoolsRightBox">
+                <div class="ESUCSchoolsImgRight"></div>
+                <p class="ESUCSchoolsTitle inter-black">SIAY</p>
+                <p class="ESUCSchoolsTitleOutlineRight">SIAY</p>
+                <p class="ESUCSchoolsSubTitleRight inter-extralight">Zamboanga Del Sur</p>
+                <p class="ESUCSchoolsTextRight inter-light">The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.</p>
+            </div>
+        </div>
+        <div class="ESUCSchoolsLeft">
+            <div class="ESUCSchoolsLeftBox">
+                <div class="ESUCSchoolsImgLeft"></div>
+                <p class="ESUCSchoolsTitle inter-black">TUNGAWAN</p>
+                <p class="ESUCSchoolsTitleOutlineLeft">TUNGAWAN</p>
+                <p class="ESUCSchoolsSubTitle inter-extralight">Zamboanga Sibugay</p>
+                <p class="ESUCSchoolsTextLeft inter-light">Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.</p>
+            </div>
+        </div>
     </div>
 </section>

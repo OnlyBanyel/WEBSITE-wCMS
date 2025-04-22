@@ -11,7 +11,9 @@
 
 <body>
         <nav class="container-breadcrumb">
-          <?php require_once '../../__includes/subnav_academics.php'?>
+          <div class="relative z-10">
+              <?php require_once '../../__includes/subnav_academics.php' ?>
+          </div>
         </nav>
 
     <div class="main">

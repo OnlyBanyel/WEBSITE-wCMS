@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.3"
+  },
+  "name": "website-wcms",
+  "version": "1.0.0",
+  "description": "- # WMSU-Homepage\r     - GROUP 2 - ACT INTERNSHIP",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OnlyBanyel/WEBSITE-wCMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OnlyBanyel/WEBSITE-wCMS/issues"
+  },
+  "homepage": "https://github.com/OnlyBanyel/WEBSITE-wCMS#readme"
+}

@@ -13,6 +13,91 @@ if (isset($_POST['courseTitle']) && isset($_POST['titleSectionID'])) {
     $titleSectionID = $_POST['titleSectionID'];
     $subpage = $_SESSION['account']['subpage_assigned'];
 
+    // Enhance the updateCourse.php file to better handle new courses
+    // Add this code after checking if required fields are set
+
+    // Check if this is a new course
+    $isNew = isset($_POST['isNew']) && $_POST['isNew'] === '1';
+
+    // If it's a new course, add it instead of updating
+    if ($isNew) {
+        $courseType = $_POST['courseType']; // 'undergrad' or 'grad'
+        
+        // Add new course title
+        $titleSectionID = $pagesObj->addContent(
+            $subpage,
+            'Courses and Programs',
+            'text',
+            $courseTitle,
+            null,
+            'course-header-' . $courseType
+        );
+        
+        if (!$titleSectionID) {
+            echo json_encode(["success" => false, "message" => "Failed to create new course"]);
+            exit;
+        }
+        
+        // Determine course number for outcomes
+        $allCourses = $pagesObj->fetchSectionsByIndicator('Courses and Programs', 3, $subpage);
+        $courseNumber = 0;
+        
+        foreach ($allCourses as $course) {
+            if ($course['description'] === 'course-header-' . $courseType) {
+                $courseNumber++;
+            }
+        }
+        
+        // Handle outcomes
+        $updateOutcomes = true;
+        $errors = [];
+        
+        if (isset($_POST['outcomes'])) {
+            // Parse outcomes data
+            if (is_string($_POST['outcomes'])) {
+                $outcomesData = json_decode($_POST['outcomes'], true);
+            } else {
+                $outcomesData = $_POST['outcomes'];
+            }
+            
+            if (is_array($outcomesData)) {
+                foreach ($outcomesData as $outcome) {
+                    if (!isset($outcome['content']) || trim($outcome['content']) === '') {
+                        continue; // Skip empty outcomes
+                    }
+                    
+                    $content = trim($outcome['content']);
+                    
+                    // Add new outcome
+                    $newID = $pagesObj->addContent(
+                        $subpage,
+                        'Courses and Programs',
+                        'text',
+                        $content,
+                        null,
+                        $courseType . '-course-list-items-' . $courseNumber
+                    );
+                    
+                    if (!$newID) {
+                        $errors[] = "Failed to create outcome: " . $content;
+                        $updateOutcomes = false;
+                    }
+                }
+            }
+        }
+        
+        // Refresh session data
+        $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
+        
+        echo json_encode([
+            "success" => true,
+            "isNew" => true,
+            "courseNumber" => $courseNumber,
+            "courseType" => $courseType
+        ]);
+        exit;
+    }
+
     // Get the original course type
     $originalCourse = $pagesObj->getRowById($titleSectionID);
     if (!$originalCourse) {
