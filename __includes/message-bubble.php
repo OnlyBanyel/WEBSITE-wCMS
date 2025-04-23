@@ -6,9 +6,11 @@ require_once "../../CMS-WMSU-Website/classes/pages.class.php";
 $contentManager = null;
 $managerId = 1; // Default fallback to admin ID 1
 
+// Check if subpage is set in the session
 if (isset($_SESSION['subpage'])) {
+    $subpage_id = $_SESSION['subpage'];
     $pagesObj = new Pages();
-    $managers = $pagesObj->fetchContentManagersBySubpage($_SESSION['subpage']);
+    $managers = $pagesObj->fetchContentManagersBySubpage($subpage_id);
     // Get the first manager if available
     $contentManager = !empty($managers) ? $managers[0] : null;
     
@@ -39,7 +41,7 @@ if (isset($_SESSION['last_message_time'])) {
 }
 
 // Handle AJAX message submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $_POST['message_action'] == 'send') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $_POST['message_action'] == 'send_anonymous') {
     header('Content-Type: application/json');
     
     if (!$canSendMessage) {
@@ -102,22 +104,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $
     
     <div class="max-h-[70vh] overflow-y-auto">
         <!-- Message Form -->
-<div id="messageForm" class="p-4">
-    <p class="text-gray-700 mb-4">Send a message to the manager of this page. You can remain anonymous if you prefer.</p>
-    
-    <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Recipient</label>
-        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-            <?php echo htmlspecialchars($managerName); ?>
-        </div>
-        <input type="hidden" id="receiver_id" name="receiver_id" value="<?php echo $managerId; ?>">
-    </div>
-    
-    <form id="contactForm" class="space-y-4">
-        <div>
-            <label for="sender_name" class="block text-sm font-medium text-gray-700 mb-1">Your Name (Optional)</label>
-            <input type="text" id="sender_name" name="sender_name" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="Enter your name or leave blank to remain anonymous">
-        </div>
+        <div id="messageForm" class="p-4">
+            <p class="text-gray-700 mb-4">Send a message to the manager of this page. You can remain anonymous if you prefer.</p>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Recipient</label>
+                <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
+                    <?php echo htmlspecialchars($managerName); ?>
+                </div>
+                <input type="hidden" id="receiver_id" name="receiver_id" value="<?php echo $managerId; ?>">
+            </div>
+            
+            <form id="contactForm" class="space-y-4">
+                <div>
+                    <label for="sender_name" class="block text-sm font-medium text-gray-700 mb-1">Your Name (Optional)</label>
+                    <input type="text" id="sender_name" name="sender_name" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="Enter your name or leave blank to remain anonymous">
+                </div>
                 
                 <div>
                     <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
@@ -130,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $
                 </div>
                 
                 <div>
-                    <button type="button" onclick="sendMessage()" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" <?php echo !$canSendMessage ? 'disabled' : ''; ?>>
+                    <button type="button" onclick="sendAnonymousMessage()" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" <?php echo !$canSendMessage ? 'disabled' : ''; ?>>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
@@ -147,16 +149,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $
         </div>
         
         <!-- Success Message (hidden by default) -->
-<div id="successMessage" class="p-6 text-center hidden">
-    <svg class="mx-auto h-12 w-12 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-    </svg>
-    <h3 class="text-lg font-medium text-gray-900 mb-2">Message Sent!</h3>
-    <p class="text-gray-600 mb-4">Thank you for your message. <span class="font-semibold"><?php echo htmlspecialchars($managerName); ?></span> will review it soon.</p>
-    <button onclick="resetMessageForm()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-        Send Another Message
-    </button>
-</div>
+        <div id="successMessage" class="p-6 text-center hidden">
+            <svg class="mx-auto h-12 w-12 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Message Sent!</h3>
+            <p class="text-gray-600 mb-4">Thank you for your message. <span class="font-semibold"><?php echo htmlspecialchars($managerName); ?></span> will review it soon.</p>
+            <button onclick="resetMessageForm()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Send Another Message
+            </button>
+        </div>
         
         <!-- Error Message (hidden by default) -->
         <div id="errorMessage" class="p-6 text-center hidden">
@@ -204,8 +206,8 @@ function toggleMessageOverlay() {
     }
 }
     
-// Send message via AJAX
-function sendMessage() {
+// Send anonymous message via AJAX
+function sendAnonymousMessage() {
     const form = document.getElementById('contactForm');
     const receiver_id = document.getElementById('receiver_id').value;
     const subject = document.getElementById('subject').value;
@@ -225,7 +227,7 @@ function sendMessage() {
     
     // Create form data
     const formData = new FormData();
-    formData.append('message_action', 'send');
+    formData.append('message_action', 'send_anonymous');
     formData.append('receiver_id', receiver_id);
     formData.append('subject', subject);
     formData.append('message', message);
@@ -310,7 +312,7 @@ function showToast(message, type = 'info') {
             <span>${message}</span>
         </div>
         <button class="ml-auto text-gray-500 hover:text-gray-700" onclick="this.parentElement.remove()">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
@@ -326,7 +328,7 @@ function showToast(message, type = 'info') {
     
 // Start cooldown timer
 function startCooldownTimer(seconds) {
-    const sendButton = document.querySelector('button[onclick="sendMessage()"]');
+    const sendButton = document.querySelector('button[onclick="sendAnonymousMessage()"]');
     const cooldownMessage = document.getElementById('cooldown-message');
     
     if (!cooldownMessage) {

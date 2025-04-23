@@ -165,6 +165,23 @@ if ($_SESSION['account']['role_id'] == 1){
                         Account Management
                     </a>
                 </li>
+            <li class="sidebar-nav-item">
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="../page-views/messages.php" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    Messages
+                    <?php 
+                    // Get unread message count
+                    require_once __DIR__ . "/../classes/messages.class.php";
+                    $messagesObj = new Messages();
+                    $unread_count = $messagesObj->getUnreadCount($_SESSION['account']['id']);
+                    if ($unread_count > 0): 
+                    ?>
+                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full"><?php echo $unread_count; ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
         </ul>
 
     </div>
@@ -261,11 +278,20 @@ foreach ($words as $word) {
                 </a>
             </li>
             <li class="sidebar-nav-item">
-                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="../page-views/admin-messages.php" href="#">
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="../page-views/messages.php" href="#">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
                     Messages
+                    <?php 
+                    // Get unread message count
+                    require_once __DIR__ . "/../classes/messages.class.php";
+                    $messagesObj = new Messages();
+                    $unread_count = $messagesObj->getUnreadCount($_SESSION['account']['id']);
+                    if ($unread_count > 0): 
+                    ?>
+                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full"><?php echo $unread_count; ?></span>
+                    <?php endif; ?>
                 </a>
             </li>
         </ul>
@@ -282,4 +308,3 @@ foreach ($words as $word) {
 
 <?php } ?>
 <script src="../js/script.js"></script>
-

@@ -33,39 +33,54 @@ if (empty($contentManager)) {
     }
 }
 
-// Handle message actions via AJAX
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action'])) {
-   $response = ['success' => false, 'message' => 'Unknown action'];
-   
-   // Make sure user is logged in
-   if (!isset($_SESSION['account'])) {
-       $response = ['success' => false, 'message' => 'You must be logged in'];
-       echo json_encode($response);
-       exit;
-   }
-   
-   $messagesObj = new Messages();
-   
-   // Send message
-   if ($_POST['message_action'] == 'send' && isset($_POST['receiver_id']) && isset($_POST['subject']) && isset($_POST['message'])) {
-       $result = $messagesObj->sendMessage($_SESSION['account']['id'], $_POST['receiver_id'], $_POST['subject'], $_POST['message']);
-       $response = ['success' => $result, 'message' => $result ? 'Message sent successfully' : 'Failed to send message'];
-   }
-   
-   // Mark message as read
-   if ($_POST['message_action'] == 'mark_read' && isset($_POST['message_id'])) {
-       $result = $messagesObj->markAsRead($_POST['message_id']);
-       $response = ['success' => $result, 'message' => $result ? 'Message marked as read' : 'Failed to mark message as read'];
-   }
-   
-   // Delete message
-   if ($_POST['message_action'] == 'delete' && isset($_POST['message_id'])) {
-       $result = $messagesObj->deleteMessage($_POST['message_id']);
-       $response = ['success' => $result, 'message' => $result ? 'Message deleted successfully' : 'Failed to delete message'];
-   }
-   
-   echo json_encode($response);
-   exit;
+// Handle anonymous message submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $_POST['message_action'] == 'send_anonymous') {
+    header('Content-Type: application/json');
+    
+    // Anti-spam check
+    $canSendMessage = true;
+    if (isset($_SESSION['last_message_time'])) {
+        $timeSinceLastMessage = time() - $_SESSION['last_message_time'];
+        $cooldownPeriod = 60; // 60 seconds cooldown
+        
+        if ($timeSinceLastMessage < $cooldownPeriod) {
+            $canSendMessage = false;
+            $timeRemaining = $cooldownPeriod - $timeSinceLastMessage;
+            echo json_encode([
+                'success' => false,
+                'message' => "Please wait $timeRemaining seconds before sending another message."
+            ]);
+            exit;
+        }
+    }
+    
+    if ($canSendMessage) {
+        $messagesObj = new Messages();
+        
+        $sender_name = !empty($_POST['sender_name']) ? $_POST['sender_name'] : 'Anonymous';
+        $subject = $_POST['subject'];
+        $message = $_POST['message'];
+        $receiver_id = isset($_POST['receiver_id']) ? $_POST['receiver_id'] : ($contentManager ? $contentManager['id'] : 1);
+        
+        // Send anonymous message (sender_id = 0)
+        $result = $messagesObj->sendAnonymousMessage(0, $sender_name, $receiver_id, $subject, $message);
+        
+        if ($result) {
+            // Set cooldown timestamp
+            $_SESSION['last_message_time'] = time();
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Message sent successfully!'
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to send message. Please try again.'
+            ]);
+        }
+    }
+    exit;
 }
 
 /** @region Carousel */
@@ -1309,8 +1324,13 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
             <textarea id="message" name="message" class="form-control" rows="4" required></textarea>
         </div>
         
+        <div class="form-group">
+            <label for="sender_name" class="form-label">Your Name (Optional):</label>
+            <input type="text" id="sender_name" name="sender_name" class="form-control">
+        </div>
+        
         <div class="text-right">
-            <button type="button" onclick="sendMessage()" class="btn btn-primary">Send Message</button>
+            <button type="button" onclick="sendAnonymousMessage()" class="btn btn-primary">Send Message</button>
         </div>
     </form>
 </div>
@@ -1514,6 +1534,50 @@ function sendMessage() {
     formData.append('subject', subject);
     formData.append('message', message);
     formData.append('sender_name', 'Anonymous'); // Since this is a public page
+    
+    // Send AJAX request
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            form.reset();
+            // Close the compose form or switch to another tab
+            switchMessageTab('inbox');
+        } else {
+            showToast(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        showToast('An error occurred', 'error');
+        console.error('Error:', error);
+    });
+}
+        
+        // Send anonymous message
+function sendAnonymousMessage() {
+    const form = document.getElementById('message-form');
+    const receiver_id = document.getElementById('receiver_id').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+    const sender_name = document.getElementById('sender_name').value;
+    
+    // Basic validation
+    if (!receiver_id || !subject || !message) {
+        showToast('Please fill all fields', 'error');
+        return;
+    }
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('message_action', 'send_anonymous');
+    formData.append('receiver_id', receiver_id);
+    formData.append('subject', subject);
+    formData.append('message', message);
+    formData.append('sender_name', sender_name);
     
     // Send AJAX request
     fetch(window.location.href, {

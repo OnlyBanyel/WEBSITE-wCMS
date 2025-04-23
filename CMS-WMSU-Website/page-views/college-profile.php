@@ -24,7 +24,7 @@ foreach ($collegeProfile as $data){
     if ($data['description'] == 'carousel-img'){
         $carouselImgs[] = $data;
     }
-    if ($data['description'] == 'college-name'){
+    if ($data['description'] == 'carousel-logo-text'){
         $collegeName[] = $data;
     }
 }
