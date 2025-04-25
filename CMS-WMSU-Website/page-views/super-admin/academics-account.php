@@ -14,22 +14,6 @@ $contentManage = $accManagementObj->fetchContentManagers();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Content Manager Accounts</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#BD0F03',
-                        primaryLight: '#ee948e',
-                        primaryDark: '#8B0000',
-                        secondary: '#f5efef',
-                        neutral: '#6a6a6a',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         /* File input styling */
         .custom-file-input {

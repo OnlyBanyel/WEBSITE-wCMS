@@ -47,23 +47,6 @@ if (empty($collegeName)) {
 }
 ?>
 
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '#BD0F03',
-                    primaryLight: '#ee948e',
-                    primaryDark: '#8B0000',
-                    secondary: '#f5efef',
-                    neutral: '#6a6a6a',
-                }
-            }
-        }
-    }
-</script>
 <style>
     /* Override Bootstrap's primary color with our red theme */
     .bg-primary,

@@ -1,24 +1,3 @@
-<?php 
-// Existing PHP code
-?>
-
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '#BD0F03',
-                    primaryLight: '#ee948e',
-                    primaryDark: '#8B0000',
-                    secondary: '#f5efef',
-                    neutral: '#6a6a6a',
-                }
-            }
-        }
-    }
-</script>
 <style>
     /* Override Bootstrap's primary color with our red theme */
     .bg-primary,
@@ -60,9 +39,6 @@
 <?php 
 if ($_SESSION['account']['role_id'] == 1){
 ?>
-
-
-
 <div class="h-screen flex flex-col bg-white border-r border-gray-200 w-64 shadow-md">
     <div class="p-4 border-b border-gray-200 flex items-center justify-between">
         <h2 class="text-xl font-bold text-primary">WMSU - CMS</h2>
@@ -215,8 +191,6 @@ foreach ($words as $word) {
 
 ?>
 
-
-
 <div class="h-screen flex flex-col bg-white border-r border-gray-200 w-64 shadow-md">
     <div class="p-4 border-b border-gray-200 flex items-center justify-between">
         <h2 class="text-xl font-bold text-primary"><?php echo $collegeName?> - CMS</h2>
@@ -228,58 +202,62 @@ foreach ($words as $word) {
     </div>
     
     <div class="flex-1 overflow-y-auto py-4">
-        <div class="px-4 mb-2">
-            <h3 class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Main Webpages</h3>
-        </div>
-
         <?php 
-        if ($_SESSION['subpageData']['isCollege'] == 0){
-            
-            ?>
-
+        if (isset($_SESSION['subpageData']) && $_SESSION['subpageData']['isCollege'] == 0){
+        ?>
+        <div class="px-4 mb-2">
+            <h3 class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Senior High School</h3>
+        </div>
+        
         <script>
-            $(document).ready(() => {
-            // For college users, load college profile by default if no saved page
-            var defaultPage = "<?php echo $_SESSION['subpageData']['isCollege'] == 0 
-                ? '../page-views/shs.php' 
-                : '../page-views/.php' ?>";
-            var savedPage = localStorage.getItem("activePage") || defaultPage;
-            loadPage(savedPage);
+            $(document).ready(function() {
+                // For SHS users, load SHS page by default
+                var defaultPage = "../page-views/shs.php";
+                var savedPage = localStorage.getItem("activePage");
+                
+                // If no saved page or saved page is not valid for SHS, use default
+                if (!savedPage || savedPage.indexOf("shs.php") === -1) {
+                    savedPage = defaultPage;
+                    localStorage.setItem("activePage", savedPage);
+                }
+                
+                loadPage(savedPage);
             });
         </script>
+        
         <ul class="space-y-1">
             <li class="sidebar-nav-item">
-                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="" href="#">
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="../page-views/shs.php" href="#">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
-                    College Profile
-                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
-                </a>
-            </li>
-            <li class="sidebar-nav-item">
-                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="" href="#">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    College Profile
-                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
-                </a>
-            </li>
-            <li class="sidebar-nav-item">
-                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="" href="#">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    College Profile
-                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
+                    Strands
                 </a>
             </li>
         </ul>
-            <?php 
-    
-        }else{
+        <?php 
+        } else {
         ?>
+        <div class="px-4 mb-2">
+            <h3 class="text-xs uppercase tracking-wider text-gray-500 font-semibold">College Management</h3>
+        </div>
+        
+        <script>
+            $(document).ready(function() {
+                // For college users, load college profile by default
+                var defaultPage = "../page-views/college-profile.php";
+                var savedPage = localStorage.getItem("activePage");
+                
+                // If no saved page, use default
+                if (!savedPage) {
+                    savedPage = defaultPage;
+                    localStorage.setItem("activePage", savedPage);
+                }
+                
+                loadPage(savedPage);
+            });
+        </script>
+        
         <ul class="space-y-1">
             <li class="sidebar-nav-item">
                 <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="../page-views/college-profile.php" href="#">
@@ -287,7 +265,6 @@ foreach ($words as $word) {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     College Profile
-                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
@@ -296,7 +273,10 @@ foreach ($words as $word) {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     College Overview
-                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
+                </a>
+            </li>  />
+                    </svg>
+                    College Overview
                 </a>
             </li>
             <li class="sidebar-nav-item">
@@ -305,7 +285,6 @@ foreach ($words as $word) {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     Departments
-                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
@@ -314,7 +293,6 @@ foreach ($words as $word) {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                     Courses Offered
-                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
                 </a>
             </li>
         </ul>
@@ -349,6 +327,7 @@ foreach ($words as $word) {
                 </a>
             </li>
         </ul>
+        <?php } ?>
     </div>
     
     <div class="border-t border-gray-200 p-4">
@@ -360,7 +339,5 @@ foreach ($words as $word) {
     </div>
 </div>
 
-<?php }
-
-} ?>
+<?php } ?>
 <script src="../js/script.js"></script>

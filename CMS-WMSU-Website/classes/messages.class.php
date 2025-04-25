@@ -38,7 +38,7 @@ class Messages {
     /**
      * Send a new message from an anonymous user
      * 
-     * @param int $sender_id The ID of the sender (0 for anonymous)
+     * @param int $sender_id The ID of the sender (NULL for anonymous)
      * @param string $sender_name The name of the anonymous sender
      * @param int $receiver_id The ID of the receiver
      * @param string $subject The message subject
@@ -51,7 +51,14 @@ class Messages {
                     VALUES (:sender_id, :sender_name, :receiver_id, :subject, :message, NOW())";
             
             $qry = $this->db->connect()->prepare($sql);
-            $qry->bindParam(':sender_id', $sender_id);
+            
+            // Bind sender_id as NULL if it's 0
+            if ($sender_id === 0) {
+                $qry->bindValue(':sender_id', null, PDO::PARAM_NULL);
+            } else {
+                $qry->bindParam(':sender_id', $sender_id);
+            }
+            
             $qry->bindParam(':sender_name', $sender_name);
             $qry->bindParam(':receiver_id', $receiver_id);
             $qry->bindParam(':subject', $subject);
@@ -74,7 +81,7 @@ class Messages {
         try {
             $sql = "SELECT m.*, 
                     CASE 
-                        WHEN m.sender_id = 0 THEN m.sender_name
+                        WHEN m.sender_id IS NULL THEN m.sender_name
                         ELSE CONCAT(a_sender.firstName, ' ', a_sender.lastName)
                     END AS sender_name,
                     a_sender.profileImg AS sender_profile_img

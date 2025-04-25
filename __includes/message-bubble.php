@@ -1,73 +1,88 @@
 <?php
-require_once "../../CMS-WMSU-Website/classes/messages.class.php";
-require_once "../../CMS-WMSU-Website/classes/pages.class.php";
-
-// Get the content manager for the current subpage
-$contentManager = null;
-$managerId = 1; // Default fallback to admin ID 1
-
-// Check if subpage is set in the session
-if (isset($_SESSION['subpage'])) {
-    $subpage_id = $_SESSION['subpage'];
-    $pagesObj = new Pages();
-    $managers = $pagesObj->fetchContentManagersBySubpage($subpage_id);
-    // Get the first manager if available
-    $contentManager = !empty($managers) ? $managers[0] : null;
-    
-    // Set the manager ID for the form
-    if ($contentManager) {
-        $managerId = $contentManager['id'];
-    }
+// Check if session is not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-// Store manager's name for display
-$managerName = $contentManager ? $contentManager['firstName'] . ' ' . $contentManager['lastName'] : 'Page Administrator';
+// Ensure headers are sent before any output
+header('Content-Type: application/json');
 
-// Anti-spam measures
-$canSendMessage = true;
-$spamErrorMessage = '';
-$timeRemaining = 0;
+// Initialize session variables for message cooldown if they don't exist
+if (!isset($_SESSION['last_message_time'])) {
+    $_SESSION['last_message_time'] = 0;
+}
 
-// Check if there's a recent message timestamp in the session
-if (isset($_SESSION['last_message_time'])) {
-    $timeSinceLastMessage = time() - $_SESSION['last_message_time'];
-    $cooldownPeriod = 60; // 60 seconds (1 minute) cooldown
+// Get content manager for current subpage
+$contentManager = null;
+$subpage_id = isset($_SESSION['subpage']) ? $_SESSION['subpage'] : null;
+
+// Only proceed if we have a subpage ID
+if ($subpage_id) {
+    // Include the Pages class if not already included
+    if (!class_exists('Pages')) {
+        require_once $_SERVER['DOCUMENT_ROOT'] . "/WEBSITE-WCMS/CMS-WMSU-Website/classes/pages.class.php";
+    }
     
-    if ($timeSinceLastMessage < $cooldownPeriod) {
-        $canSendMessage = false;
-        $timeRemaining = $cooldownPeriod - $timeSinceLastMessage;
-        $spamErrorMessage = "Please wait " . $timeRemaining . " seconds before sending another message.";
+    $pagesObj = new Pages();
+    
+    // Get content manager for the current subpage
+    $managers = $pagesObj->fetchContentManagersBySubpage($subpage_id);
+    $contentManager = !empty($managers) ? $managers[0] : null;
+    
+    // If no content manager found, get admin users as fallback
+    if (empty($contentManager)) {
+        $adminUsers = $pagesObj->fetchAdminUsers();
+        if (!empty($adminUsers)) {
+            $contentManager = $adminUsers[0];
+        }
     }
 }
 
 // Handle AJAX message submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $_POST['message_action'] == 'send_anonymous') {
-    header('Content-Type: application/json');
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'send_message') {
     
-    if (!$canSendMessage) {
+    // Anti-spam check - 60 seconds cooldown
+    $cooldownPeriod = 60;
+    $timeSinceLastMessage = time() - $_SESSION['last_message_time'];
+    
+    if ($timeSinceLastMessage < $cooldownPeriod) {
+        $timeRemaining = $cooldownPeriod - $timeSinceLastMessage;
         echo json_encode([
             'success' => false,
-            'message' => $spamErrorMessage
+            'message' => "Please wait {$timeRemaining} seconds before sending another message."
         ]);
         exit;
     }
     
+    // Include the Messages class if not already included
+    if (!class_exists('Messages')) {
+        require_once $_SERVER['DOCUMENT_ROOT'] . "/WEBSITE-WCMS/CMS-WMSU-Website/classes/messages.class.php";
+    }
+    
+    $messagesObj = new Messages();
+    
+    // Get form data
     $sender_name = !empty($_POST['sender_name']) ? $_POST['sender_name'] : 'Anonymous';
     $subject = $_POST['subject'];
     $message = $_POST['message'];
+    $receiver_id = isset($_POST['receiver_id']) ? $_POST['receiver_id'] : ($contentManager ? $contentManager['id'] : null);
     
-    // Use the manager ID from the form, fallback to the one we determined above
-    $receiver_id = isset($_POST['receiver_id']) ? $_POST['receiver_id'] : $managerId;
+    // Validate required fields
+    if (empty($subject) || empty($message) || empty($receiver_id)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Please fill in all required fields.'
+        ]);
+        exit;
+    }
     
-    // Set the sender_id to 0 for anonymous users
-    $sender_id = 0;
-    
-    $messagesObj = new Messages();
-    $result = $messagesObj->sendAnonymousMessage($sender_id, $sender_name, $receiver_id, $subject, $message);
+    // Send anonymous message (sender_id = 0)
+    $result = $messagesObj->sendAnonymousMessage(0, $sender_name, $receiver_id, $subject, $message);
     
     if ($result) {
-        // Set the last message timestamp to prevent spam
+        // Set cooldown timestamp
         $_SESSION['last_message_time'] = time();
+        
         echo json_encode([
             'success' => true,
             'message' => 'Message sent successfully!'
@@ -82,456 +97,382 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $
 }
 ?>
 
-<!-- Message Bubble -->
-<div id="message-bubble" class="fixed bottom-6 right-6 z-50" style="cursor: pointer;">
-    <button id="messageBubbleBtn" class="relative flex items-center justify-center w-14 h-14 text-white bg-primary hover:bg-primaryDark rounded-full shadow-lg transition-all duration-300 hover:scale-110">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-        </svg>
-    </button>
-</div>
-
-<!-- Message Overlay -->
-<div id="messageOverlay" class="fixed right-6 bottom-24 w-96 max-w-[90vw] bg-white rounded-lg shadow-xl z-40 overflow-hidden hidden">
-    <div class="bg-primary text-white px-4 py-3 flex justify-between items-center">
-        <h3 class="text-lg font-semibold">Contact Page Manager</h3>
-        <button onclick="toggleMessageOverlay()" class="text-white hover:text-gray-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-    </div>
-    
-    <div class="max-h-[70vh] overflow-y-auto">
-        <!-- Message Form -->
-        <div id="messageForm" class="p-4">
-            <p class="text-gray-700 mb-4">Send a message to the manager of this page. You can remain anonymous if you prefer.</p>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Recipient</label>
-                <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
-                    <?php echo htmlspecialchars($managerName); ?>
-                </div>
-                <input type="hidden" id="receiver_id" name="receiver_id" value="<?php echo $managerId; ?>">
-            </div>
-            
-            <form id="contactForm" class="space-y-4">
-                <div>
-                    <label for="sender_name" class="block text-sm font-medium text-gray-700 mb-1">Your Name (Optional)</label>
-                    <input type="text" id="sender_name" name="sender_name" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="Enter your name or leave blank to remain anonymous">
-                </div>
-                
-                <div>
-                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                    <input type="text" id="subject" name="subject" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" required placeholder="Enter message subject">
-                </div>
-                
-                <div>
-                    <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                    <textarea id="message" name="message" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" required placeholder="Enter your message here..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="receiver_id" class="form-label">To:</label>
-                    <select id="receiver_id" name="receiver_id" class="form-control" required>
-                        <?php if ($contentManager): ?>
-                            <option value="<?php echo $contentManager['id']; ?>" selected>
-                                <?php echo htmlspecialchars($contentManager['firstName'] . ' ' . $contentManager['lastName']); ?> (Page Manager)
-                            </option>
-                        <?php else: ?>
-                            <option value="1" selected>Page Administrator</option>
-                        <?php endif; ?>
-                    </select>
-                </div>
-                
-                <div>
-                    <button type="button" id="sendMessageBtn" onclick="sendAnonymousMessage()" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300" <?php echo !$canSendMessage ? 'disabled' : ''; ?>>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
-                        Send Message
-                    </button>
-                    
-                    <?php if (!$canSendMessage): ?>
-                        <div class="text-xs text-gray-500 text-center mt-2" id="cooldown-message">
-                            <?php echo $spamErrorMessage; ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </form>
-        </div>
-        
-        <!-- Success Message (hidden by default) -->
-        <div id="successMessage" class="p-6 text-center hidden">
-            <svg class="mx-auto h-12 w-12 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Message Sent!</h3>
-            <p class="text-gray-600 mb-4">Thank you for your message. <span class="font-semibold"><?php echo htmlspecialchars($managerName); ?></span> will review it soon.</p>
-            <button onclick="resetMessageForm()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                Send Another Message
-            </button>
-        </div>
-        
-        <!-- Error Message (hidden by default) -->
-        <div id="errorMessage" class="p-6 text-center hidden">
-            <svg class="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Error</h3>
-            <p id="errorText" class="text-gray-600 mb-4">Failed to send message. Please try again.</p>
-            <button onclick="showMessageForm()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                Try Again
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- Toast Notifications Container -->
-<div id="toastContainer" class="fixed top-4 right-4 z-50">
-    <!-- Toasts will be dynamically added here -->
-</div>
-
-<script>
-// Add event listener to the button
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('messageBubbleBtn').addEventListener('click', toggleMessageOverlay);
-    
-    <?php if (!$canSendMessage): ?>
-        startCooldownTimer(<?php echo $timeRemaining; ?>);
-    <?php endif; ?>
-});
-
-// Toggle message overlay visibility
-function toggleMessageOverlay() {
-    const overlay = document.getElementById('messageOverlay');
-    if (overlay.style.display === 'none' || overlay.classList.contains('hidden')) {
-        overlay.style.display = 'block';
-        overlay.classList.remove('hidden');
-    } else {
-        overlay.style.display = 'none';
-        overlay.classList.add('hidden');
-    }
-    
-    // If showing the overlay, ensure we're showing the form
-    if (overlay.style.display === 'block' || !overlay.classList.contains('hidden')) {
-        showMessageForm();
-    }
-}
-    
-// Send anonymous message via AJAX
-function sendAnonymousMessage() {
-    const form = document.getElementById('contactForm');
-    const receiver_id = document.getElementById('receiver_id').value;
-    const subject = document.getElementById('subject').value;
-    const message = document.getElementById('message').value;
-    const sender_name = document.getElementById('sender_name').value;
-    
-    // Basic validation
-    if (!subject) {
-        showToast('Please enter a subject', 'error');
-        return;
-    }
-    
-    if (!message) {
-        showToast('Please enter your message', 'error');
-        return;
-    }
-    
-    // Show loading state
-    const sendButton = document.getElementById('sendMessageBtn');
-    const originalButtonText = sendButton.innerHTML;
-    sendButton.disabled = true;
-    sendButton.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending...';
-    
-    // Create form data
-    const formData = new FormData();
-    formData.append('message_action', 'send_anonymous');
-    formData.append('receiver_id', receiver_id);
-    formData.append('subject', subject);
-    formData.append('message', message);
-    formData.append('sender_name', sender_name);
-        
-    // Send AJAX request
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Reset button state
-        sendButton.disabled = false;
-        sendButton.innerHTML = originalButtonText;
-        
-        if (data.success) {
-            // Show success message
-            showSuccessMessage();
-            
-            // Start cooldown timer if needed
-            if (data.cooldown) {
-                startCooldownTimer(data.cooldown);
-            }
-            
-            // Show toast notification
-            showToast('Message sent successfully!', 'success');
-        } else {
-            // Show error message
-            showErrorMessage(data.message);
-            showToast(data.message, 'error');
-        }
-    })
-    .catch(error => {
-        // Reset button state
-        sendButton.disabled = false;
-        sendButton.innerHTML = originalButtonText;
-        
-        console.error('Error:', error);
-        showErrorMessage('An error occurred. Please try again.');
-        showToast('An error occurred. Please try again.', 'error');
-    });
-}
-    
-// Show success message
-function showSuccessMessage() {
-    document.getElementById('messageForm').classList.add('hidden');
-    document.getElementById('errorMessage').classList.add('hidden');
-    document.getElementById('successMessage').classList.remove('hidden');
-}
-    
-// Show error message
-function showErrorMessage(message) {
-    document.getElementById('messageForm').classList.add('hidden');
-    document.getElementById('successMessage').classList.add('hidden');
-    document.getElementById('errorText').textContent = message;
-    document.getElementById('errorMessage').classList.remove('hidden');
-}
-    
-// Show message form
-function showMessageForm() {
-    document.getElementById('successMessage').classList.add('hidden');
-    document.getElementById('errorMessage').classList.add('hidden');
-    document.getElementById('messageForm').classList.remove('hidden');
-}
-    
-// Reset message form
-function resetMessageForm() {
-    document.getElementById('contactForm').reset();
-    showMessageForm();
-}
-    
-// Show toast notification
-function showToast(message, type = 'info') {
-    const toastContainer = document.getElementById('toastContainer');
-    
-    const toast = document.createElement('div');
-    toast.className = `flex items-center p-3 mb-3 text-sm rounded-md shadow-md
-                        ${type === 'success' ? 'bg-green-50 text-green-800 border-l-4 border-green-500' : 
-                          type === 'error' ? 'bg-red-50 text-red-800 border-l-4 border-red-500' : 
-                          'bg-blue-50 text-blue-800 border-l-4 border-blue-500'}`;
-    
-    let icon = '';
-    if (type === 'success') {
-        icon = '<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
-    } else if (type === 'error') {
-        icon = '<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-    } else {
-        icon = '<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-    }
-    
-    toast.innerHTML = `
-        <div class="flex items-center">
-            ${icon}
-            <span>${message}</span>
-        </div>
-        <button class="ml-auto text-gray-500 hover:text-gray-700" onclick="this.parentElement.remove()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-    `;
-    
-    toastContainer.appendChild(toast);
-    
-    // Remove toast after 5 seconds
-    setTimeout(() => {
-        toast.remove();
-    }, 5000);
-}
-    
-// Start cooldown timer
-function startCooldownTimer(seconds) {
-    const sendButton = document.querySelector('button[onclick="sendAnonymousMessage()"]');
-    const cooldownMessage = document.getElementById('cooldown-message');
-    
-    if (!cooldownMessage) {
-        const cooldownElement = document.createElement('div');
-        cooldownElement.id = 'cooldown-message';
-        cooldownElement.className = 'text-xs text-gray-500 text-center mt-2';
-        sendButton.parentNode.appendChild(cooldownElement);
-    }
-    
-    sendButton.disabled = true;
-    
-    const updateCooldown = function(remaining) {
-        document.getElementById('cooldown-message').textContent = `Please wait ${remaining} seconds before sending another message.`;
-        
-        if (remaining <= 0) {
-            sendButton.disabled = false;
-            document.getElementById('cooldown-message').textContent = '';
-            clearInterval(interval);
-        }
-    };
-    
-    updateCooldown(seconds);
-    
-    const interval = setInterval(() => {
-        seconds--;
-        updateCooldown(seconds);
-    }, 1000);
-}
-    
-// Initialize
-<?php if (!$canSendMessage): ?>
-document.addEventListener('DOMContentLoaded', function() {
-    startCooldownTimer(<?php echo $timeRemaining; ?>);
-});
-<?php endif; ?>
-
-function loadContentManager() {
-    // Get the current subpage from the session
-    const subpageId = <?php echo isset($_SESSION['subpage']) ? $_SESSION['subpage'] : 1; ?>;
-    
-    // Create form data
-    const formData = new FormData();
-    formData.append('action', 'get_content_manager');
-    formData.append('subpage_id', subpageId);
-    
-    // Send AJAX request to get content manager
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.manager) {
-            const select = document.getElementById('receiver_id');
-            
-            // Clear existing options
-            select.innerHTML = '';
-            
-            // Add the content manager option
-            const option = document.createElement('option');
-            option.value = data.manager.id;
-            option.textContent = data.manager.firstName + ' ' + data.manager.lastName + ' (Page Manager)';
-            option.selected = true;
-            select.appendChild(option);
-        } else {
-            console.error('Failed to load content manager:', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error loading content manager:', error);
-    });
-}
-
-function switchMessageTab(tab) {
-    // Hide all content
-    document.getElementById('inbox-content').style.display = 'none';
-    document.getElementById('sent-content').style.display = 'none';
-    document.getElementById('compose-form').style.display = 'none';
-    document.getElementById('message-view').style.display = 'none';
-    
-    // Remove active class from all tabs
-    document.getElementById('tab-inbox').classList.remove('active');
-    document.getElementById('tab-sent').classList.remove('active');
-    document.getElementById('tab-compose').classList.remove('active');
-    
-    // Show selected content and activate tab
-    if (tab === 'inbox') {
-        document.getElementById('inbox-content').style.display = 'block';
-        document.getElementById('tab-inbox').classList.add('active');
-    } else if (tab === 'sent') {
-        document.getElementById('sent-content').style.display = 'block';
-        document.getElementById('tab-sent').classList.add('active');
-    } else if (tab === 'compose') {
-        document.getElementById('compose-form').style.display = 'block';
-        document.getElementById('tab-compose').classList.add('active');
-        if (document.getElementById('compose-form').style.display === 'block') {
-            loadContentManager();
-        }
-    }
-}
-</script>
-
+<!-- Message Bubble Styles -->
 <style>
-    /* Custom scrollbar for message overlay */
-    #messageOverlay::-webkit-scrollbar {
-        width: 6px;
+    /* Message Bubble */
+    .message-bubble {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 1000;
+        transition: all 0.3s ease;
     }
-    
-    #messageOverlay::-webkit-scrollbar-track {
-        background: #f1f1f1;
+
+    .message-bubble:hover {
+        transform: scale(1.1);
     }
-    
-    #messageOverlay::-webkit-scrollbar-thumb {
-        background: #BD0F03;
-        border-radius: 10px;
+
+    .message-bubble-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #BD0F03;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
-    
-    #messageOverlay::-webkit-scrollbar-thumb:hover {
-        background: #8B0000;
+
+    .message-bubble-btn:hover {
+        background-color: #8B0000;
     }
-    
-    /* Disabled button styles */
-    button:disabled {
-        opacity: 0.7;
+
+    /* Message Form Overlay */
+    .message-form-overlay {
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        width: 320px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        z-index: 999;
+        overflow: hidden;
+        display: none;
+        transition: all 0.3s ease;
+    }
+
+    .message-form-header {
+        background-color: #BD0F03;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .message-form-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .message-form-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .message-form-body {
+        padding: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #BD0F03;
+        outline: none;
+    }
+
+    .form-control.textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .btn-send {
+        background-color: #BD0F03;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
+
+    .btn-send:hover {
+        background-color: #8B0000;
+    }
+
+    .btn-send:disabled {
+        background-color: #cccccc;
         cursor: not-allowed;
     }
-    
-    /* Enhanced Send button styles */
-    #sendMessageBtn {
-        position: relative;
-        overflow: hidden;
+
+    /* Toast Notification */
+    .toast-container {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 1100;
     }
 
-    #sendMessageBtn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    .toast {
+        padding: 12px 20px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 250px;
+        max-width: 350px;
+        animation: slideIn 0.3s ease forwards;
     }
 
-    #sendMessageBtn:active {
-        transform: translateY(0);
+    .toast-success {
+        background-color: #4CAF50;
+        color: white;
     }
 
-    #sendMessageBtn::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 5px;
-        height: 5px;
-        background: rgba(255, 255, 255, 0.5);
-        opacity: 0;
-        border-radius: 100%;
-        transform: scale(1, 1) translate(-50%);
-        transform-origin: 50% 50%;
+    .toast-error {
+        background-color: #F44336;
+        color: white;
     }
 
-    #sendMessageBtn:focus:not(:active)::after {
-        animation: ripple 1s ease-out;
+    .toast-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 0;
+        margin-left: 10px;
     }
 
-    @keyframes ripple {
-        0% {
-            transform: scale(0, 0);
-            opacity: 0.5;
-        }
-        20% {
-            transform: scale(25, 25);
-            opacity: 0.3;
-        }
-        100% {
+    @keyframes slideIn {
+        from {
+            transform: translateX(-100%);
             opacity: 0;
-            transform: scale(40, 40);
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+    }
+
+    .slide-out {
+        animation: slideOut 0.3s ease forwards;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+        .message-form-overlay {
+            width: 90%;
+            right: 5%;
+            left: 5%;
         }
     }
 </style>
+
+<!-- Message Bubble Button -->
+<div class="message-bubble">
+    <div class="message-bubble-btn" id="messageBubbleBtn">
+        <i class="fas fa-comment"></i>
+    </div>
+</div>
+
+<!-- Message Form Overlay -->
+<div class="message-form-overlay" id="messageFormOverlay">
+    <div class="message-form-header">
+        <h3>Send a Message</h3>
+        <button class="message-form-close" id="messageFormClose">&times;</button>
+    </div>
+    <div class="message-form-body">
+        <form id="messageForm">
+            <input type="hidden" name="action" value="send_message">
+            <?php if ($contentManager): ?>
+                <input type="hidden" name="receiver_id" value="<?php echo $contentManager['id']; ?>">
+            <?php endif; ?>
+            
+            <div class="form-group">
+                <label for="sender_name">Your Name (optional)</label>
+                <input type="text" class="form-control" id="sender_name" name="sender_name" placeholder="Anonymous">
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject *</label>
+                <input type="text" class="form-control" id="subject" name="subject" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Message *</label>
+                <textarea class="form-control textarea" id="message" name="message" required></textarea>
+            </div>
+            
+            <button type="submit" class="btn-send" id="sendButton">
+                Send Message
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Toast Container for Notifications -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- JavaScript for Message Bubble Functionality -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elements
+        const messageBubbleBtn = document.getElementById('messageBubbleBtn');
+        const messageFormOverlay = document.getElementById('messageFormOverlay');
+        const messageFormClose = document.getElementById('messageFormClose');
+        const messageForm = document.getElementById('messageForm');
+        const sendButton = document.getElementById('sendButton');
+        const toastContainer = document.getElementById('toastContainer');
+        
+        // Toggle message form
+        messageBubbleBtn.addEventListener('click', function() {
+            messageFormOverlay.style.display = messageFormOverlay.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        // Close message form
+        messageFormClose.addEventListener('click', function() {
+            messageFormOverlay.style.display = 'none';
+        });
+        
+        // Handle form submission
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Disable send button and show loading state
+            sendButton.disabled = true;
+            const originalButtonText = sendButton.innerHTML;
+            sendButton.innerHTML = '<span class="spinner"></span> Sending...';
+            
+            // Get form data
+            const formData = new FormData(messageForm);
+            
+            // Send AJAX request
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Show toast notification
+                showToast(data.success ? 'success' : 'error', data.message);
+                
+                // Reset form if successful
+                if (data.success) {
+                    messageForm.reset();
+                    setTimeout(() => {
+                        messageFormOverlay.style.display = 'none';
+                    }, 2000);
+                }
+                
+                // Reset button state
+                sendButton.disabled = false;
+                sendButton.innerHTML = originalButtonText;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'An unexpected error occurred. Please try again.');
+                
+                // Reset button state
+                sendButton.disabled = false;
+                sendButton.innerHTML = originalButtonText;
+            });
+        });
+        
+        // Function to show toast notifications
+        function showToast(type, message) {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            const messageSpan = document.createElement('span');
+            messageSpan.textContent = message;
+            
+            const closeButton = document.createElement('button');
+            closeButton.className = 'toast-close';
+            closeButton.innerHTML = '&times;';
+            closeButton.addEventListener('click', function() {
+                removeToast(toast);
+            });
+            
+            toast.appendChild(messageSpan);
+            toast.appendChild(closeButton);
+            toastContainer.appendChild(toast);
+            
+            // Auto-remove toast after 5 seconds
+            setTimeout(() => {
+                removeToast(toast);
+            }, 5000);
+        }
+        
+        // Function to remove toast with animation
+        function removeToast(toast) {
+            toast.classList.add('slide-out');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }
+        
+        // Close message form when clicking outside
+        document.addEventListener('click', function(event) {
+            if (messageFormOverlay.style.display === 'block' && 
+                !messageFormOverlay.contains(event.target) && 
+                event.target !== messageBubbleBtn) {
+                messageFormOverlay.style.display = 'none';
+            }
+        });
+    });
+</script>

@@ -212,7 +212,12 @@ nav{
 .dropdown-content {
     margin: 0 30px;
 }
-
+.inline-align {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
 .dropdown-content h6 {
     color: #7C0A02;
     font-size: 17px;

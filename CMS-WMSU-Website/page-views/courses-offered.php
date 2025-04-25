@@ -104,27 +104,10 @@ if (empty($gradCourses)) {
 }
 ?>
 
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '#BD0F03',
-                    primaryLight: '#ee948e',
-                    primaryDark: '#8B0000',
-                    secondary: '#f5efef',
-                    neutral: '#6a6a6a',
-                }
-            }
-        }
-    }
-</script>
 <style>
     /* Override Bootstrap's primary color with our red theme */
     .bg-primary,
-    .bg-primary.active,
+    .bg-primary.active,ta
     .bg-primary:not([class*="bg-opacity"]) {
         --tw-bg-opacity: 1 !important;
         --bs-bg-opacity: 1 !important;

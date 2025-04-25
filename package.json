@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/OnlyBanyel/WEBSITE-wCMS/issues"
   },
-  "homepage": "https://github.com/OnlyBanyel/WEBSITE-wCMS#readme"
+  "homepage": "https://github.com/OnlyBanyel/WEBSITE-wCMS#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
 }

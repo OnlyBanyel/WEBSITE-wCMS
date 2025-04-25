@@ -3,11 +3,11 @@ session_start();
 
 // Check if user is logged in
 if (empty($_SESSION['account'])) {
-    header('Location: ../pages/login-form.php');
+    header('Location: login-form.php');
     exit;
 }
 
-require_once __DIR__ . "/../classes/messages.class.php";
+require_once "../classes/messages.class.php";
 
 // Initialize Messages class
 $messagesObj = new Messages();
@@ -26,7 +26,7 @@ if (isset($_POST['action'])) {
     }
 }
 
-// Get inbox messages
+// Get inbox messages for the current user
 $messages = $messagesObj->getInboxMessages($user_id);
 
 // Get unread count
@@ -34,7 +34,6 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
 ?>
 
 <!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
 <script>
     tailwind.config = {
         theme: {
@@ -240,6 +239,7 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
+                                        
                                     </button>
                                 </div>
                                 
@@ -357,12 +357,13 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
     
     // Close modal with Escape key
     document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            const modals = document.querySelectorAll('.modal-overlay.active');
-            modals.forEach(modal => {
-                modal.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-        }
-    });
+    if (event.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal-overlay.active');
+        modals.forEach(modal => {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }); 
+    } 
+}); 
+
 </script>
