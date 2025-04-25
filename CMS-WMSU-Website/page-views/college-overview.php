@@ -57,9 +57,9 @@ if (empty($genInfoTitles)) {
 
 if (empty($genInfoBackHead)) {
     $genInfoBackHead = [
-        ['content' => 'Our College Goals', 'sectionID' => 'temp_cg_head'],
-        ['content' => 'Our College Mission', 'sectionID' => 'temp_cm_head'],
-        ['content' => 'Our College Vision', 'sectionID' => 'temp_cv_head']
+        ['content' => ' ', 'sectionID' => 'temp_cg_head'],
+        ['content' => ' ', 'sectionID' => 'temp_cm_head'],
+        ['content' => ' ', 'sectionID' => 'temp_cv_head']
     ];
 }
 
@@ -250,7 +250,7 @@ if (empty($genInfoImgs)) {
                         <form action="../page-functions/updateOverviewItem.php" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
-                                <input type="text" name="overviewTitle" data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>">
+                                <input type="text" name="overviewTitle" disabled data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>">
                                 <input type="hidden" name="overviewSectionID" value="<?php echo $titleSectionID; ?>">
                                 <input type="hidden" name="isNew" value="<?php echo strpos($titleSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
                                 <input type="hidden" name="sectionType" value="<?php echo $q; ?>">
@@ -376,43 +376,6 @@ if (empty($genInfoImgs)) {
     document.getElementById('previewSection').addEventListener('click', function() {
         const previewContent = document.getElementById('previewContent');
         previewContent.classList.toggle('hidden');
-    });
-    
-    // Add outcome functionality
-    document.querySelectorAll('.add-outcome').forEach(button => {
-        button.addEventListener('click', function() {
-            const sectionNum = this.getAttribute('data-section');
-            const outcomeType = this.getAttribute('data-type');
-            const outcomesList = document.getElementById('outcomes-list-' + sectionNum);
-            const items = outcomesList.querySelectorAll('li');
-            const newIndex = items.length + 1;
-            const formName = this.closest('form').getAttribute('name').split('-')[0];
-            const tempId = 'temp_new_outcome_' + Date.now();
-            
-            const newItem = document.createElement('li');
-            newItem.className = 'flex items-center gap-2';
-            newItem.innerHTML = `
-                <input type="text" 
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
-                    name="outcome_content[]" 
-                    id="${formName}-${newIndex}-outcomes" 
-                    data-sectionid="${tempId}" 
-                    value="">
-                <input type="hidden" name="outcome_sectionid[]" value="${tempId}">
-                <input type="hidden" name="outcome_isnew[]" value="1">
-                <input type="hidden" name="outcome_type[]" value="${outcomeType}">
-                <button type="button" class="remove-outcome btn btn-danger">
-                    ×
-                </button>
-            `;
-            
-            outcomesList.appendChild(newItem);
-            
-            // Add event listener to the new remove button
-            newItem.querySelector('.remove-outcome').addEventListener('click', function() {
-                this.closest('li').remove();
-            });
-        });
     });
     
     // Remove outcome functionality

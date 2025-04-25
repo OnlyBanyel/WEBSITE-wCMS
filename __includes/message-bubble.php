@@ -131,8 +131,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $
                     <textarea id="message" name="message" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" required placeholder="Enter your message here..."></textarea>
                 </div>
                 
+                <div class="form-group">
+                    <label for="receiver_id" class="form-label">To:</label>
+                    <select id="receiver_id" name="receiver_id" class="form-control" required>
+                        <?php if ($contentManager): ?>
+                            <option value="<?php echo $contentManager['id']; ?>" selected>
+                                <?php echo htmlspecialchars($contentManager['firstName'] . ' ' . $contentManager['lastName']); ?> (Page Manager)
+                            </option>
+                        <?php else: ?>
+                            <option value="1" selected>Page Administrator</option>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                
                 <div>
-                    <button type="button" onclick="sendAnonymousMessage()" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" <?php echo !$canSendMessage ? 'disabled' : ''; ?>>
+                    <button type="button" id="sendMessageBtn" onclick="sendAnonymousMessage()" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300" <?php echo !$canSendMessage ? 'disabled' : ''; ?>>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
@@ -225,6 +238,12 @@ function sendAnonymousMessage() {
         return;
     }
     
+    // Show loading state
+    const sendButton = document.getElementById('sendMessageBtn');
+    const originalButtonText = sendButton.innerHTML;
+    sendButton.disabled = true;
+    sendButton.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending...';
+    
     // Create form data
     const formData = new FormData();
     formData.append('message_action', 'send_anonymous');
@@ -240,6 +259,10 @@ function sendAnonymousMessage() {
     })
     .then(response => response.json())
     .then(data => {
+        // Reset button state
+        sendButton.disabled = false;
+        sendButton.innerHTML = originalButtonText;
+        
         if (data.success) {
             // Show success message
             showSuccessMessage();
@@ -248,14 +271,23 @@ function sendAnonymousMessage() {
             if (data.cooldown) {
                 startCooldownTimer(data.cooldown);
             }
+            
+            // Show toast notification
+            showToast('Message sent successfully!', 'success');
         } else {
             // Show error message
             showErrorMessage(data.message);
+            showToast(data.message, 'error');
         }
     })
     .catch(error => {
+        // Reset button state
+        sendButton.disabled = false;
+        sendButton.innerHTML = originalButtonText;
+        
         console.error('Error:', error);
         showErrorMessage('An error occurred. Please try again.');
+        showToast('An error occurred. Please try again.', 'error');
     });
 }
     
@@ -313,8 +345,7 @@ function showToast(message, type = 'info') {
         </div>
         <button class="ml-auto text-gray-500 hover:text-gray-700" onclick="this.parentElement.remove()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
     `;
     
@@ -364,6 +395,71 @@ document.addEventListener('DOMContentLoaded', function() {
     startCooldownTimer(<?php echo $timeRemaining; ?>);
 });
 <?php endif; ?>
+
+function loadContentManager() {
+    // Get the current subpage from the session
+    const subpageId = <?php echo isset($_SESSION['subpage']) ? $_SESSION['subpage'] : 1; ?>;
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('action', 'get_content_manager');
+    formData.append('subpage_id', subpageId);
+    
+    // Send AJAX request to get content manager
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.manager) {
+            const select = document.getElementById('receiver_id');
+            
+            // Clear existing options
+            select.innerHTML = '';
+            
+            // Add the content manager option
+            const option = document.createElement('option');
+            option.value = data.manager.id;
+            option.textContent = data.manager.firstName + ' ' + data.manager.lastName + ' (Page Manager)';
+            option.selected = true;
+            select.appendChild(option);
+        } else {
+            console.error('Failed to load content manager:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading content manager:', error);
+    });
+}
+
+function switchMessageTab(tab) {
+    // Hide all content
+    document.getElementById('inbox-content').style.display = 'none';
+    document.getElementById('sent-content').style.display = 'none';
+    document.getElementById('compose-form').style.display = 'none';
+    document.getElementById('message-view').style.display = 'none';
+    
+    // Remove active class from all tabs
+    document.getElementById('tab-inbox').classList.remove('active');
+    document.getElementById('tab-sent').classList.remove('active');
+    document.getElementById('tab-compose').classList.remove('active');
+    
+    // Show selected content and activate tab
+    if (tab === 'inbox') {
+        document.getElementById('inbox-content').style.display = 'block';
+        document.getElementById('tab-inbox').classList.add('active');
+    } else if (tab === 'sent') {
+        document.getElementById('sent-content').style.display = 'block';
+        document.getElementById('tab-sent').classList.add('active');
+    } else if (tab === 'compose') {
+        document.getElementById('compose-form').style.display = 'block';
+        document.getElementById('tab-compose').classList.add('active');
+        if (document.getElementById('compose-form').style.display === 'block') {
+            loadContentManager();
+        }
+    }
+}
 </script>
 
 <style>
@@ -389,5 +485,53 @@ document.addEventListener('DOMContentLoaded', function() {
     button:disabled {
         opacity: 0.7;
         cursor: not-allowed;
+    }
+    
+    /* Enhanced Send button styles */
+    #sendMessageBtn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    #sendMessageBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #sendMessageBtn:active {
+        transform: translateY(0);
+    }
+
+    #sendMessageBtn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+    }
+
+    #sendMessageBtn:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+    }
+
+    @keyframes ripple {
+        0% {
+            transform: scale(0, 0);
+            opacity: 0.5;
+        }
+        20% {
+            transform: scale(25, 25);
+            opacity: 0.3;
+        }
+        100% {
+            opacity: 0;
+            transform: scale(40, 40);
+        }
     }
 </style>

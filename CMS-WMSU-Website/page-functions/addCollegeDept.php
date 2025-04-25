@@ -20,6 +20,8 @@ if (isset($_POST['collegeName'])) {
     $pageID = 3;
     // Handle logo upload
     $logoPath = null;
+
+
     if (isset($_FILES['collegeLogo']) && $_FILES['collegeLogo']['error'] == 0) {
         $logoFile = $_FILES['collegeLogo'];
         $logoFileName = time() . '_' . basename($logoFile['name']);
@@ -50,6 +52,8 @@ if (isset($_POST['collegeName'])) {
                 $logoPath,
                 $pageID
             );
+            $pagesObj->addNewCollegeName($pageID, 'College Profile', 'text', $collegeName, 'carousel-logo-text');
+
         }         
         if ($collegeAdded) {
             // Refresh college data in session if needed

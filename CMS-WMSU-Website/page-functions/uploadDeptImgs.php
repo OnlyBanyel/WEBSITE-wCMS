@@ -44,13 +44,11 @@ if (isset($_POST['deptName']) && isset($_POST['textID'])) {
         }
     }
     
-    // Handle image upload if present
     if (isset($_FILES['deptImg']) && $_FILES['deptImg']['error'] === UPLOAD_ERR_OK) {
         $sectionID = $_POST['sectionID']; 
         $imgIsNew = isset($_POST['imgIsNew']) && $_POST['imgIsNew'] === '1';
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . "/WEBSITE-wCMS/imgs/";
         
-        // Create directory if it doesn't exist
         if (!file_exists($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }

@@ -20,6 +20,7 @@ if ((isset($_POST['submit'])) && ($_SERVER['REQUEST_METHOD'] === 'POST')){
         $_SESSION['account'] = $loginObj->fetchAccount();
         if ($_SESSION['account']['role_id'] == 2 && isset($_SESSION['account']['subpage_assigned'])){
             $subpage_assigned = $_SESSION['account']['subpage_assigned'];
+            $_SESSION['subpageData'] = $loginObj->fetchSubpage($subpage_assigned);
             $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage_assigned);
         }
         header('Location: dashboard.php');
@@ -260,8 +261,8 @@ if ((isset($_POST['submit'])) && ($_SERVER['REQUEST_METHOD'] === 'POST')){
     <?php } ?>
 
     <div class="form-container">
-        <div class="form-header">
-            <img src="https://wmsu.edu.ph/wp-content/uploads/2019/08/wmsu-logo.png" alt="WMSU Logo">
+        <div class="form-header flex flex-column justify-center items-center">
+            <img src="../../imgs/WMSU-Logo.png" class="" alt="WMSU Logo">
             <h2>Login to WMSU</h2>
             <p>Enter your credentials to access your account</p>
         </div>

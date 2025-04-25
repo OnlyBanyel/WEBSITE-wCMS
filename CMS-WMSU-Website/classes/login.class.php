@@ -56,6 +56,19 @@ require_once __DIR__ . "/db_connection.class.php";
             }
         }
 
+        function fetchSubpage($subpage_assigned){
+            $sql = "SELECT * from subpages WHERE subpageID = :subpage_assigned";
+            $qry = $this->db->connect()->prepare($sql);
+
+            $qry->bindParam(':subpage_assigned', $subpage_assigned);
+
+            if ($qry->execute()){
+                $data = $qry->fetch(PDO::FETCH_ASSOC);
+            }else{
+                $data = null;
+            }
+            return $data;
+        }
         function fetchCollegeData($subpage_assigned){
             $sql = "SELECT * from page_sections WHERE subpage = :subpage_assigned";
             $qry = $this->db->connect()->prepare($sql);

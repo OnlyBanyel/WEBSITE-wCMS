@@ -40,13 +40,7 @@ $(document).ready(() => {
       },
     });
   }
-
-  // This is the updated code for handling the status form submissions
-  // Initialize form handlers when page first loads
   initFormHandlers();
-
-  // Only updating the relevant part of the script.js file
-  // This is the function that handles the form submission
 
   function initFormHandlers() {
     // Check if jQuery is loaded
@@ -57,7 +51,6 @@ $(document).ready(() => {
       return; // Exit the function if jQuery is not loaded
     }
 
-    // Remove any existing event handlers to prevent duplicates
     $(document)
       .off("submit", "form.status-form")
       .on("submit", "form.status-form", function (e) {

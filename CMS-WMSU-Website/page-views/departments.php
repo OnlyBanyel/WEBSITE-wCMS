@@ -236,45 +236,4 @@ while (count($genInfoImgs) < count($departments)) {
         document.body.appendChild(form);
         form.submit();
     });
-    
-    // Form submission with AJAX
-    document.querySelectorAll('.departmentForm').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-        
-            const formData = new FormData(this);
-            const isNew = formData.get('isNew') === '1';
-        
-            // Disable the submit button to prevent double submission
-            const submitButton = this.querySelector('input[type="submit"]');
-            submitButton.disabled = true;
-            submitButton.value = 'Saving...';
-        
-            fetch(this.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Department ' + (isNew ? 'added' : 'updated') + ' successfully!');
-                    // Reload the page to show updated content
-                    window.location.reload();
-                } else {
-                    alert('Error: ' + (data.message || 'Failed to save department.'));
-                    console.error(data);
-                    // Re-enable the button if there was an error
-                    submitButton.disabled = false;
-                    submitButton.value = 'Save';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-                // Re-enable the button if there was an error
-                submitButton.disabled = false;
-                submitButton.value = 'Save';
-            });
-        });
-    });
 </script>

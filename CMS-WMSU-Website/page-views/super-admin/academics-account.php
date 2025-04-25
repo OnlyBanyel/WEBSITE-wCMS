@@ -126,7 +126,7 @@ $contentManage = $accManagementObj->fetchContentManagers();
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Department Logo</label>
                                 <div class="border border-dashed border-gray-300 rounded-lg p-4 text-center">
                                     <div class="mb-4">
-                                        <img id="logoPreview" src="/placeholder.svg?height=150&width=150" alt="Logo Preview" class="mx-auto h-32 w-32 object-contain">
+                                        <img id="logoPreview" src="../../imgs/default-dept-img.png" alt="Logo Preview" class="mx-auto h-32 w-32 object-contain">
                                     </div>
                                     
                                     <div class="custom-file-input">
@@ -173,7 +173,7 @@ $contentManage = $accManagementObj->fetchContentManagers();
                                     <?php if(!empty($manager['profileImg'])): ?>
                                         <img src="<?php echo htmlspecialchars($manager['profileImg']); ?>" class="w-full h-full object-cover" alt="Profile Image">
                                     <?php else: ?>
-                                        <img src="/WEBSITE-wCMS/imgs/profiles/default-profile.jpg" class="w-full h-full object-cover" alt="Default Profile">
+                                        <img src="/WEBSITE-wCMS/imgs/profiles/default-profile.png" class="w-full h-full object-cover" alt="Default Profile">
                                     <?php endif; ?>
                                 </div>
                                 <h5 class="text-xl font-semibold">
@@ -373,7 +373,7 @@ $contentManage = $accManagementObj->fetchContentManagers();
                 
                 // Reset form
                 form.reset();
-                $('#logoPreview').attr('src', '/placeholder.svg?height=150&width=150');
+                $('#logoPreview').attr('src', '../../imgs/profiles/default-profile.png');
                 $('#fileNameDisplay').text('Choose logo file...');
                 
                 // Reload the page after a short delay to show the new department
@@ -396,33 +396,6 @@ $contentManage = $accManagementObj->fetchContentManagers();
         }
     });
 }
-        
-        // Handle status form submissions with AJAX
-        document.querySelectorAll('.status-form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(this);
-                
-                fetch('update-account-status.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Reload the page to show updated status
-                        location.reload();
-                    } else {
-                        alert(data.message || 'An error occurred');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                });
-            });
-        });
     </script>
 </body>
 </html>

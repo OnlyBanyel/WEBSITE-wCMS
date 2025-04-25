@@ -14,7 +14,6 @@ if (empty($_SESSION['account'])){
 <head>
 <title>Academics Page</title>
 <?php require_once '../__includes/head.php' ?>
-<link rel="stylesheet" href="../css/academics-page.css">
 </head>
 
     <script>

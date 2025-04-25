@@ -61,6 +61,8 @@
 if ($_SESSION['account']['role_id'] == 1){
 ?>
 
+
+
 <div class="h-screen flex flex-col bg-white border-r border-gray-200 w-64 shadow-md">
     <div class="p-4 border-b border-gray-200 flex items-center justify-between">
         <h2 class="text-xl font-bold text-primary">WMSU - CMS</h2>
@@ -210,7 +212,10 @@ foreach ($words as $word) {
         $collegeName .= strtoupper($word[0]); // Take first letter
     }
 }
+
 ?>
+
+
 
 <div class="h-screen flex flex-col bg-white border-r border-gray-200 w-64 shadow-md">
     <div class="p-4 border-b border-gray-200 flex items-center justify-between">
@@ -226,6 +231,55 @@ foreach ($words as $word) {
         <div class="px-4 mb-2">
             <h3 class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Main Webpages</h3>
         </div>
+
+        <?php 
+        if ($_SESSION['subpageData']['isCollege'] == 0){
+            
+            ?>
+
+        <script>
+            $(document).ready(() => {
+            // For college users, load college profile by default if no saved page
+            var defaultPage = "<?php echo $_SESSION['subpageData']['isCollege'] == 0 
+                ? '../page-views/shs.php' 
+                : '../page-views/.php' ?>";
+            var savedPage = localStorage.getItem("activePage") || defaultPage;
+            loadPage(savedPage);
+            });
+        </script>
+        <ul class="space-y-1">
+            <li class="sidebar-nav-item">
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    College Profile
+                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    College Profile
+                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    College Profile
+                    <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full">NEW</span>
+                </a>
+            </li>
+        </ul>
+            <?php 
+    
+        }else{
+        ?>
         <ul class="space-y-1">
             <li class="sidebar-nav-item">
                 <a class="flex items-center px-4 py-2 text-gray-700 hover:text-primary dynamic-load" data-file="../page-views/college-profile.php" href="#">
@@ -306,5 +360,7 @@ foreach ($words as $word) {
     </div>
 </div>
 
-<?php } ?>
+<?php }
+
+} ?>
 <script src="../js/script.js"></script>

@@ -449,11 +449,9 @@ public function fetchAdminUsers() {
 }
 public function fetchContentManagersBySubpage($subpage_id) {
     try {
-        $sql = "SELECT a.id, a.firstName, a.lastName, a.profileImg, a.role_id, r.roleName 
+        $sql = "SELECT *
                 FROM accounts a 
-                LEFT JOIN roles r ON a.role_id = r.id 
-                WHERE a.subpage_assigned = :subpage_id 
-                ORDER BY a.firstName, a.lastName";
+                WHERE a.subpage_assigned = :subpage_id";
         $qry = $this->db->connect()->prepare($sql);
         $qry->bindParam(':subpage_id', $subpage_id, PDO::PARAM_INT);
         $qry->execute();
@@ -462,11 +460,10 @@ public function fetchContentManagersBySubpage($subpage_id) {
         
         // If no specific managers found for this subpage, fall back to admin users
         if (empty($managers)) {
-            $sql = "SELECT a.id, a.firstName, a.lastName, a.profileImg, a.role_id, r.roleName 
+            $sql = "SELECT *
                     FROM accounts a 
-                    LEFT JOIN roles r ON a.role_id = r.id 
-                    WHERE a.role_id = 1 
-                    ORDER BY a.firstName, a.lastName";
+                    WHERE a.role_id = 1";
+                    
             $qry = $this->db->connect()->prepare($sql);
             $qry->execute();
             $managers = $qry->fetchAll(PDO::FETCH_ASSOC);
@@ -491,6 +488,29 @@ public function fetchContentManagersBySubpage($subpage_id) {
         $qry->bindParam(':logoPath', $logoPath);
 
         return ($qry->execute());
+    }
+
+    function addNewCollegeName($pageID, $indicator, $elemType, $content, $desc){
+
+        $sql0 = "SELECT subpageID from subpages WHERE subPageName = :content";
+        $qry0 = $this->db->connect()->prepare($sql0);
+        $qry0->bindParam(':content', $content);
+        $qry0->execute();
+        $data = $qry0->fetchColumn();
+        
+        $sql = "INSERT INTO page_sections (pageID, subpage, indicator, elemType, content, description)
+        VALUES (:pageID, :subpage, :indicator, :elemType, :content, :desc);";
+        $qry = $this->db->connect()->prepare($sql);
+
+        $qry->bindParam(':pageID', $pageID);
+        $qry->bindParam(':subpage', $data);
+        $qry->bindParam(':elemType', $elemType);
+        $qry->bindParam(':indicator', $indicator);
+        $qry->bindParam(':content', $content);
+        $qry->bindParam(':desc', $desc);
+
+        return ($qry->execute());
+
     }
 }
 

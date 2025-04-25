@@ -11,12 +11,10 @@ $acadSubpages = $acadSubpagesObj->fetchCollegeSubpages(3);
     <?php require_once "../../__includes/head.php"; ?>
     <title>WMSU - Academics</title>
     <style>
-        /* Remove underlines from links */
         a {
             text-decoration: none !important;
         }
         
-        /* College title styling */
         .college-title {
             color: #0066cc;
             font-weight: 500;
@@ -24,14 +22,12 @@ $acadSubpages = $acadSubpagesObj->fetchCollegeSubpages(3);
             line-height: 1.3;
         }
         
-        /* Red line under college titles */
         .red-line {
             height: 2px;
             background-color: #BD0F03;
             width: 100%;
         }
         
-        /* View Details button styling */
         .view-details-btn {
             background-color: #BD0F03;
             color: white !important;

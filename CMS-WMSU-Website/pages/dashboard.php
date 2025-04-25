@@ -56,15 +56,8 @@ if (!isset($_SESSION['lastRole']) || $_SESSION['lastRole'] != $_SESSION['account
      <?php require_once '../__includes/sidebar.php'; ?>
      </div>
 
-     <div class="welcome-container">
-     <h2>Welcome <?php
-    echo $_SESSION['account']['firstName']?>!</h2>
-     </div>
      
-<div class="main-content">
-<h2>Welcome <?php
-    echo $_SESSION['account']['firstName']?>!</h2>
-    
+<div class="main-content">    
     <section class='main-content-section'id="main-content-section"></section>
 </div>
 </html>

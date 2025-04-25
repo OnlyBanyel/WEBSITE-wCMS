@@ -75,12 +75,12 @@ foreach ($coursesAndPrograms as $item) {
 // Create default courses if none exist
 if (empty($undergradCourses)) {
     $undergradCourses = [
-        "Bachelor of Science in Computer Science" => [
+        "Change this with course name " => [
             "sectionID" => "temp_undergrad_1",
             "outcomes" => [],
             "index" => 1
         ],
-        "Bachelor of Business Administration" => [
+        "Change this with course name" => [
             "sectionID" => "temp_undergrad_2",
             "outcomes" => [],
             "index" => 2
@@ -90,12 +90,12 @@ if (empty($undergradCourses)) {
 
 if (empty($gradCourses)) {
     $gradCourses = [
-        "Master of Science in Information Technology" => [
+        "Change this with course name" => [
             "sectionID" => "temp_grad_1",
             "outcomes" => [],
             "index" => 1
         ],
-        "Master of Business Administration" => [
+        "Change this with course name " => [
             "sectionID" => "temp_grad_2",
             "outcomes" => [],
             "index" => 2
@@ -453,41 +453,7 @@ if (empty($gradCourses)) {
         previewContent.classList.toggle('hidden');
     });
     
-    // Add outcome functionality
-    document.querySelectorAll('.add-outcome').forEach(button => {
-        button.addEventListener('click', function() {
-            const courseId = this.getAttribute('data-course');
-            const outcomesList = document.getElementById('outcomes-' + courseId);
-            const items = outcomesList.querySelectorAll('li');
-            const newIndex = items.length + 1;
-            const formName = this.closest('form').getAttribute('id').split('-')[0];
-            const tempId = 'temp_new_outcome_' + Date.now();
-            
-            const newItem = document.createElement('li');
-            newItem.className = 'flex items-center gap-2';
-            newItem.innerHTML = `
-                <input type="text" 
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
-                    name="outcome_content[]" 
-                    id="${formName}-outcomes-${newIndex}" 
-                    data-sectionid="${tempId}" 
-                    value="">
-                <input type="hidden" name="outcome_sectionid[]" value="${tempId}">
-                <input type="hidden" name="outcome_isnew[]" value="1">
-                <button type="button" class="remove-outcome btn btn-danger">
-                    ×
-                </button>
-            `;
-            
-            outcomesList.appendChild(newItem);
-            
-            // Add event listener to the new remove button
-            newItem.querySelector('.remove-outcome').addEventListener('click', function() {
-                this.closest('li').remove();
-            });
-        });
-    });
-    
+
     // Remove outcome functionality
     document.querySelectorAll('.remove-outcome').forEach(button => {
         button.addEventListener('click', function() {
