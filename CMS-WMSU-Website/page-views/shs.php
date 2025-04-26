@@ -1,10 +1,7 @@
 <?php 
-session_start();
+// No need for session_start() as it's already handled in dashboard.php
 require_once "../classes/pages.class.php";
 $shsObj = new Pages;
-
-// Fetch all strand data using the same pattern as college-overview.php
-$strandsData = [];
 
 // Use the same subpage ID for SHS (31)
 $subpage = 31;
@@ -71,29 +68,8 @@ if (empty($strands)) {
 }
 ?>
 
+<!-- No need for HTML, head, body tags as this is loaded into dashboard.php -->
 <style>
-    /* Override Bootstrap's primary color with our red theme */
-    .bg-primary,
-    .bg-primary.active,
-    .bg-primary:not([class*="bg-opacity"]) {
-        --tw-bg-opacity: 1 !important;
-        --bs-bg-opacity: 1 !important;
-        background-color: rgb(189 15 3 / var(--tw-bg-opacity)) !important;
-    }
-    
-    .btn-primary,
-    .btn-primary:hover,
-    .btn-primary:focus,
-    .btn-primary:active {
-        background-color: rgb(189 15 3 / var(--tw-bg-opacity)) !important;
-        border-color: rgb(189 15 3 / var(--tw-bg-opacity)) !important;
-    }
-    
-    :root {
-        --bs-primary: #BD0F03 !important;
-        --bs-primary-rgb: 189, 15, 3 !important;
-    }
-    
     /* Custom styles for preview section */
     .preview-section {
         transition: all 0.3s ease;
@@ -264,7 +240,7 @@ if (empty($strands)) {
                 
                 <div class="collapsible-content expanded" id="strand-content-<?php echo $strand['sectionID']; ?>">
                     <div class="p-5">
-                        <form action="../page-functions/addStrandItem.php" method="POST" class="space-y-4 strand-form">
+                        <form action="" method="POST" class="space-y-4 strand-form" id="updateStrandForm-<?php echo $strand['sectionID']; ?>">
                             <input type="hidden" name="subpage" value="31">
                             <input type="hidden" name="strandID" value="<?php echo $strand['sectionID']; ?>">
                             <input type="hidden" name="descID" value="<?php echo $strand['desc_sectionID']; ?>">
@@ -278,58 +254,28 @@ if (empty($strands)) {
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Strand Description</label>
-                                <textarea name="strandDesc" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"><?php echo $strand['desc']; ?></textarea>
+                                <textarea name="strandDesc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required><?php echo $strand['desc']; ?></textarea>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Core Subjects</label>
-                                <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $strand['sectionID']; ?>">
-                                    <?php 
-                                    if (!empty($strand['outcomes'])) {
-                                        foreach ($strand['outcomes'] as $index => $outcome) { 
-                                    ?>
-                                        <li class="flex items-center gap-2">
-                                            <input type="text" 
-                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
-                                                name="outcome_content[]" 
-                                                value="<?php echo $outcome['content']; ?>">
-                                            <input type="hidden" name="outcome_sectionid[]" value="<?php echo $outcome['sectionID']; ?>">
-                                            <input type="hidden" name="outcome_isnew[]" value="<?php echo strpos($outcome['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
-                                            <button type="button" class="remove-outcome" data-sectionid="<?php echo $outcome['sectionID']; ?>">
-                                                ×
-                                            </button>
-                                        </li>
-                                    <?php 
-                                        }
-                                    } else {
-                                        // Add empty input field if no items exist
-                                    ?>
-                                        <li class="flex items-center gap-2">
-                                            <input type="text" 
-                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
-                                                name="outcome_content[]" 
-                                                value="">
-                                            <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $strand['sectionID']; ?>_1">
-                                            <input type="hidden" name="outcome_isnew[]" value="1">
-                                            <button type="button" class="remove-outcome" data-sectionid="temp_outcome_<?php echo $strand['sectionID']; ?>_1">
-                                                ×
-                                            </button>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Strand End Description</label>
+                                <textarea name="strandEndDesc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required><?php echo $strand['end_desc']; ?></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Outcomes</label>
+                                <ul class="outcomes-list" id="outcome-list-<?php echo $strand['sectionID']; ?>">
+                                    <?php foreach ($strand['outcomes'] as $outcome) { ?>
+                                        <li>
+                                            <input type="text" name="outcomeContent[]" class="outcome-input" value="<?php echo $outcome['content']; ?>" data-sectionid="<?php echo $outcome['sectionID']; ?>">
+                                            <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $outcome['sectionID']; ?>">Remove</button>
                                         </li>
                                     <?php } ?>
                                 </ul>
-                                <button type="button" class="add-outcome mt-2 bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm transition-colors" data-strand-id="<?php echo $strand['sectionID']; ?>">
-                                    + Add Subject
-                                </button>
+                                <button type="button" class="add-outcome bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Add Outcome</button>
                             </div>
                             
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Closing Description</label>
-                                <textarea name="strandEndDesc" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"><?php echo $strand['end_desc']; ?></textarea>
-                            </div>
-                            
-                            <div class="flex justify-end">
-                                <input type="submit" value="Save Changes" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors">
-                            </div>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Update Strand</button>
                         </form>
                     </div>
                 </div>
@@ -338,279 +284,202 @@ if (empty($strands)) {
     </div>
 </div>
 
+<!-- Modal for adding new strand -->
+<div id="addStrandModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Strand</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addStrandForm" class="space-y-4" method="POST">
+          <input type="hidden" name="subpage" value="31">
+          <input type="hidden" name="isNew" value="1">
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Strand Name</label>
+            <input type="text" name="strandName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Strand Description</label>
+            <textarea name="strandDesc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required></textarea>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Strand End Description</label>
+            <textarea name="strandEndDesc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required></textarea>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Outcomes</label>
+            <ul class="outcomes-list" id="outcome-list-new">
+            </ul>
+            <button type="button" class="add-outcome bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" data-target="new">Add Outcome</button>
+          </div>
+          
+          <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Strand</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Toggle collapsible sections
-        document.querySelectorAll('.collapse-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const targetContent = document.getElementById(targetId);
-                const icon = this.querySelector('.collapse-icon');
-                
-                if (targetContent) {
-                    targetContent.classList.toggle('expanded');
-                    if (icon) {
-                        icon.classList.toggle('rotated');
-                    }
-                }
-            });
-        });
-        
-        // Add new outcome/subject
-        document.querySelectorAll('.add-outcome').forEach(button => {
-            button.addEventListener('click', function() {
-                const strandId = this.getAttribute('data-strand-id');
-                const outcomesList = document.getElementById(`outcomes-list-${strandId}`);
-                const outcomeCount = outcomesList.querySelectorAll('li').length + 1;
-                
-                const newOutcome = document.createElement('li');
-                newOutcome.className = 'flex items-center gap-2';
-                newOutcome.innerHTML = `
-                    <input type="text" 
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
-                        name="outcome_content[]" 
-                        value="">
-                    <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_${strandId}_${outcomeCount}">
-                    <input type="hidden" name="outcome_isnew[]" value="1">
-                    <button type="button" class="remove-outcome" data-sectionid="temp_outcome_${strandId}_${outcomeCount}">
-                        ×
-                    </button>
-                `;
-                
-                outcomesList.appendChild(newOutcome);
-                
-                // Add event listener to the new remove button
-                newOutcome.querySelector('.remove-outcome').addEventListener('click', function() {
-                    this.closest('li').remove();
-                });
-            });
-        });
-        
-        // Remove outcome/subject
-        document.querySelectorAll('.remove-outcome').forEach(button => {
-            button.addEventListener('click', function() {
-                this.closest('li').remove();
-            });
-        });
-        
-        // Add new strand
-        document.getElementById('addNewStrand').addEventListener('click', function() {
-            const strandId = 'temp_strand_' + Date.now();
-            const strandsContainer = document.getElementById('strandsContainer');
-            
-            const newStrandForm = document.createElement('div');
-            newStrandForm.className = 'bg-white rounded-lg shadow-md overflow-hidden strand-form-container';
-            newStrandForm.setAttribute('data-strand-id', strandId);
-            
-            newStrandForm.innerHTML = `
-                <div class="bg-primary text-white p-4 flex justify-between items-center collapse-toggle" data-target="strand-content-${strandId}">
-                    <h3 class="font-semibold">New Strand</h3>
-                    <div class="flex items-center">
-                        <button type="button" class="remove-strand mr-3" data-strand-id="${strandId}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <span class="collapse-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="collapsible-content expanded" id="strand-content-${strandId}">
-                    <div class="p-5">
-                        <form action="../page-functions/addStrandItem.php" method="POST" class="space-y-4 strand-form">
-                            <input type="hidden" name="subpage" value="31">
-                            <input type="hidden" name="strandID" value="${strandId}">
-                            <input type="hidden" name="descID" value="temp_desc_${strandId}">
-                            <input type="hidden" name="endDescID" value="temp_end_desc_${strandId}">
-                            <input type="hidden" name="isNew" value="1">
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Strand Name</label>
-                                <input type="text" name="strandName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="" required>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Strand Description</label>
-                                <textarea name="strandDesc" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Core Subjects</label>
-                                <ul class="outcomes-list space-y-3" id="outcomes-list-${strandId}">
-                                    <li class="flex items-center gap-2">
-                                        <input type="text" 
-                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
-                                            name="outcome_content[]" 
-                                            value="">
-                                        <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_${strandId}_1">
-                                        <input type="hidden" name="outcome_isnew[]" value="1">
-                                        <button type="button" class="remove-outcome" data-sectionid="temp_outcome_${strandId}_1">
-                                            ×
-                                        </button>
-                                    </li>
-                                </ul>
-                                <button type="button" class="add-outcome mt-2 bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm transition-colors" data-strand-id="${strandId}">
-                                    + Add Subject
-                                </button>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Closing Description</label>
-                                <textarea name="strandEndDesc" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
-                            </div>
-                            
-                            <div class="flex justify-end">
-                                <input type="submit" value="Save Changes" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors">
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            `;
-            
-            strandsContainer.appendChild(newStrandForm);
-            
-            // Add event listeners to the new elements
-            const newToggle = newStrandForm.querySelector('.collapse-toggle');
-            newToggle.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const targetContent = document.getElementById(targetId);
-                const icon = this.querySelector('.collapse-icon');
-                
-                if (targetContent) {
-                    targetContent.classList.toggle('expanded');
-                    if (icon) {
-                        icon.classList.toggle('rotated');
-                    }
-                }
-            });
-            
-            const newAddOutcome = newStrandForm.querySelector('.add-outcome');
-            newAddOutcome.addEventListener('click', function() {
-                const strandId = this.getAttribute('data-strand-id');
-                const outcomesList = document.getElementById(`outcomes-list-${strandId}`);
-                const outcomeCount = outcomesList.querySelectorAll('li').length + 1;
-                
-                const newOutcome = document.createElement('li');
-                newOutcome.className = 'flex items-center gap-2';
-                newOutcome.innerHTML = `
-                    <input type="text" 
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
-                        name="outcome_content[]" 
-                        value="">
-                    <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_${strandId}_${outcomeCount}">
-                    <input type="hidden" name="outcome_isnew[]" value="1">
-                    <button type="button" class="remove-outcome" data-sectionid="temp_outcome_${strandId}_${outcomeCount}">
-                        ×
-                    </button>
-                `;
-                
-                outcomesList.appendChild(newOutcome);
-                
-                // Add event listener to the new remove button
-                newOutcome.querySelector('.remove-outcome').addEventListener('click', function() {
-                    this.closest('li').remove();
-                });
-            });
-            
-            newStrandForm.querySelectorAll('.remove-outcome').forEach(button => {
-                button.addEventListener('click', function() {
-                    this.closest('li').remove();
-                });
-            });
-            
-            const newRemoveStrand = newStrandForm.querySelector('.remove-strand');
-            newRemoveStrand.addEventListener('click', function() {
-                const strandId = this.getAttribute('data-strand-id');
-                const strandContainer = document.querySelector(`.strand-form-container[data-strand-id="${strandId}"]`);
-                if (strandContainer) {
-                    strandContainer.remove();
-                }
-            });
-        });
-        
-        // Remove strand
-        document.querySelectorAll('.remove-strand').forEach(button => {
-            button.addEventListener('click', function() {
-                const strandId = this.getAttribute('data-strand-id');
-                const strandContainer = document.querySelector(`.strand-form-container[data-strand-id="${strandId}"]`);
-                
-                if (strandContainer) {
-                    if (confirm('Are you sure you want to delete this strand? This action cannot be undone.')) {
-                        // If it's not a temporary ID (new strand), send delete request to server
-                        if (!strandId.startsWith('temp_')) {
-                            fetch('../page-functions/removeItem.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                },
-                                body: `sectionID=${strandId}`
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    strandContainer.remove();
-                                    alert('Strand deleted successfully!');
-                                } else {
-                                    alert('Error: ' + (data.message || 'Failed to delete strand.'));
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('An error occurred. Please try again.');
-                            });
-                        } else {
-                            // For new strands that haven't been saved yet, just remove from DOM
-                            strandContainer.remove();
-                        }
-                    }
-                }
-            });
-        });
-        
-        // Form submission with AJAX
-        document.querySelectorAll('.strand-form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Disable the submit button to prevent double submission
-                const submitButton = this.querySelector('input[type="submit"]');
-                submitButton.disabled = true;
-                submitButton.value = 'Saving...';
-                
-                // Create FormData object
-                const formData = new FormData(this);
-                
-                // Send AJAX request
-                fetch(this.action, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Changes saved successfully!');
-                        // Reload the page to show updated content
-                        window.location.reload();
-                    } else {
-                        alert('Error: ' + (data.message || 'Failed to save changes.'));
-                        console.error(data);
-                        // Re-enable the button if there was an error
-                        submitButton.disabled = false;
-                        submitButton.value = 'Save Changes';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                    // Re-enable the button if there was an error
-                    submitButton.disabled = false;
-                    submitButton.value = 'Save Changes';
-                });
-            });
-        });
+$(document).ready(function() {
+  // Add event listener for the "Add New Strand" button
+  $('#addNewStrand').click(function() {
+    // Open the modal for adding a new strand
+    $('#addStrandModal').modal('show');
+  });
+
+  // Handle form submission for adding new strand
+  $(document).on('submit', '#addStrandForm', function(e) {
+    e.preventDefault();
+
+    var formData = new FormData(this);
+
+    // Collect outcomes
+    $('#outcome-list-new li input').each(function(index) {
+        formData.append('outcome_content[]', $(this).val());
     });
+
+    $.ajax({
+      url: '../page-functions/addStrandItem.php',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      dataType: 'json',
+      success: function(response) {
+        if (response.success) {
+          alert(response.message);
+          location.reload();
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('An error occurred: ' + error);
+      }
+    });
+  });
+
+  // Handle form submission for updating a strand
+  $(document).on('submit', 'form[id^="updateStrandForm-"]', function(e) {
+    e.preventDefault();
+
+    var formData = new FormData(this);
+
+    // Collect outcomes
+    $(this).find('.outcomes-list li input').each(function(index) {
+        formData.append('outcome_content[]', $(this).val());
+        formData.append('outcome_sectionid[]', $(this).data('sectionid'));
+        formData.append('outcome_isnew[]', $(this).data('is-new') ? '1' : '0');
+    });
+
+    var strandID = $(this).attr('id').replace('updateStrandForm-', '');
+
+    formData.append('strandID', strandID);
+
+    $.ajax({
+      url: '../page-functions/updateStrand.php',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      dataType: 'json',
+      success: function(response) {
+        if (response.success) {
+          alert(response.message);
+          location.reload();
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('An error occurred: ' + error);
+      }
+    });
+  });
+
+  // Handle delete strand button click
+  $(document).on('click', '.remove-strand', function() {
+    var strandID = $(this).data('strand-id');
+
+    if (confirm('Are you sure you want to delete this strand?')) {
+      $.ajax({
+        url: '../page-functions/deleteStrand.php',
+        type: 'POST',
+        data: { strandID: strandID },
+        dataType: 'json',
+        success: function(response) {
+          if (response.success) {
+            alert(response.message);
+            location.reload();
+          } else {
+            alert(response.message);
+          }
+        },
+        error: function(xhr, status, error) {
+          alert('An error occurred: ' + error);
+        }
+      });
+    }
+  });
+
+  // Handle add outcome button click
+  $(document).on('click', '.add-outcome', function(e) {
+    e.preventDefault();
+    const form = $(this).closest('.strand-form');
+    const outcomesList = form.find('.outcomes-list');
+    const formID = form.attr('id').replace('updateStrandForm-', '');
+
+    const newOutcome = $(`
+      <li>
+        <input type="text" name="outcomeContent[]" class="outcome-input" data-sectionid="" data-is-new="1">
+        <button type="button" class="remove-outcome btn btn-danger">Remove</button>
+      </li>
+    `);
+
+    outcomesList.append(newOutcome);
+  });
+
+  // Handle delete outcome button click
+  $(document).on('click', '.remove-outcome', function() {
+    const button = $(this);
+    const listItem = button.closest('li');
+
+    if (button.data('is-new') || !button.data('sectionid')) {
+      listItem.remove();
+      return;
+    }
+
+    if (confirm('Are you sure you want to delete this outcome permanently?')) {
+      $.ajax({
+        url: '../page-functions/deleteStrandOutcome.php',
+        type: 'POST',
+        data: {
+          outcomeID: button.data('sectionid')
+        },
+        dataType: 'json',
+        success: function(response) {
+          if (response.success) {
+            alert(response.message);
+            location.reload();
+          } else {
+            alert(response.message);
+          }
+        },
+        error: function(xhr, status, error) {
+          alert('An error occurred: ' + error);
+        }
+      });
+    }
+  });
+});
+
 </script>

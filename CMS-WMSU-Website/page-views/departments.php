@@ -123,7 +123,7 @@ while (count($genInfoImgs) < count($departments)) {
     </div>
 
     <!-- Edit Forms Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="flex flex-col justify-between gap-5">
         <?php 
         $i = 0;
         foreach ($departments as $items) { ?>

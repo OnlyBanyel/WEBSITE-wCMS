@@ -1,32 +1,55 @@
 <?php
 session_start();
 require_once "../classes/pages.class.php";
-require_once "../tools/functions.php";
 
-// Check if user is logged in and has appropriate permissions
-if (!isset($_SESSION['logged_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+// Set content type to JSON
+header('Content-Type: application/json');
+
+// Check if user is logged in
+if (!isset($_SESSION['account'])) {
+    echo json_encode(['success' => false, 'message' => 'You must be logged in to perform this action.']);
     exit;
 }
 
-// Initialize Pages object
-$pagesObj = new Pages();
-
-// Check if form was submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get strand ID
-    $strandID = $_POST['strandID'] ?? '';
+// Process deletion request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['strandID'])) {
+    $pagesObj = new Pages();
+    $strandID = $_POST['strandID'];
     
-    if (empty($strandID)) {
-        echo json_encode(['success' => false, 'message' => 'Strand ID is required']);
-        exit;
+    try {
+        // Get the strand data to find related items
+        $strandData = $pagesObj->getRowById($strandID);
+        
+        if (!$strandData) {
+            throw new Exception("Strand not found");
+        }
+        
+        // Delete the strand name entry
+        if (!$pagesObj->deleteVal($strandID)) {
+            throw new Exception("Failed to delete strand");
+        }
+        
+        // Find and delete related entries (description, end description, and outcomes)
+        $relatedItemsSQL = "SELECT sectionID FROM page_sections 
+                           WHERE subpage = 31 
+                           AND indicator = 'Strand' 
+                           AND (description = 'strand-desc' 
+                                OR description = 'strand-desc-end' 
+                                OR description LIKE 'strand-item-%')";
+        
+        $relatedItems = $pagesObj->execQuery($relatedItemsSQL);
+        
+        if ($relatedItems) {
+            foreach ($relatedItems as $item) {
+                $pagesObj->deleteVal($item['sectionID']);
+            }
+        }
+        
+        echo json_encode(['success' => true, 'message' => 'Strand deleted successfully']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
-    
-    // Delete strand
-    $result = $pagesObj->deleteStrand($strandID);
-    
-    echo json_encode($result);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    echo json_encode(['success' => false, 'message' => 'Invalid request']);
 }
 ?>

@@ -12,6 +12,9 @@ if (!isset($_SESSION['account'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pagesObj = new Pages();
     
+    // Log received data for debugging
+    file_put_contents('updateStrand.log', print_r($_POST, true), FILE_APPEND);
+
     // Get form data
     $subpage = isset($_POST['subpage']) ? intval($_POST['subpage']) : 31; // Default to SHS subpage
     $strandID = $_POST['strandID'];
@@ -24,9 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $strandEndDesc = $_POST['strandEndDesc'];
     
     try {
-        // Begin transaction
-        $pagesObj->beginTransaction();
-        
+
         // Handle strand name (main strand entry)
         if ($isNew) {
             // Create new strand
@@ -72,15 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle outcomes/subjects
         if (isset($_POST['outcome_content']) && is_array($_POST['outcome_content'])) {
             $outcomeContents = $_POST['outcome_content'];
-            $outcomeSectionIDs = $_POST['outcome_sectionid'];
-            $outcomeIsNew = $_POST['outcome_isnew'];
+            $outcomeSectionIDs = isset($_POST['outcome_sectionid']) ? $_POST['outcome_sectionid'] : [];
+            $outcomeIsNew = isset($_POST['outcome_isnew']) ? $_POST['outcome_isnew'] : [];
             
             for ($i = 0; $i < count($outcomeContents); $i++) {
                 $content = $outcomeContents[$i];
-                $sectionID = $outcomeSectionIDs[$i];
-                $isNewOutcome = $outcomeIsNew[$i] === '1';
+                $sectionID = isset($outcomeSectionIDs[$i]) ? $outcomeSectionIDs[$i] : null;
+                $isNewOutcome = isset($outcomeIsNew[$i]) && $outcomeIsNew[$i] === '1';
                 
-                if ($isNewOutcome) {
+                if ($isNewOutcome || is_null($sectionID)) {
                     // Create new outcome
                     $pagesObj->addPageSection([
                         'subpage' => $subpage,
@@ -97,13 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // Commit transaction
-        $pagesObj->commit();
-        
         echo json_encode(['success' => true, 'message' => 'Strand updated successfully']);
     } catch (Exception $e) {
-        // Rollback transaction on error
-        $pagesObj->rollback();
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 } else {

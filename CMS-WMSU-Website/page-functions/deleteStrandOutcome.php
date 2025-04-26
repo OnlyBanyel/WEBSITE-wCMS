@@ -1,32 +1,32 @@
 <?php
 session_start();
 require_once "../classes/pages.class.php";
-require_once "../tools/functions.php";
 
-// Check if user is logged in and has appropriate permissions
-if (!isset($_SESSION['logged_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+// Set content type to JSON
+header('Content-Type: application/json');
+
+// Check if user is logged in
+if (!isset($_SESSION['account'])) {
+    echo json_encode(['success' => false, 'message' => 'You must be logged in to perform this action.']);
     exit;
 }
 
-// Initialize Pages object
-$pagesObj = new Pages();
-
-// Check if form was submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get outcome ID
-    $outcomeID = $_POST['outcomeID'] ?? '';
+// Process deletion request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['outcomeID'])) {
+    $pagesObj = new Pages();
+    $outcomeID = $_POST['outcomeID'];
     
-    if (empty($outcomeID)) {
-        echo json_encode(['success' => false, 'message' => 'Outcome ID is required']);
-        exit;
+    try {
+        // Delete the outcome
+        if (!$pagesObj->deleteVal($outcomeID)) {
+            throw new Exception("Failed to delete subject");
+        }
+        
+        echo json_encode(['success' => true, 'message' => 'Subject deleted successfully']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
-    
-    // Delete outcome
-    $result = $pagesObj->deleteStrandOutcome($outcomeID);
-    
-    echo json_encode($result);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    echo json_encode(['success' => false, 'message' => 'Invalid request']);
 }
 ?>

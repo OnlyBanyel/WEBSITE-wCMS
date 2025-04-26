@@ -207,7 +207,7 @@ if (empty($genInfoImgs)) {
     </div>
 
     <!-- Edit Forms Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="flex flex-col justify-between gap-2">
         <!-- Overview Items -->
         <div class="space-y-6">
             <?php for ($q = 0; $q < 3; $q++) { 
@@ -224,6 +224,47 @@ if (empty($genInfoImgs)) {
                 
                 $listTypes = ['CG-list-item', 'CM-list-item', 'CV-list-item'];
             ?> 
+
+              <!-- Image Section -->
+        <div>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-primary text-white p-4">
+                    <h3 class="font-semibold"><?php echo !empty($genInfoImgs) && !empty($genInfoImgs[1]['imagePath']) ? 'Change Overview Image' : 'Add Overview Image'; ?></h3>
+                </div>
+                <div class="p-5">
+                    <form action="../page-functions/uploadOverviewImg.php" method="POST" id="overviewImg-<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>" enctype="multipart/form-data" class="space-y-4">
+                        <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-64 flex items-center justify-center">
+                            <?php if (isset($genInfoImgs[1]) && !empty($genInfoImgs[1]['imagePath'])) { ?>
+                                <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" alt="Overview Image" class="max-w-full max-h-full object-contain">
+                            <?php } else { ?>
+                                <div class="text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p class="text-gray-500">No image uploaded</p>
+                                </div>
+                            <?php } ?>
+                        </div>
+                        
+                        <input type="hidden" name="imageIndex" value="<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>">
+                        <input type="hidden" name="isNew" value="<?php echo (!isset($genInfoImgs[1]) || strpos($genInfoImgs[1]['sectionID'], 'temp_') === 0) ? '1' : '0'; ?>">
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="relative flex-1 mr-4">
+                                <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="overviewImg" id="overviewImg-<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>" accept="image/*">
+                                <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
+                                    <span class="file-name">Choose a file...</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <input type="submit" name="submitImg" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Upload">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
                     <div class="bg-primary text-white p-4">
                         <h3 class="font-semibold"><?php echo !empty($titleContent) ? 'Edit '.$titleContent : 'Add '.$sectionNames[$q]; ?></h3>
@@ -302,46 +343,6 @@ if (empty($genInfoImgs)) {
             <?php } ?>
         </div>
 
-        <!-- Image Section -->
-        <div>
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="bg-primary text-white p-4">
-                    <h3 class="font-semibold"><?php echo !empty($genInfoImgs) && !empty($genInfoImgs[1]['imagePath']) ? 'Change Overview Image' : 'Add Overview Image'; ?></h3>
-                </div>
-                <div class="p-5">
-                    <form action="../page-functions/uploadOverviewImg.php" method="POST" id="overviewImg-<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>" enctype="multipart/form-data" class="space-y-4">
-                        <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-64 flex items-center justify-center">
-                            <?php if (isset($genInfoImgs[1]) && !empty($genInfoImgs[1]['imagePath'])) { ?>
-                                <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" alt="Overview Image" class="max-w-full max-h-full object-contain">
-                            <?php } else { ?>
-                                <div class="text-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <p class="text-gray-500">No image uploaded</p>
-                                </div>
-                            <?php } ?>
-                        </div>
-                        
-                        <input type="hidden" name="imageIndex" value="<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>">
-                        <input type="hidden" name="isNew" value="<?php echo (!isset($genInfoImgs[1]) || strpos($genInfoImgs[1]['sectionID'], 'temp_') === 0) ? '1' : '0'; ?>">
-                        
-                        <div class="flex items-center justify-between">
-                            <div class="relative flex-1 mr-4">
-                                <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="overviewImg" id="overviewImg-<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>" accept="image/*">
-                                <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
-                                    <span class="file-name">Choose a file...</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <input type="submit" name="submitImg" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Upload">
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 

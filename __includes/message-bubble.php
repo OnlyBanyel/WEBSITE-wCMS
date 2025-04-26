@@ -5,7 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Ensure headers are sent before any output
-header('Content-Type: application/json');
 
 // Initialize session variables for message cooldown if they don't exist
 if (!isset($_SESSION['last_message_time'])) {

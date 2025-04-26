@@ -274,9 +274,7 @@ foreach ($words as $word) {
                     </svg>
                     College Overview
                 </a>
-            </li>  />
-                    </svg>
-                    College Overview
+            </li> 
                 </a>
             </li>
             <li class="sidebar-nav-item">

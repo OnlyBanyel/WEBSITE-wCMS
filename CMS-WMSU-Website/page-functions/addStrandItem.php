@@ -1,7 +1,9 @@
 <?php
 session_start();
 require_once "../classes/pages.class.php";
-require_once "../classes/login.class.php";
+
+// Set content type to JSON
+header('Content-Type: application/json');
 
 // Check if user is logged in
 if (!isset($_SESSION['account'])) {
@@ -13,36 +15,21 @@ if (!isset($_SESSION['account'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pagesObj = new Pages();
     
-    // Get form data
-    $subpage = isset($_POST['subpage']) ? intval($_POST['subpage']) : 31; // Default to SHS subpage
-    $strandID = $_POST['strandID'];
-    $descID = $_POST['descID'];
-    $endDescID = $_POST['endDescID'];
-    $isNew = $_POST['isNew'] === '1';
-    
-    $strandName = $_POST['strandName'];
-    $strandDesc = $_POST['strandDesc'];
-    $strandEndDesc = $_POST['strandEndDesc'];
-    
-    // Get outcomes data
-    $outcomeContents = isset($_POST['outcome_content']) ? $_POST['outcome_content'] : [];
-    $outcomeSectionIDs = isset($_POST['outcome_sectionid']) ? $_POST['outcome_sectionid'] : [];
-    $outcomeIsNew = isset($_POST['outcome_isnew']) ? $_POST['outcome_isnew'] : [];
-    
-        // Begin transaction
-        $pagesObj->beginTransaction();
+    try {
+        // Get form data
+        $subpage = isset($_POST['subpage']) ? intval($_POST['subpage']) : 31; // Default to SHS subpage
+        $strandID = isset($_POST['strandID']) ? $_POST['strandID'] : null;
+        $descID = isset($_POST['descID']) ? $_POST['descID'] : null;
+        $endDescID = isset($_POST['endDescID']) ? $_POST['endDescID'] : null;
+        $isNew = isset($_POST['isNew']) && $_POST['isNew'] === 'true';
+        
+        $strandName = isset($_POST['strandName']) ? $_POST['strandName'] : '';
+        $strandDesc = isset($_POST['strandDesc']) ? $_POST['strandDesc'] : '';
+        $strandEndDesc = isset($_POST['strandEndDesc']) ? $_POST['strandEndDesc'] : '';
         
         // Handle strand name
         if ($isNew) {
             // Insert new strand name
-            $newStrandData = [
-                'subpage' => $subpage,
-                'indicator' => 'Strand',
-                'description' => 'strand-name',
-                'elemType' => 'text',
-                'content' => $strandName,
-                'imagePath' => ''
-            ];
             $strandID = $pagesObj->addContent(
                 $subpage,
                 'Strand',
@@ -87,6 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $endDescID = $endDescResult;
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Strand added successfully',
+                'strandID' => $strandID,
+                'descID' => $descID,
+                'endDescID' => $endDescID
+            ]);
         } else {
             // Update existing strand name
             $result = $pagesObj->changeContent($strandID, $subpage, $strandName);
@@ -141,14 +136,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $endDescID = $endDescResult;
             }
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Strand updated successfully',
+                'strandID' => $strandID,
+                'descID' => $descID,
+                'endDescID' => $endDescID
+            ]);
         }
         
         // Handle outcomes/subjects
+        /*
         foreach ($outcomeContents as $index => $content) {
             $sectionID = $outcomeSectionIDs[$index];
-            $isNewOutcome = $outcomeIsNew[$index] === '1';
+            $isNewOutcome = $outcomeIsNew[$index] === 'true';
             
-            if ($isNewOutcome) {
+            if ($isNewOutcome || strpos($sectionID, 'temp_') === 0) {
                 // Insert new outcome
                 $itemNumber = $index + 1;
                 $outcomeResult = $pagesObj->addContent(
@@ -171,12 +175,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
+        */
         
+        // Commit transaction
+        /*
+        $pagesObj->commit();
         
-        echo json_encode(['success' => true, 'message' => 'Strand updated successfully']);
-        echo json_encode(['success' => false, 'message' => 'Error']);
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Strand updated successfully',
+            'strandID' => $strandID,
+            'descID' => $descID,
+            'endDescID' => $endDescID
+        ]);
+        */
+    } catch (Exception $e) {
+        // Rollback transaction on error
+        /*
+        $pagesObj->rollback();
+        */
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
-    else {
-        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
 }
 ?>

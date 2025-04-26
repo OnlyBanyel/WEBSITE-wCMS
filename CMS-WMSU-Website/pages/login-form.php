@@ -5,6 +5,8 @@ $loginObj = new Login;
 
 $_SESSION['account'] = '';
 
+unset($_SESSION['lastRole']);
+
 if ((isset($_POST['submit'])) && ($_SERVER['REQUEST_METHOD'] === 'POST')){
     $loginObj->clean();
 

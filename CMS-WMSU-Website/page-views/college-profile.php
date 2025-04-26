@@ -91,7 +91,7 @@ if (empty($collegeName)) {
     }
 </style>
 
-<div class="bg-gray-50 min-h-screen p-4 md:p-6">
+<div class="bg-gray-50 min-h-full p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800">College Profile Management</h1>
@@ -156,7 +156,7 @@ if (empty($collegeName)) {
     </div>
 
     <!-- Edit Forms Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="flex flex-col justify-between gap-3">
         <!-- College Name -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
             <div class="bg-primary text-white p-4">
@@ -166,13 +166,13 @@ if (empty($collegeName)) {
                 <form action="../page-functions/updateCollegeName.php" method="POST" id="collegeNameForm" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">College Name</label>
-                        <input type="text" name="collegeName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="collegeName" value="<?php echo $collegeName[0]['content']; ?>">
-                        <input type="hidden" name="textID" value="<?php echo $collegeName[0]['sectionID']; ?>">
-                        <input type="hidden" name="isNew" value="<?php echo strpos($collegeName[0]['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
-                    </div>
-                    
-                    <div class="flex justify-end">
-                        <input type="submit" value="Save Changes" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors">
+
+                        <div class="flex justify-between gap-2">
+                            <input type="text" name="collegeName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="collegeName" value="<?php echo $collegeName[0]['content']; ?>">
+                            <input type="hidden" name="textID" value="<?php echo $collegeName[0]['sectionID']; ?>">
+                            <input type="hidden" name="isNew" value="<?php echo strpos($collegeName[0]['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
+                            <input type="submit" value="Save Changes" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors">
+                        </div>
                     </div>
                 </form>
             </div>

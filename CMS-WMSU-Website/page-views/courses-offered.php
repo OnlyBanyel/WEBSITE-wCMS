@@ -256,7 +256,7 @@ if (empty($gradCourses)) {
         <!-- Undergraduate Courses -->
         <div>
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Undergraduate Courses</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col justify-between gap-2">
                 <?php foreach ($undergradCourses as $courseName => $courseData) { ?>
                     <div class="bg-white rounded-lg shadow-md overflow-hidden courses-item-container">
                         <div class="bg-primary text-white p-4">
@@ -343,7 +343,7 @@ if (empty($gradCourses)) {
         <!-- Graduate Courses -->
         <div>
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Graduate Courses</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col justify-between gap-2">
                 <?php foreach ($gradCourses as $courseName => $courseData) { ?>
                     <div class="bg-white rounded-lg shadow-md overflow-hidden courses-item-container">
                         <div class="bg-primary text-white p-4">
