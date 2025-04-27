@@ -85,42 +85,6 @@
     .mobile-dropdown.active {
       display: block;
     }
-
-/* Mobile menu styles */
-@media (max-width: 768px) {
-  .nav-links {
-    display: none;
-  }
-  
-  .nav-links.mobile-active {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: white;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    padding: 1rem;
-  }
-  
-  .nav-links.mobile-active a {
-    margin: 0.5rem 0;
-    padding: 0.5rem 0;
-  }
-  
-  .hamburger-icon {
-    display: block;
-    cursor: pointer;
-  }
-}
-
-@media (min-width: 769px) {
-  .hamburger-icon {
-    display: none;
-  }
-}
   </style>
 </head>
 
@@ -136,15 +100,6 @@
               </div>
           </div>
       </div>
-      
-      <!-- Hamburger Menu Icon for Mobile -->
-      <div class="hamburger-icon">
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
-  </svg>
-</div>
       
       <!-- Burger Menu Icon for Mobile -->
       <div class="burger-menu">
@@ -469,29 +424,5 @@
       const arrow = this.querySelector('.dropdown-arrow');
       arrow.textContent = dropdown.classList.contains('active') ? '▲' : '▼';
     });
-  });
-</script>
-
-<script>
-  // Mobile menu toggle
-  document.querySelector('.hamburger-icon').addEventListener('click', function() {
-    document.querySelector('.nav-links').classList.toggle('mobile-active');
-  });
-  
-  // Close mobile menu when clicking outside
-  document.addEventListener('click', function(event) {
-    const navLinks = document.querySelector('.nav-links');
-    const hamburgerIcon = document.querySelector('.hamburger-icon');
-    
-    if (!navLinks.contains(event.target) && !hamburgerIcon.contains(event.target) && navLinks.classList.contains('mobile-active')) {
-      navLinks.classList.remove('mobile-active');
-    }
-  });
-  
-  // Handle window resize
-  window.addEventListener('resize', function() {
-    if (window.innerWidth > 768) {
-      document.querySelector('.nav-links').classList.remove('mobile-active');
-    }
   });
 </script>

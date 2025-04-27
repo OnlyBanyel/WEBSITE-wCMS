@@ -122,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $
   foreach ($carouselItems as $item) {
   if ($item["description"] == "carousel-logo-text") {
   $carouselLogo = $item['content'];
+  $carouselLogoStyles = $item['styles'];
       }
   if ($item["description"] == "carousel-logo") {
   $carouselLogoImage = $item['imagePath'];
@@ -146,9 +147,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $
       foreach ($genInfoItems as $item) {
       if ($item["description"] == "geninfo-front-img") {
           $genInfoImgs[] = $item['imagePath'];
+          $genInfoImgsStyles[] = $item['styles'];
       }
       if ($item["description"] == "geninfo-front-title") {
           $genInfoTitles[] = $item['content'];
+          $genInfoTitlesStyles[] = $item['styles'];
       }
   }
 /** @engregion */
@@ -171,15 +174,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message_action']) && $
   foreach ($genInfoBackItems as $item) {
   if ($item["description"] == "geninfo-back-head") {
       $genInfoBackHead[] = $item['content'];
+      $genInfoBackHeadStyles[] = $item['styles'];
   }
   if ($item["description"] == "CG-list-item" ) {
       $genInfoBackCGList[] = $item['content'];
+      $genInfoBackCGListStyles[] = $item['styles'];
   }
   if ($item["description"] == "CM-list-item") {
       $genInfoBackCMList[] = $item['content'];
+      $genInfoBackCMListStyles[] = $item['styles'];
   }
   if ($item["description"] == "CV-list-item") {
       $genInfoBackCVList[] = $item['content'];
+      $genInfoBackCVListStyles[] = $item['styles'];
   }
 
   $genInfoBackLists = [
@@ -213,10 +220,6 @@ $currentGrad = null;
 $accordionCourses = $ccsPage->execQuery($accordionCoursesSQL);
 
 foreach ($accordionCourses as $item) {
-// Store Program Headers
-if ($item["description"] == "program-header") {
-  $programHeaders[] = $item['content'];
-}
 
 // ✅ Identify Course Type (Undergrad or Grad)
 $isUndergrad = $item["description"] === "course-header-undergrad";
@@ -234,10 +237,12 @@ if ($isUndergrad) {
 // ✅ Ensure Outcomes Are Stored Under Correct Course
 if (isset($currentUndergrad) && preg_match('/undergrad-course-list-items-\d+$/', $item["description"])) {
   $undergradCourses[$currentUndergrad]["outcomes"][] = $item['content'];
+  $undergradCourses[$currentUndergrad]["styles"][] = $item['styles'];
 }
 
 if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["description"])) {
   $gradCourses[$currentGrad]["outcomes"][] = $item['content'];
+  $gradCourses[$currentGrad]["styles"][] = $item['styles'];
 }
 }
 
@@ -606,17 +611,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
                                   <img src="<?php echo $img['imagePath'] ?>" class="h-full w-full object-cover" alt="CCS Carousel Image">
                               </div>
                           <?php } ?>
-                      </div>
-                      
-                      <!-- Carousel Controls -->
-                      <button class="carousel-control-prev" type="button" data-bs-target="#carouselHero" data-bs-slide="prev">
-                          <span class="carousel-control-prev-icon inline-block bg-primary/80 rounded-full p-3" aria-hidden="true"></span>
-                          <span class="visually-hidden">Previous</span>
-                      </button>
-                      <button class="carousel-control-next" type="button" data-bs-target="#carouselHero" data-bs-slide="next">
-                          <span class="carousel-control-next-icon inline-block bg-primary/80 rounded-full p-3" aria-hidden="true"></span>
-                          <span class="visually-hidden">Next</span>
-                      </button>
+                      </div>          
                       
                       <!-- Carousel Indicators -->
                       <div class="carousel-indicators absolute bottom-4">
@@ -633,7 +628,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
                       <img src="<?php echo $carouselLogoImage ?>" class="h-32 w-32 sm:h-48 sm:w-48 md:h-80 md:w-80 drop-shadow-lg animate-pulse-slow" alt="CCS Logo">
                   </div>
                   <div class="mt-6 md:mt-8 text-center">
-                      <h1 class="text-2xl sm:text-3xl md:text-6xl font-bold text-white mt-4 md:mt-6 text-center drop-shadow-lg font-montserrat animate-slide-up">
+                      <h1 class="<?php echo $carouselLogoStyles ?> text-2xl sm:text-3xl md:text-6xl font-bold mt-4 md:mt-6 text-center drop-shadow-lg animate-slide-up">
                           <?php echo $carouselLogo?>
                       </h1>
                       <div class="w-16 md:w-24 h-1 bg-primary mx-auto mt-3 md:mt-4 rounded-full animate-slide-up"></div>
@@ -658,18 +653,19 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
                   <div class="space-y-8 md:space-y-10 order-2 md:order-1">
                       <?php for ($i = 0; $i < count($genInfoBackHead); $i++) { ?>
                           <div class="card-content space-y-4 bg-white p-8 rounded-xl shadow-card border-l-4 border-primary transform transition-all duration-300 hover:shadow-xl">
-                              <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-primaryDark font-montserrat red-underline inline-block">
+                              <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-primaryDark font-montserrat red-underline inline-block <?php echo $genInfoTitlesStyles[$i] ?>">
                                   <?php echo $genInfoTitles[$i] ?>
                               </h2>
-                              <p class="text-base sm:text-lg md:text-xl font-semibold text-gray-700">
+                              <p class="text-base sm:text-lg md:text-xl font-semibold text-gray-700 <?php echo $genInfoBackHeadStyles[$i] ?>">
                                   <?php echo $genInfoBackHead[$i]?>
                               </p>
                               <ul class="space-y-2 md:space-y-3 text-neutral custom-list">
-                                  <?php foreach ($genInfoBackLists[$i] as $item) { ?>
-                                      <li class="transition-all duration-300 hover:text-primary">
-                                          <span><?php echo $item; ?></span>
-                                      </li>
-                                  <?php } ?>
+                                <?php foreach ($genInfoBackLists[$i] as $index => $item) { ?>
+                                    <li class="transition-all duration-300 hover:text-primary <?php echo $genInfoBackListStyles[$i][$index] ?? ''; ?>">
+                                        <span><?php echo htmlspecialchars($item); ?></span>
+                                    </li>
+                                <?php } ?>
+
                               </ul>
                           </div>
                       <?php } ?>
@@ -879,8 +875,8 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
                                    <div class="px-4 md:px-8 py-4 md:py-6 bg-primary/5 border-l-4 border-primary">
                                        <h4 class="font-bold text-base md:text-lg text-primary mb-3 md:mb-4 red-underline inline-block">Program Objectives/Outcomes:</h4>
                                        <ul class="space-y-2 md:space-y-3 pl-4 md:pl-5 list-disc text-gray-700">
-                                           <?php foreach ($courseData["outcomes"] as $outcome) { ?>
-                                               <li class="pl-1 md:pl-2"><?php echo $outcome; ?></li>
+                                           <?php foreach ($courseData['outcomes'] as $i => $outcome) { ?>
+                                               <li class="pl-1 md:pl-2 <?php echo $courseData['styles'][$i]  ?>"><?php echo $outcome; ?></li>
                                            <?php } ?>
                                        </ul>
                                        

@@ -80,19 +80,7 @@ $currentUser = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Messages - WMSU CMS</title>
-    
-    <!-- Include your CSS files -->
-    <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="../css/style.css">
-    
-    <!-- Include Bootstrap and other libraries -->
-    <link rel="stylesheet" href="../vendors/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <?php echo require_once '../__includes/head.php'?>
     <style>
         :root {
             --primary-color: #BD0F03;

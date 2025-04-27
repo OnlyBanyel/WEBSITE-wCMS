@@ -180,21 +180,32 @@ if (empty($strands)) {
             <?php if (!empty($strands)) { ?>
                 <div class="space-y-6">
                     <?php foreach ($strands as $strandName => $strand) { ?>
-                        <div class="strand-card">
-                            <div class="strand-title">
-                                <h3 class="text-lg font-bold text-primary"><?php echo $strand['name']; ?></h3>
-                            </div>
-                            <p class="text-gray-700 my-3"><?php echo $strand['desc']; ?></p>
-                            
-                            <h4 class="font-medium text-gray-800 mb-2">Core Subjects Include:</h4>
-                            <ul class="space-y-2 pl-5 list-disc text-gray-600">
-                                <?php foreach ($strand['outcomes'] as $outcome) { ?>
-                                    <li><?php echo $outcome['content']; ?></li>
-                                <?php } ?>
-                            </ul>
-                            
-                            <p class="mt-3 text-gray-700"><?php echo $strand['end_desc']; ?></p>
-                        </div>
+                        
+<div class="strand-card">
+    <div class="strand-title">
+        <h3 class="text-lg font-bold text-primary styleable <?php echo isset($strand['styles']) ? implode(' ', json_decode($strand['styles'], true) ?? []) : ''; ?>"
+    data-section-id="<?php echo $strand['sectionID']; ?>" 
+    data-element-name="Strand: <?php echo htmlspecialchars($strand['name']); ?>">
+            <?php echo $strand['name']; ?>
+        </h3>
+    </div>
+    <p class="text-gray-700 my-3 <?php echo isset($strand['desc_styles']) ? implode(' ', json_decode($strand['desc_styles'], true) ?? []) : ''; ?>">
+        <?php echo $strand['desc']; ?>
+    </p>
+    
+    <h4 class="font-medium text-gray-800 mb-2">Core Subjects Include:</h4>
+    <ul class="space-y-2 pl-5 list-disc text-gray-600">
+        <?php foreach ($strand['outcomes'] as $outcome) { ?>
+            <li class="<?php echo isset($outcome['styles']) ? implode(' ', json_decode($outcome['styles'], true) ?? []) : ''; ?>">
+                <?php echo $outcome['content']; ?>
+            </li>
+        <?php } ?>
+    </ul>
+    
+    <p class="mt-3 text-gray-700 <?php echo isset($strand['end_desc_styles']) ? implode(' ', json_decode($strand['end_desc_styles'], true) ?? []) : ''; ?>">
+        <?php echo $strand['end_desc']; ?>
+    </p>
+</div>
                     <?php } ?>
                 </div>
             <?php } else { ?>
@@ -249,30 +260,33 @@ if (empty($strands)) {
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Strand Name</label>
-                                <input type="text" name="strandName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="<?php echo $strand['name']; ?>" required>
+                                <input type="text" name="strandName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent styleable <?php echo isset($strand['styles']) ? implode(' ', json_decode($strand['styles'], true) ?? []) : ''; ?>" value="<?php echo $strand['name']; ?>" required data-section-id="<?php echo $strand['sectionID']; ?>" data-element-name="Strand Name: <?php echo htmlspecialchars($strand['name']); ?>">
                             </div>
+
+                    
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Strand Description</label>
-                                <textarea name="strandDesc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required><?php echo $strand['desc']; ?></textarea>
+                                <textarea name="strandDesc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent styleable" required data-section-id="<?php echo $strand['desc_sectionID']; ?>" data-element-name="Strand Description"><?php echo $strand['desc']; ?></textarea>
                             </div>
                             
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Strand End Description</label>
-                                <textarea name="strandEndDesc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required><?php echo $strand['end_desc']; ?></textarea>
-                            </div>
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Outcomes</label>
                                 <ul class="outcomes-list" id="outcome-list-<?php echo $strand['sectionID']; ?>">
                                     <?php foreach ($strand['outcomes'] as $outcome) { ?>
                                         <li>
-                                            <input type="text" name="outcomeContent[]" class="outcome-input" value="<?php echo $outcome['content']; ?>" data-sectionid="<?php echo $outcome['sectionID']; ?>">
-                                            <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $outcome['sectionID']; ?>">Remove</button>
+                                            <input type="text" name="outcomeContent[]" class="outcome-input styleable" value="<?php echo $outcome['content']; ?>" data-sectionid="<?php echo $outcome['sectionID']; ?>" data-section-id="<?php echo $outcome['sectionID']; ?>" data-element-name="Outcome: <?php echo substr(htmlspecialchars($outcome['content']), 0, 30) . '...'; ?>">
+                                            <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $outcome['sectionID']; ?>">X</button>
                                         </li>
                                     <?php } ?>
                                 </ul>
                                 <button type="button" class="add-outcome bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Add Outcome</button>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Strand End Description</label>
+                                <textarea name="strandEndDesc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent styleable" required data-section-id="<?php echo $strand['end_desc_sectionID']; ?>" data-element-name="Strand End Description"><?php echo $strand['end_desc']; ?></textarea>
                             </div>
                             
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Update Strand</button>
@@ -313,7 +327,7 @@ if (empty($strands)) {
             <label class="block text-sm font-medium text-gray-700 mb-1">Strand End Description</label>
             <textarea name="strandEndDesc" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required></textarea>
           </div>
-          
+
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Outcomes</label>
             <ul class="outcomes-list" id="outcome-list-new">

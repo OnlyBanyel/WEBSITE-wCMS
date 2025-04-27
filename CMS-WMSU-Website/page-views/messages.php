@@ -207,22 +207,30 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between">
-                                    <p class="message-sender text-sm text-gray-900">
-                                        <?php echo htmlspecialchars($message['sender_name']); ?>
-                                        <?php if ($is_guest): ?>
-                                            <span class="ml-1 text-xs bg-gray-200 text-gray-800 px-1.5 py-0.5 rounded">Guest</span>
-                                        <?php endif; ?>
-                                    </p>
-                                    <span class="message-time">
-                                        <?php echo date('M d, Y', strtotime($message['created_at'])); ?>
-                                    </span>
+                                    <p class="message-sender text-sm text-gray-900 styleable <?php echo isset($message['styles']) ? implode(' ', json_decode($message['styles'], true) ?? []) : ''; ?>" 
+   data-section-id="<?php echo $message['id']; ?>" 
+   data-element-name="Sender: <?php echo htmlspecialchars($message['sender_name']); ?>">
+    <?php echo htmlspecialchars($message['sender_name']); ?>
+    <?php if ($is_guest): ?>
+        <span class="ml-1 text-xs bg-gray-200 text-gray-800 px-1.5 py-0.5 rounded">Guest</span>
+    <?php endif; ?>
+</p>
+<span class="message-time styleable <?php echo isset($message['styles_time']) ? implode(' ', json_decode($message['styles_time'], true) ?? []) : ''; ?>" 
+      data-section-id="<?php echo $message['id']; ?>_time" 
+      data-element-name="Time: <?php echo date('M d, Y', strtotime($message['created_at'])); ?>">
+    <?php echo date('M d, Y', strtotime($message['created_at'])); ?>
+</span>
                                 </div>
-                                <h3 class="message-subject text-base text-gray-900 mt-1">
-                                    <?php echo htmlspecialchars($message['subject']); ?>
-                                </h3>
-                                <p class="message-preview text-sm mt-1">
-                                    <?php echo htmlspecialchars($message['message']); ?>
-                                </p>
+                                <h3 class="message-subject text-base text-gray-900 mt-1 styleable <?php echo isset($message['styles_subject']) ? implode(' ', json_decode($message['styles_subject'], true) ?? []) : ''; ?>" 
+    data-section-id="<?php echo $message['id']; ?>_subject" 
+    data-element-name="Subject: <?php echo htmlspecialchars($message['subject']); ?>">
+    <?php echo htmlspecialchars($message['subject']); ?>
+</h3>
+                                <p class="message-preview text-sm mt-1 styleable <?php echo isset($message['styles_message']) ? implode(' ', json_decode($message['styles_message'], true) ?? []) : ''; ?>" 
+   data-section-id="<?php echo $message['id']; ?>_message" 
+   data-element-name="Message: <?php echo substr(htmlspecialchars($message['message']), 0, 30) . '...'; ?>">
+    <?php echo htmlspecialchars($message['message']); ?>
+</p>
                             </div>
                         </div>
                     </div>
@@ -295,7 +303,6 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
 </div>
 
 <!-- Include Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <script>
     // Open message modal and mark as read

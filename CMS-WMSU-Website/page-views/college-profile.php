@@ -1,13 +1,15 @@
 <?php
 session_start();
 require_once "../classes/pages.class.php";
+require_once "../classes/element_styler.class.php";
 $collegeProfileObj = new Pages;
-
+$styler = new ElementStyler();
 // Initialize arrays to prevent undefined variable errors
 $collegeProfile = [];
 $carouselLogo = [];
 $carouselImgs = [];
 $collegeName = [];
+
 
 // Extract data from session
 foreach($_SESSION['collegeData'] as $data){
@@ -89,17 +91,59 @@ if (empty($collegeName)) {
         from { opacity: 0; }
         to { opacity: 1; }
     }
+    
+    /* Style for elements being edited */
+    .style-editing {
+        outline: 2px dashed #BD0F03 !important;
+        position: relative;
+    }
+    
+    .style-editing::after {
+        content: "Editing";
+        position: absolute;
+        top: -20px;
+        right: 0;
+        background-color: #BD0F03;
+        color: white;
+        padding: 2px 6px;
+        font-size: 10px;
+        border-radius: 3px;
+        z-index: 100;
+    }
+    
+    /* Style for styleable elements when in edit mode */
+    body.style-edit-mode .styleable {
+        cursor: pointer;
+        position: relative;
+    }
+    
+    body.style-edit-mode .styleable:hover {
+        outline: 2px dotted #BD0F03;
+    }
+    
+    body.style-edit-mode .styleable:hover::after {
+        content: "Click to edit";
+        position: absolute;
+        top: -20px;
+        right: 0;
+        background-color: #BD0F03;
+        color: white;
+        padding: 2px 6px;
+        font-size: 10px;
+        border-radius: 3px;
+        z-index: 100;
+    }
 </style>
 
 <div class="bg-gray-50 min-h-full p-4 md:p-6">
     <!-- Page Header -->
-    <div class="mb-8">
+    <div class="mb-8 styleable" data-section-id="page_header" data-element-name="Page Header">
         <h1 class="text-3xl font-bold text-gray-800">College Profile Management</h1>
         <p class="text-gray-600 mt-2">Edit and manage your college profile information</p>
     </div>
 
     <!-- Preview Section -->
-    <div class="bg-white rounded-xl shadow-md p-6 mb-8 preview-section cursor-pointer" id="previewSection">
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8 preview-section cursor-pointer styleable" id="previewSection" data-section-id="preview_section" data-element-name="Preview Section">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold text-primary">Preview</h2>
             <span class="text-sm text-gray-500">Click to expand/collapse</span>
@@ -109,25 +153,27 @@ if (empty($collegeName)) {
             <?php if (!empty($collegeProfile)) { ?>
                 <div class="flex flex-col md:flex-row gap-8">
                     <div class="md:w-1/3">
-                        <div class="bg-white p-4 rounded-lg shadow-md">
+                        <div class="bg-white p-4 rounded-lg shadow-md styleable" data-section-id="college_logo_container" data-element-name="College Logo Container">
                             <?php if (!empty($carouselLogo[0]['imagePath'])) { ?>
-                                <img src="<?php echo $carouselLogo[0]['imagePath']; ?>" alt="College Logo" class="w-full h-auto object-contain mb-4">
+                                <img src="<?php echo $carouselLogo[0]['imagePath']; ?>" alt="College Logo" class="w-full h-auto object-contain mb-4 styleable" data-section-id="<?php echo $carouselLogo[0]['sectionID']; ?>" data-element-name="College Logo">
                             <?php } else { ?>
-                                <div class="w-full h-32 bg-gray-200 flex items-center justify-center mb-4">
+                                <div class="w-full h-32 bg-gray-200 flex items-center justify-center mb-4 styleable" data-section-id="logo_placeholder" data-element-name="Logo Placeholder">
                                     <p class="text-gray-600">No logo available</p>
                                 </div>
                             <?php } ?>
-                            <h3 class="text-xl font-bold text-center text-gray-800"><?php echo $collegeName[0]['content']; ?></h3>
+                            <h3 class="text-xl font-bold text-center text-gray-800 styleable <?php echo $collegeName[0]['styles'];?>" data-section-id="<?php echo $collegeName[0]['sectionID']; ?>" data-element-name="College Name Display">
+                                <?php echo $collegeName[0]['content']; ?>
+                            </h3>
                         </div>
                     </div>
                     <div class="md:w-2/3">
-                        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                        <div id="carouselExampleIndicators" class="carousel slide styleable" data-bs-ride="carousel" data-section-id="carousel_container" data-element-name="Carousel Container">
                             <div class="carousel-inner rounded-lg overflow-hidden shadow-md">
                                 <?php 
                                 $active = "active";
                                 foreach ($carouselImgs as $index => $img) { 
                                 ?>
-                                    <div class="carousel-item <?php echo $active; ?>">
+                                    <div class="carousel-item <?php echo $active; ?> styleable" data-section-id="<?php echo $img['sectionID']; ?>" data-element-name="Carousel Image <?php echo $index + 1; ?>">
                                         <?php if (!empty($img['imagePath'])) { ?>
                                             <img src="<?php echo $img['imagePath']; ?>" class="d-block w-100 h-64 object-cover" alt="College Image">
                                         <?php } else { ?>
@@ -145,7 +191,7 @@ if (empty($collegeName)) {
                     </div>
                 </div>
             <?php } else { ?>
-                <div class="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-lg">
+                <div class="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-lg styleable" data-section-id="empty_preview" data-element-name="Empty Preview">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
@@ -157,52 +203,91 @@ if (empty($collegeName)) {
 
     <!-- Edit Forms Section -->
     <div class="flex flex-col justify-between gap-3">
-        <!-- College Name -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="bg-primary text-white p-4">
-                <h3 class="font-semibold">Edit College Name</h3>
-            </div>
-            <div class="p-5">
-                <form action="../page-functions/updateCollegeName.php" method="POST" id="collegeNameForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">College Name</label>
+    <!-- College Name -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden styleable" data-section-id="college_name_form_container" data-element-name="College Name Form Container">
+        <div class="bg-primary text-white p-4 styleable" data-section-id="college_name_header" data-element-name="College Name Header">
+            <h3 class="font-semibold">Edit College Name</h3>
+        </div>
+        <div class="p-5 styleable" data-section-id="college_name_form_body" data-element-name="College Name Form Body">
+            <form action="../page-functions/updateCollegeName.php" method="POST" id="collegeNameForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">College Name</label>
+                    <div class="flex justify-between gap-2">
+                        <input type="text" name="collegeName" class="styleable <?php echo $styler->getElementClassString($collegeName[0]['sectionID']); ?> w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="collegeName" value="<?php echo $collegeName[0]['content']; ?>" data-section-id="<?php echo $collegeName[0]['sectionID']; ?>" data-element-name="College Name">
+                        <input type="hidden" name="textID" value="<?php echo $collegeName[0]['sectionID']; ?>">
+                        <input type="hidden" name="isNew" value="<?php echo strpos($collegeName[0]['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
+                        <input type="submit" value="Save Changes" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                        <div class="flex justify-between gap-2">
-                            <input type="text" name="collegeName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="collegeName" value="<?php echo $collegeName[0]['content']; ?>">
-                            <input type="hidden" name="textID" value="<?php echo $collegeName[0]['sectionID']; ?>">
-                            <input type="hidden" name="isNew" value="<?php echo strpos($collegeName[0]['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
-                            <input type="submit" value="Save Changes" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors">
+    <!-- College Logo -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden styleable" data-section-id="college_logo_form_container" data-element-name="College Logo Form Container">
+        <div class="bg-primary text-white p-4 styleable" data-section-id="college_logo_header" data-element-name="College Logo Header">
+            <h3 class="font-semibold"><?php echo !empty($carouselLogo[0]['imagePath']) ? 'Change College Logo' : 'Add College Logo'; ?></h3>
+        </div>
+        <div class="p-5 styleable" data-section-id="college_logo_form_body" data-element-name="College Logo Form Body">
+            <form action="../page-functions/uploadLogo.php" method="POST" id="logoForm" enctype="multipart/form-data" class="space-y-4">
+                <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-40 flex items-center justify-center styleable" data-section-id="logo_preview" data-element-name="Logo Preview">
+                    <?php if (!empty($carouselLogo[0]['imagePath'])) { ?>
+                        <img src="<?php echo $carouselLogo[0]['imagePath']; ?>" alt="College Logo" class="max-w-full max-h-full object-contain">
+                    <?php } else { ?>
+                        <div class="text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p class="text-gray-500">No logo uploaded</p>
+                        </div>
+                    <?php } ?>
+                </div>
+                
+                <input type="hidden" name="isNew" value="<?php echo empty($carouselLogo[0]['imagePath']) || strpos($carouselLogo[0]['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
+                
+                <div class="flex items-center justify-between">
+                    <div class="relative flex-1 mr-4">
+                        <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10 styleable" name="logoImage" id="logoImage" accept="image/*">
+                        <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
+                            <span class="file-name">Choose a file...</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
+                            </svg>
                         </div>
                     </div>
-                </form>
-            </div>
+                    <input type="submit" name="submitLogo" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable" value="Upload">
+                </div>
+            </form>
         </div>
+    </div>
 
-        <!-- College Logo -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="bg-primary text-white p-4">
-                <h3 class="font-semibold"><?php echo !empty($carouselLogo[0]['imagePath']) ? 'Change College Logo' : 'Add College Logo'; ?></h3>
+    <!-- Carousel Images -->
+    <?php foreach ($carouselImgs as $index => $img) { ?>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden styleable" data-section-id="carousel_image_form_<?php echo $index; ?>" data-element-name="Carousel Image Form <?php echo $index + 1; ?>">
+            <div class="bg-primary text-white p-4 styleable" data-section-id="carousel_image_header_<?php echo $index; ?>" data-element-name="Carousel Image Header <?php echo $index + 1; ?>">
+                <h3 class="font-semibold"><?php echo !empty($img['imagePath']) ? 'Change Carousel Image ' . ($index + 1) : 'Add Carousel Image ' . ($index + 1); ?></h3>
             </div>
-            <div class="p-5">
-                <form action="../page-functions/uploadLogo.php" method="POST" id="logoForm" enctype="multipart/form-data" class="space-y-4">
-                    <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-40 flex items-center justify-center">
-                        <?php if (!empty($carouselLogo[0]['imagePath'])) { ?>
-                            <img src="<?php echo $carouselLogo[0]['imagePath']; ?>" alt="College Logo" class="max-w-full max-h-full object-contain">
+            <div class="p-5 styleable" data-section-id="carousel_image_form_body_<?php echo $index; ?>" data-element-name="Carousel Image Form Body <?php echo $index + 1; ?>">
+                <form action="../page-functions/uploadProfileImgs.php" method="POST" id="carouselForm-<?php echo $img['sectionID']; ?>" enctype="multipart/form-data" class="space-y-4">
+                    <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-48 flex items-center justify-center styleable" data-section-id="carousel_image_preview_<?php echo $index; ?>" data-element-name="Carousel Image Preview <?php echo $index + 1; ?>">
+                        <?php if (!empty($img['imagePath'])) { ?>
+                            <img src="<?php echo $img['imagePath']; ?>" alt="Carousel Image <?php echo $index + 1; ?>" class="max-w-full max-h-full object-contain">
                         <?php } else { ?>
                             <div class="text-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <p class="text-gray-500">No logo uploaded</p>
+                                <p class="text-gray-500">No image uploaded</p>
                             </div>
                         <?php } ?>
                     </div>
                     
-                    <input type="hidden" name="isNew" value="<?php echo empty($carouselLogo[0]['imagePath']) || strpos($carouselLogo[0]['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
+                    <input type="hidden" name="imageIndex" value="<?php echo $img['sectionID']; ?>">
+                    <input type="hidden" name="isNew" value="<?php echo empty($img['imagePath']) || strpos($img['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
                     
                     <div class="flex items-center justify-between">
                         <div class="relative flex-1 mr-4">
-                            <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="logoImage" id="logoImage" accept="image/*">
+                            <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10 styleable" name="carouselImage-<?php echo $img['sectionID']; ?>" id="carouselImage-<?php echo $img['sectionID']; ?>" accept="image/*">
                             <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
                                 <span class="file-name">Choose a file...</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
@@ -210,52 +295,14 @@ if (empty($collegeName)) {
                                 </svg>
                             </div>
                         </div>
-                        <input type="submit" name="submitLogo" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Upload">
+                        <input type="submit" name="submitImage" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable" value="Upload">
                     </div>
                 </form>
             </div>
         </div>
+    <?php } ?>
+</div>
 
-        <!-- Carousel Images -->
-        <?php foreach ($carouselImgs as $index => $img) { ?>
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="bg-primary text-white p-4">
-                    <h3 class="font-semibold"><?php echo !empty($img['imagePath']) ? 'Change Carousel Image ' . ($index + 1) : 'Add Carousel Image ' . ($index + 1); ?></h3>
-                </div>
-                <div class="p-5">
-                    <form action="../page-functions/uploadProfileImgs.php" method="POST" id="carouselForm-<?php echo $img['sectionID']; ?>" enctype="multipart/form-data" class="space-y-4">
-                        <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-48 flex items-center justify-center">
-                            <?php if (!empty($img['imagePath'])) { ?>
-                                <img src="<?php echo $img['imagePath']; ?>" alt="Carousel Image <?php echo $index + 1; ?>" class="max-w-full max-h-full object-contain">
-                            <?php } else { ?>
-                                <div class="text-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <p class="text-gray-500">No image uploaded</p>
-                                </div>
-                            <?php } ?>
-                        </div>
-                        
-                        <input type="hidden" name="imageIndex" value="<?php echo $img['sectionID']; ?>">
-                        <input type="hidden" name="isNew" value="<?php echo empty($img['imagePath']) || strpos($img['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
-                        
-                        <div class="flex items-center justify-between">
-                            <div class="relative flex-1 mr-4">
-                                <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="logoImage" id="carouselImage-<?php echo $index; ?>" accept="image/*">
-                                <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
-                                    <span class="file-name">Choose a file...</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
-                        <input type="submit" name="submitImg" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Upload">
-                    </div>
-                </form>
-            </div>
-        <?php } ?>
-    </div>
 </div>
 
 <script>
@@ -273,9 +320,6 @@ if (empty($collegeName)) {
         previewContent.classList.toggle('hidden');
     });
     
-    // Update the form submission script for college name to properly handle new items
-    // Replace the existing script with this enhanced version
-
     // Form submission with AJAX
     document.getElementById('collegeNameForm').addEventListener('submit', function(e) {
         e.preventDefault();

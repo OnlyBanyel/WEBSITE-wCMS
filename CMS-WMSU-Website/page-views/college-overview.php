@@ -173,11 +173,23 @@ if (empty($genInfoImgs)) {
             <div class="md:w-1/2 space-y-6">
                 <?php for ($i = 0; $i < count($genInfoBackHead); $i ++) { ?>
                     <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary">
-                        <h4 class="text-lg font-bold text-primary mb-2"><?php echo $genInfoTitles[$i]['content'] ?></h4>
-                        <p class="text-gray-700 mb-3"><?php echo $genInfoBackHead[$i]['content']?></p>
+                        <h4 class="text-lg font-bold text-primary mb-2 styleable <?php echo isset($genInfoTitles[$i]['styles']) ? implode(' ', json_decode($genInfoTitles[$i]['styles'], true) ?? []) : ''; ?>" 
+                            data-section-id="<?php echo $genInfoTitles[$i]['sectionID']; ?>" 
+                            data-element-name="Title: <?php echo htmlspecialchars($genInfoTitles[$i]['content']); ?>">
+                            <?php echo $genInfoTitles[$i]['content'] ?>
+                        </h4>
+                        <p class="text-gray-700 mb-3 styleable <?php echo isset($genInfoBackHead[$i]['styles']) ? implode(' ', json_decode($genInfoBackHead[$i]['styles'], true) ?? []) : ''; ?>" 
+                           data-section-id="<?php echo $genInfoBackHead[$i]['sectionID']; ?>" 
+                           data-element-name="Description: <?php echo substr(htmlspecialchars($genInfoBackHead[$i]['content']), 0, 30) . '...'; ?>">
+                            <?php echo $genInfoBackHead[$i]['content']?>
+                        </p>
                         <ul class="space-y-2 pl-5 list-disc text-gray-600">
                             <?php foreach ($genInfoBackLists[$i] as $item) { ?>
-                                <li><?php echo $item['content']; ?></li>
+                                <li class="styleable <?php echo isset($item['styles']) ? implode(' ', json_decode($item['styles'], true) ?? []) : ''; ?>" 
+                                    data-section-id="<?php echo $item['sectionID']; ?>" 
+                                    data-element-name="List Item: <?php echo substr(htmlspecialchars($item['content']), 0, 30) . '...'; ?>">
+                                    <?php echo $item['content']; ?>
+                                </li>
                             <?php } ?>
                         </ul>
                     </div>
@@ -186,7 +198,9 @@ if (empty($genInfoImgs)) {
             <div class="md:w-1/2">
                 <div class="rounded-lg overflow-hidden shadow-md">
                     <?php if (isset($genInfoImgs) && !empty($genInfoImgs) && !empty($genInfoImgs[1]['imagePath'])) { ?>
-                        <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" class="w-full h-64 object-cover" alt="Overview Image">
+                        <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" alt="Overview Image" class="max-w-full max-h-full object-contain styleable" 
+                             data-section-id="<?php echo $genInfoImgs[1]['sectionID']; ?>" 
+                             data-element-name="Overview Image">
                     <?php } else { ?>
                         <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
                             <p class="text-gray-600">No image available</p>
@@ -235,7 +249,9 @@ if (empty($genInfoImgs)) {
                     <form action="../page-functions/uploadOverviewImg.php" method="POST" id="overviewImg-<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>" enctype="multipart/form-data" class="space-y-4">
                         <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-64 flex items-center justify-center">
                             <?php if (isset($genInfoImgs[1]) && !empty($genInfoImgs[1]['imagePath'])) { ?>
-                                <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" alt="Overview Image" class="max-w-full max-h-full object-contain">
+                                <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" alt="Overview Image" class="max-w-full max-h-full object-contain styleable" 
+                                     data-section-id="<?php echo $genInfoImgs[1]['sectionID']; ?>" 
+                                     data-element-name="Overview Image">
                             <?php } else { ?>
                                 <div class="text-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -273,7 +289,7 @@ if (empty($genInfoImgs)) {
                         <form action="../page-functions/updateOverviewItem.php" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
-                                <input type="text" name="overviewTitle" disabled data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>">
+                                <input type="text" name="overviewTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle styleable <?php echo isset($genInfoTitles[$q]['styles']) ? implode(' ', json_decode($genInfoTitles[$q]['styles'], true) ?? []) : ''; ?>" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>" data-section-id="<?php echo $titleSectionID; ?>" data-element-name="Title Input: <?php echo htmlspecialchars($titleContent); ?>">
                                 <input type="hidden" name="overviewSectionID" value="<?php echo $titleSectionID; ?>">
                                 <input type="hidden" name="isNew" value="<?php echo strpos($titleSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
                                 <input type="hidden" name="sectionType" value="<?php echo $q; ?>">
@@ -283,7 +299,7 @@ if (empty($genInfoImgs)) {
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Section Content</label>
-                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>">
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Content: <?php echo substr(htmlspecialchars($headContent), 0, 30) . '...'; ?>">
                                 <input type="hidden" name="topContentSectionID" value="<?php echo $headSectionID; ?>">
                                 <input type="hidden" name="topContentIsNew" value="<?php echo strpos($headSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
                             </div>
@@ -298,11 +314,13 @@ if (empty($genInfoImgs)) {
                                     ?>
                                         <li class="flex items-center gap-2">
                                             <input type="text" 
-                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
                                                 name="outcome_content[]" 
                                                 id="<?php echo $titleContent; ?>-<?php echo $i; ?>-outcomes" 
                                                 data-sectionid="<?php echo $item['sectionID']; ?>" 
-                                                value="<?php echo $item['content']; ?>">
+                                                value="<?php echo $item['content']; ?>"
+                                                data-section-id="<?php echo $item['sectionID']; ?>" 
+                                                data-element-name="Outcome: <?php echo substr(htmlspecialchars($item['content']), 0, 30) . '...'; ?>">
                                             <input type="hidden" name="outcome_sectionid[]" value="<?php echo $item['sectionID']; ?>">
                                             <input type="hidden" name="outcome_isnew[]" value="0">
                                             <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']; ?>">
@@ -317,11 +335,13 @@ if (empty($genInfoImgs)) {
                                     ?>
                                         <li class="flex items-center gap-2">
                                             <input type="text" 
-                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
                                                 name="outcome_content[]" 
                                                 id="<?php echo $titleContent; ?>-1-outcomes" 
                                                 data-sectionid="temp_outcome_<?php echo $q; ?>_1" 
-                                                value="">
+                                                value=""
+                                                data-section-id="temp_outcome_<?php echo $q; ?>_1" 
+                                                data-element-name="New Outcome">
                                             <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $q; ?>_1">
                                             <input type="hidden" name="outcome_isnew[]" value="1">
                                             <input type="hidden" name="outcome_type[]" value="<?php echo $listTypes[$q]; ?>">
@@ -365,6 +385,43 @@ if (empty($genInfoImgs)) {
     document.querySelectorAll('.remove-outcome').forEach(button => {
         button.addEventListener('click', function() {
             this.closest('li').remove();
+        });
+    });
+    
+    // Add outcome functionality
+    document.querySelectorAll('.add-outcome').forEach(button => {
+        button.addEventListener('click', function() {
+            const section = this.dataset.section;
+            const type = this.dataset.type;
+            const outcomesList = document.getElementById('outcomes-list-' + section);
+            const itemCount = outcomesList.querySelectorAll('li').length + 1;
+            const titleContent = this.closest('form').querySelector('.overviewTitle').value;
+            
+            const newOutcome = document.createElement('li');
+            newOutcome.className = 'flex items-center gap-2';
+            newOutcome.innerHTML = `
+                <input type="text" 
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
+                    name="outcome_content[]" 
+                    id="${titleContent}-${itemCount}-outcomes" 
+                    data-sectionid="temp_new_outcome_${section}_${itemCount}" 
+                    value=""
+                    data-section-id="temp_new_outcome_${section}_${itemCount}" 
+                    data-element-name="New Outcome">
+                <input type="hidden" name="outcome_sectionid[]" value="temp_new_outcome_${section}_${itemCount}">
+                <input type="hidden" name="outcome_isnew[]" value="1">
+                <input type="hidden" name="outcome_type[]" value="${type}">
+                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="temp_new_outcome_${section}_${itemCount}">
+                    ×
+                </button>
+            `;
+            
+            outcomesList.appendChild(newOutcome);
+            
+            // Add event listener to the new remove button
+            newOutcome.querySelector('.remove-outcome').addEventListener('click', function() {
+                this.closest('li').remove();
+            });
         });
     });
     

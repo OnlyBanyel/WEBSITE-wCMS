@@ -29,14 +29,14 @@ foreach ($coursesAndPrograms as $item) {
         $undergradCourses[$item['content']] = [
             "sectionID" => $item["sectionID"],
             "outcomes" => [],
-            "index" => $undergradIndex
+            "index" => $undergradIndex,
         ];
         $undergradIndex++;
     } elseif ($item["description"] === "course-header-grad") {
         $gradCourses[$item['content']] = [
             "sectionID" => $item["sectionID"],
             "outcomes" => [],
-            "index" => $gradIndex
+            "index" => $gradIndex,
         ];
         $gradIndex++;
     }
@@ -209,11 +209,19 @@ if (empty($gradCourses)) {
                     <div class="bg-white border border-gray-200 rounded-b-lg p-4 space-y-3">
                         <?php foreach ($undergradCourses as $courseName => $courseData) { ?>
                             <div class="course-card bg-gray-50 p-4 rounded-lg border-l-4 border-primary">
-                                <h4 class="font-bold text-gray-800 mb-2"><?php echo $courseName; ?></h4>
+                                <h4 class="font-bold text-gray-800 mb-2 styleable <?php echo isset($courseData['styles']) ? implode(' ', json_decode($courseData['styles'], true) ?? []) : ''; ?>" 
+                                    data-section-id="<?php echo $courseData['sectionID']; ?>" 
+                                    data-element-name="Course: <?php echo htmlspecialchars($courseName); ?>">
+                                    <?php echo $courseName; ?>
+                                </h4>
                                 <p class="text-sm text-gray-600 mb-2">Program Objectives/Outcomes:</p>
                                 <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                                     <?php foreach ($courseData["outcomes"] as $outcome) { ?>
-                                        <li><?php echo $outcome['content']; ?></li>
+                                        <li class="styleable <?php echo isset($outcome['styles']) ? implode(' ', json_decode($outcome['styles'], true) ?? []) : ''; ?>"
+                                            data-section-id="<?php echo $outcome['sectionID']; ?>" 
+                                            data-element-name="Outcome: <?php echo substr(htmlspecialchars($outcome['content']), 0, 30) . '...'; ?>">
+                                            <?php echo $outcome['content']; ?>
+                                        </li>
                                     <?php } ?>
                                 </ul>
                             </div>
@@ -229,11 +237,19 @@ if (empty($gradCourses)) {
                     <div class="bg-white border border-gray-200 rounded-b-lg p-4 space-y-3">
                         <?php foreach ($gradCourses as $courseName => $courseData) { ?>
                             <div class="course-card bg-gray-50 p-4 rounded-lg border-l-4 border-primary">
-                                <h4 class="font-bold text-gray-800 mb-2"><?php echo $courseName; ?></h4>
+                                <h4 class="font-bold text-gray-800 mb-2 styleable <?php echo isset($courseData['styles']) ? implode(' ', json_decode($courseData['styles'], true) ?? []) : ''; ?>" 
+                                    data-section-id="<?php echo $courseData['sectionID']; ?>" 
+                                    data-element-name="Course: <?php echo htmlspecialchars($courseName); ?>">
+                                    <?php echo $courseName; ?>
+                                </h4>
                                 <p class="text-sm text-gray-600 mb-2">Program Objectives/Outcomes:</p>
                                 <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                                     <?php foreach ($courseData["outcomes"] as $outcome) { ?>
-                                        <li><?php echo $outcome['content']; ?></li>
+                                        <li class="styleable <?php echo isset($outcome['styles']) ? implode(' ', json_decode($outcome['styles'], true) ?? []) : ''; ?>"
+                                            data-section-id="<?php echo $outcome['sectionID']; ?>" 
+                                            data-element-name="Outcome: <?php echo substr(htmlspecialchars($outcome['content']), 0, 30) . '...'; ?>">
+                                            <?php echo $outcome['content']; ?>
+                                        </li>
                                     <?php } ?>
                                 </ul>
                             </div>
@@ -266,11 +282,57 @@ if (empty($gradCourses)) {
                             <form action="../page-functions/updateCourse.php" method="POST" class="space-y-4 course-form" name="<?php echo $courseName?>-items" id="<?php echo $courseName?>-items">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Course Title</label>
-                                    <input type="text" name="courseTitle" data-titlesectionid="<?php echo $courseData['sectionID']?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent courseTitle" id="<?php echo $courseName?>" value="<?php echo $courseName ?>">
+                                    <input type="text" name="courseTitle" data-titlesectionid="<?php echo $courseData['sectionID']?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent courseTitle styleable <?php echo isset($courseData['styles']) ? implode(' ', json_decode($courseData['styles'], true) ?? []) : ''; ?>" id="<?php echo $courseName?>" value="<?php echo $courseName ?>" data-section-id="<?php echo $courseData['sectionID']; ?>" data-element-name="Course Title: <?php echo htmlspecialchars($courseName); ?>">
                                     <input type="hidden" name="titleSectionID" value="<?php echo $courseData['sectionID']?>">
                                     <input type="hidden" name="courseIndex" value="<?php echo $courseData['index'] ?>">
                                     <input type="hidden" name="isNew" value="<?php echo strpos($courseData['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
                                     <input type="hidden" name="courseType" value="undergrad">
+                                </div>
+
+                                <div class="mt-2 mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Title Styling</label>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Font</label>
+                                            <select name="title_font_style" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                                                <option value="">Default</option>
+                                                <option value="font-[Inter]" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['font']) && json_decode($courseData['styles'], true)['font'] === 'font-[Inter]' ? 'selected' : ''; ?>>Inter</option>
+                                                <option value="font-[Roboto]" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['font']) && json_decode($courseData['styles'], true)['font'] === 'font-[Roboto]' ? 'selected' : ''; ?>>Roboto</option>
+                                                <option value="font-[Poppins]" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['font']) && json_decode($courseData['styles'], true)['font'] === 'font-[Poppins]' ? 'selected' : ''; ?>>Poppins</option>
+                                                <option value="font-[Merriweather]" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['font']) && json_decode($courseData['styles'], true)['font'] === 'font-[Merriweather]' ? 'selected' : ''; ?>>Merriweather</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Text Color</label>
+                                            <select name="title_text_color" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                                                <option value="">Default</option>
+                                                <option value="text-red-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-red-500' ? 'selected' : ''; ?>>Red</option>
+                                                <option value="text-blue-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-blue-500' ? 'selected' : ''; ?>>Blue</option>
+                                                <option value="text-green-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-green-500' ? 'selected' : ''; ?>>Green</option>
+                                                <option value="text-yellow-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-yellow-500' ? 'selected' : ''; ?>>Yellow</option>
+                                                <option value="text-purple-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-purple-500' ? 'selected' : ''; ?>>Purple</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Text Size</label>
+                                            <select name="title_text_size" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                                                <option value="">Default</option>
+                                                <option value="text-sm" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-size']) && json_decode($courseData['styles'], true)['text-size'] === 'text-sm' ? 'selected' : ''; ?>>Small</option>
+                                                <option value="text-base" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-size']) && json_decode($courseData['styles'], true)['text-size'] === 'text-base' ? 'selected' : ''; ?>>Base</option>
+                                                <option value="text-lg" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-size']) && json_decode($courseData['styles'], true)['text-size'] === 'text-lg' ? 'selected' : ''; ?>>Large</option>
+                                                <option value="text-xl" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-size']) && json_decode($courseData['styles'], true)['text-size'] === 'text-xl' ? 'selected' : ''; ?>>Extra Large</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Text Weight</label>
+                                            <select name="title_text_weight" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                                                <option value="">Default</option>
+                                                <option value="font-normal" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-weight']) && json_decode($courseData['styles'], true)['text-weight'] === 'font-normal' ? 'selected' : ''; ?>>Normal</option>
+                                                <option value="font-medium" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-weight']) && json_decode($courseData['styles'], true)['text-weight'] === 'font-medium' ? 'selected' : ''; ?>>Medium</option>
+                                                <option value="font-bold" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-weight']) && json_decode($courseData['styles'], true)['text-weight'] === 'font-bold' ? 'selected' : ''; ?>>Bold</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div class="border-t border-gray-200 my-4"></div>
@@ -285,11 +347,13 @@ if (empty($gradCourses)) {
                                         ?>
                                             <li class="flex items-center gap-2">
                                                 <input type="text" 
-                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
                                                     name="outcome_content[]" 
                                                     id="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
                                                     data-sectionid="<?php echo $outcome['sectionID']?>" 
-                                                    value="<?php echo $outcome['content']?>">
+                                                    value="<?php echo $outcome['content']?>"
+                                                    data-section-id="<?php echo $outcome['sectionID']?>" 
+                                                    data-element-name="Outcome: <?php echo substr(htmlspecialchars($outcome['content']), 0, 30) . '...'; ?>">
                                                 <input type="hidden" name="outcome_sectionid[]" value="<?php echo $outcome['sectionID']?>">
                                                 <input type="hidden" name="outcome_isnew[]" value="0">
                                                 <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $outcome['sectionID']?>">
@@ -304,11 +368,13 @@ if (empty($gradCourses)) {
                                         ?>
                                             <li class="flex items-center gap-2">
                                                 <input type="text" 
-                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
                                                     name="outcome_content[]" 
                                                     id="<?php echo $courseName?>-outcomes-1" 
                                                     data-sectionid="temp_outcome_<?php echo $courseData['index']; ?>_1" 
-                                                    value="">
+                                                    value=""
+                                                    data-section-id="temp_outcome_<?php echo $courseData['index']; ?>_1" 
+                                                    data-element-name="Outcome: ...">
                                                 <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $courseData['index']; ?>_1">
                                                 <input type="hidden" name="outcome_isnew[]" value="1">
                                                 <button type="button" class="remove-outcome btn btn-danger" data-sectionid="temp_outcome_<?php echo $courseData['index']; ?>_1">
@@ -353,11 +419,57 @@ if (empty($gradCourses)) {
                             <form action="../page-functions/updateCourse.php" method="POST" class="space-y-4 course-form" name="<?php echo $courseName?>-items" id="<?php echo $courseName?>-items">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Course Title</label>
-                                    <input type="text" name="courseTitle" data-titlesectionid="<?php echo $courseData['sectionID']?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent courseTitle" id="<?php echo $courseName?>" value="<?php echo $courseName ?>">
+                                    <input type="text" name="courseTitle" data-titlesectionid="<?php echo $courseData['sectionID']?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent courseTitle styleable <?php echo isset($courseData['styles']) ? implode(' ', json_decode($courseData['styles'], true) ?? []) : ''; ?>" id="<?php echo $courseName?>" value="<?php echo $courseName ?>" data-section-id="<?php echo $courseData['sectionID']; ?>" data-element-name="Course Title: <?php echo htmlspecialchars($courseName); ?>">
                                     <input type="hidden" name="titleSectionID" value="<?php echo $courseData['sectionID']?>">
                                     <input type="hidden" name="courseIndex" value="<?php echo $courseData['index'] ?>">
                                     <input type="hidden" name="isNew" value="<?php echo strpos($courseData['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
                                     <input type="hidden" name="courseType" value="grad">
+                                </div>
+
+                                <div class="mt-2 mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Title Styling</label>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Font</label>
+                                            <select name="title_font_style" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                                                <option value="">Default</option>
+                                                <option value="font-[Inter]" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['font']) && json_decode($courseData['styles'], true)['font'] === 'font-[Inter]' ? 'selected' : ''; ?>>Inter</option>
+                                                <option value="font-[Roboto]" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['font']) && json_decode($courseData['styles'], true)['font'] === 'font-[Roboto]' ? 'selected' : ''; ?>>Roboto</option>
+                                                <option value="font-[Poppins]" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['font']) && json_decode($courseData['styles'], true)['font'] === 'font-[Poppins]' ? 'selected' : ''; ?>>Poppins</option>
+                                                <option value="font-[Merriweather]" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['font']) && json_decode($courseData['styles'], true)['font'] === 'font-[Merriweather]' ? 'selected' : ''; ?>>Merriweather</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Text Color</label>
+                                            <select name="title_text_color" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                                                <option value="">Default</option>
+                                                <option value="text-red-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-red-500' ? 'selected' : ''; ?>>Red</option>
+                                                <option value="text-blue-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-blue-500' ? 'selected' : ''; ?>>Blue</option>
+                                                <option value="text-green-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-green-500' ? 'selected' : ''; ?>>Green</option>
+                                                <option value="text-yellow-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-yellow-500' ? 'selected' : ''; ?>>Yellow</option>
+                                                <option value="text-purple-500" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-color']) && json_decode($courseData['styles'], true)['text-color'] === 'text-purple-500' ? 'selected' : ''; ?>>Purple</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Text Size</label>
+                                            <select name="title_text_size" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                                                <option value="">Default</option>
+                                                <option value="text-sm" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-size']) && json_decode($courseData['styles'], true)['text-size'] === 'text-sm' ? 'selected' : ''; ?>>Small</option>
+                                                <option value="text-base" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-size']) && json_decode($courseData['styles'], true)['text-size'] === 'text-base' ? 'selected' : ''; ?>>Base</ && json_decode($courseData['styles'], true)['text-size'] === 'text-base' ? 'selected' : ''; ?>>Base
+                                                <option value="text-lg" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-size']) && json_decode($courseData['styles'], true)['text-size'] === 'text-lg' ? 'selected' : ''; ?>>Large</option>
+                                                <option value="text-xl" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-size']) && json_decode($courseData['styles'], true)['text-size'] === 'text-xl' ? 'selected' : ''; ?>>Extra Large</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-500 mb-1">Text Weight</label>
+                                            <select name="title_text_weight" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                                                <option value="">Default</option>
+                                                <option value="font-normal" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-weight']) && json_decode($courseData['styles'], true)['text-weight'] === 'font-normal' ? 'selected' : ''; ?>>Normal</option>
+                                                <option value="font-medium" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-weight']) && json_decode($courseData['styles'], true)['text-weight'] === 'font-medium' ? 'selected' : ''; ?>>Medium</option>
+                                                <option value="font-bold" <?php echo isset($courseData['styles']) && isset(json_decode($courseData['styles'], true)['text-weight']) && json_decode($courseData['styles'], true)['text-weight'] === 'font-bold' ? 'selected' : ''; ?>>Bold</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div class="border-t border-gray-200 my-4"></div>
@@ -372,11 +484,13 @@ if (empty($gradCourses)) {
                                         ?>
                                             <li class="flex items-center gap-2">
                                                 <input type="text" 
-                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
                                                     name="outcome_content[]" 
                                                     id="<?php echo $courseName?>-outcomes-<?php echo $i?>" 
                                                     data-sectionid="<?php echo $outcome['sectionID']?>" 
-                                                    value="<?php echo $outcome['content']?>">
+                                                    value="<?php echo $outcome['content']?>"
+                                                    data-section-id="<?php echo $outcome['sectionID']?>" 
+                                                    data-element-name="Outcome: <?php echo substr(htmlspecialchars($outcome['content']), 0, 30) . '...'; ?>">
                                                 <input type="hidden" name="outcome_sectionid[]" value="<?php echo $outcome['sectionID']?>">
                                                 <input type="hidden" name="outcome_isnew[]" value="0">
                                                 <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $outcome['sectionID']?>">
@@ -391,11 +505,13 @@ if (empty($gradCourses)) {
                                         ?>
                                             <li class="flex items-center gap-2">
                                                 <input type="text" 
-                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
                                                     name="outcome_content[]" 
                                                     id="<?php echo $courseName?>-outcomes-1" 
                                                     data-sectionid="temp_outcome_grad_<?php echo $courseData['index']; ?>_1" 
-                                                    value="">
+                                                    value=""
+                                                    data-section-id="temp_outcome_grad_<?php echo $courseData['index']; ?>_1" 
+                                                    data-element-name="Outcome: ...">
                                                 <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_grad_<?php echo $courseData['index']; ?>_1">
                                                 <input type="hidden" name="outcome_isnew[]" value="1">
                                                 <button type="button" class="remove-outcome btn btn-danger" data-sectionid="temp_outcome_grad_<?php echo $courseData['index']; ?>_1">

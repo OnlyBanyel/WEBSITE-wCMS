@@ -10,103 +10,55 @@ $acadSubpages = $acadSubpagesObj->fetchCollegeSubpages(3);
 <head>
     <?php require_once "../../__includes/head.php"; ?>
     <title>WMSU - Academics</title>
-    <style>
-        a {
-            text-decoration: none !important;
-        }
-        
-        .college-title {
-            color: #0066cc;
-            font-weight: 500;
-            font-size: 1.25rem;
-            line-height: 1.3;
-        }
-        
-        .red-line {
-            height: 2px;
-            background-color: #BD0F03;
-            width: 100%;
-        }
-        
-        .view-details-btn {
-            background-color: #BD0F03;
-            color: white !important;
-            text-align: center;
-            padding: 8px 0;
-            font-size: 0.9rem;
-            border-radius: 4px;
-            display: block;
-            width: 100%;
-        }
-        
-        /* Responsive styles */
-        @media (max-width: 768px) {
-            .college-title {
-                font-size: 1.1rem;
-            }
-            
-            .view-details-btn {
-                font-size: 0.8rem;
-                padding: 6px 0;
-            }
-        }
-        
-        @media (max-width: 640px) {
-            .college-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
-<body class="font-sans antialiased text-gray-800 overflow-x-hidden bg-white">
-    <!-- Header Section -->
-    <section class="header m-0 p-0">
+<body class="font-sans">
+    <!-- Header -->
+    <section class="header">
         <?php require_once '../../__includes/navbar.php'?>
     </section>
 
     <main class="w-full">
         <!-- Subnav -->
         <div class="relative z-10 subnav-container">
-            <?php require_once '../../__includes/subnav_academics.php'?>
+            <?php require_once '../../__includes/subnav_academics.php' ?>
         </div>
-        
-        <!-- Page Banner -->
-        <div class="bg-[#BD0F03] text-white text-center py-4 md:py-6">
-            <h1 class="text-3xl md:text-4xl font-semibold">Academic Programs</h1>
-            <p class="max-w-3xl mx-auto mt-2 text-base px-4">
-                Explore WMSU's diverse range of colleges, schools, and academic programs designed to 
-                prepare you for success in your chosen field.
-            </p>
-        </div>
-        
+
+        <!-- Page Content -->
         <div class="max-w-6xl mx-auto px-4 py-6">
             <!-- Colleges Section -->
             <div class="mb-4">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-1">Colleges and Schools</h2>
-                <div class="w-full h-px bg-[#BD0F03]"></div>
+                <div class="h-px bg-red-500"></div>
             </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8 college-grid">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
                 <?php 
                 foreach ($acadSubpages as $item) {
                 ?>
-                <div>
-                    <div class="flex items-start mb-1">
-                        <img src="<?php echo $item['imagePath'] ?>" class="w-10 h-10 md:w-12 md:h-12 object-contain mr-3" alt="<?php echo $item['subPageName'] ?> logo">
-                        <a href="<?php echo $item['subPagePath'] ?>" class="college-title"><?php echo $item['subPageName'] ?></a>
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="flex items-start p-4">
+                        <img src="<?php echo $item['imagePath'] ?>" 
+                             class="w-12 h-12 object-contain mr-3 rounded-lg" 
+                             alt="<?php echo $item['subPageName'] ?> logo">
+                        <a href="<?php echo $item['subPagePath'] ?>" 
+                           class="font-semibold text-gray-800 hover:text-red-500 transition-colors duration-300">
+                            <?php echo $item['subPageName'] ?>
+                        </a>
                     </div>
-                    <div class="red-line mb-2"></div>
-                    <p class="text-sm text-gray-700 mb-3">
+                    <p class="text-sm text-gray-600 p-4 mb-4">
                         Explore programs, faculty, and opportunities at the <?php echo $item['subPageName'] ?>.
                     </p>
-                    <a href="<?php echo $item['subPagePath'] ?>" class="view-details-btn">View Details</a>
+                    <a href="<?php echo $item['subPagePath'] ?>" 
+                       class="w-full text-center py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300">
+                        View Details
+                    </a>
                 </div>
                 <?php } ?>
             </div>
         </div>
     </main>
-    
+
     <!-- Footer -->
     <?php require_once '../../__includes/footer.php' ?>
 </body>
