@@ -273,3 +273,62 @@ Array
         )
 
 )
+Array
+(
+    [subpage] => 31
+    [strandID] => 969
+    [descID] => 994
+    [endDescID] => 995
+    [isNew] => 0
+    [strandName] => HUMSS (Humanities and Social Sciences)
+    [strandDesc] => ABM BWAHAHA
+    [outcomeContent] => Array
+        (
+            [0] => Creative Writing/Creative Nonfiction
+            [1] => Introduction to World Religions and Belief Systems
+            [2] => Creative Writing
+            [3] => Philippine Politics and Governance
+            [4] => Community Engagement, Solidarity, and Citizenship
+            [5] => Disciplines and Ideas in the Social Sciences
+            [6] => Disciplines and Ideas in the Applied Social Sciences
+            [7] => Engineering and Design
+        )
+
+    [strandEndDesc] => adsfasdf
+    [outcome_content] => Array
+        (
+            [0] => Creative Writing/Creative Nonfiction
+            [1] => Introduction to World Religions and Belief Systems
+            [2] => Creative Writing
+            [3] => Philippine Politics and Governance
+            [4] => Community Engagement, Solidarity, and Citizenship
+            [5] => Disciplines and Ideas in the Social Sciences
+            [6] => Disciplines and Ideas in the Applied Social Sciences
+            [7] => Engineering and Design
+        )
+
+    [outcome_sectionid] => Array
+        (
+            [0] => 971
+            [1] => 972
+            [2] => 973
+            [3] => 974
+            [4] => 975
+            [5] => 976
+            [6] => 977
+            [7] => 
+        )
+
+    [outcome_isnew] => Array
+        (
+            [0] => 0
+            [1] => 0
+            [2] => 0
+            [3] => 0
+            [4] => 0
+            [5] => 0
+            [6] => 0
+            [7] => 1
+        )
+
+)

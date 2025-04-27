@@ -353,34 +353,34 @@ $(document).ready(function() {
   // Handle form submission for adding new strand
   $(document).on('submit', '#addStrandForm', function(e) {
     e.preventDefault();
-
+    
     var formData = new FormData(this);
-
-    // Collect outcomes
+    
+    // Collect outcomes properly
     $('#outcome-list-new li input').each(function(index) {
         formData.append('outcome_content[]', $(this).val());
     });
-
+    
     $.ajax({
-      url: '../page-functions/addStrandItem.php',
-      type: 'POST',
-      data: formData,
-      contentType: false,
-      processData: false,
-      dataType: 'json',
-      success: function(response) {
-        if (response.success) {
-          alert(response.message);
-          location.reload();
-        } else {
-          alert(response.message);
+        url: '../page-functions/addStrandItem.php',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                location.reload();
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            alert('An error occurred: ' + error);
         }
-      },
-      error: function(xhr, status, error) {
-        alert('An error occurred: ' + error);
-      }
     });
-  });
+});
 
   // Handle form submission for updating a strand
   $(document).on('submit', 'form[id^="updateStrandForm-"]', function(e) {
@@ -455,7 +455,7 @@ $(document).ready(function() {
     const newOutcome = $(`
       <li>
         <input type="text" name="outcomeContent[]" class="outcome-input" data-sectionid="" data-is-new="1">
-        <button type="button" class="remove-outcome btn btn-danger">Remove</button>
+        <button type="button" class="remove-outcome btn btn-danger">X</button>
       </li>
     `);
 
