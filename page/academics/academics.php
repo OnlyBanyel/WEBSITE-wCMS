@@ -38,6 +38,24 @@ $acadSubpages = $acadSubpagesObj->fetchCollegeSubpages(3);
             display: block;
             width: 100%;
         }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .college-title {
+                font-size: 1.1rem;
+            }
+            
+            .view-details-btn {
+                font-size: 0.8rem;
+                padding: 6px 0;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .college-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 
@@ -54,8 +72,8 @@ $acadSubpages = $acadSubpagesObj->fetchCollegeSubpages(3);
         </div>
         
         <!-- Page Banner -->
-        <div class="bg-[#BD0F03] text-white text-center py-6">
-            <h1 class="text-4xl font-semibold">Academic Programs</h1>
+        <div class="bg-[#BD0F03] text-white text-center py-4 md:py-6">
+            <h1 class="text-3xl md:text-4xl font-semibold">Academic Programs</h1>
             <p class="max-w-3xl mx-auto mt-2 text-base px-4">
                 Explore WMSU's diverse range of colleges, schools, and academic programs designed to 
                 prepare you for success in your chosen field.
@@ -69,13 +87,13 @@ $acadSubpages = $acadSubpagesObj->fetchCollegeSubpages(3);
                 <div class="w-full h-px bg-[#BD0F03]"></div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8 college-grid">
                 <?php 
                 foreach ($acadSubpages as $item) {
                 ?>
                 <div>
                     <div class="flex items-start mb-1">
-                        <img src="<?php echo $item['imagePath'] ?>" class="w-12 h-12 object-contain mr-3" alt="<?php echo $item['subPageName'] ?> logo">
+                        <img src="<?php echo $item['imagePath'] ?>" class="w-10 h-10 md:w-12 md:h-12 object-contain mr-3" alt="<?php echo $item['subPageName'] ?> logo">
                         <a href="<?php echo $item['subPagePath'] ?>" class="college-title"><?php echo $item['subPageName'] ?></a>
                     </div>
                     <div class="red-line mb-2"></div>

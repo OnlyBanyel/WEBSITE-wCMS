@@ -1,0 +1,203 @@
+/* Responsive CSS for WMSU Website */
+
+/* General responsive styles */
+@media (max-width: 1024px) {
+  .container {
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  .hidden-mobile {
+    display: none !important;
+  }
+
+  .mobile-full-width {
+    width: 100% !important;
+  }
+
+  .mobile-text-center {
+    text-align: center !important;
+  }
+
+  .mobile-mt-2 {
+    margin-top: 0.5rem !important;
+  }
+
+  .mobile-mb-2 {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .mobile-p-2 {
+    padding: 0.5rem !important;
+  }
+}
+
+/* Academics page specific styles */
+@media (max-width: 768px) {
+  .academics-container {
+    flex-direction: column;
+  }
+
+  .academics-card {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .academics-hero {
+    height: auto;
+    padding: 2rem 1rem;
+  }
+
+  .academics-content {
+    padding: 1rem;
+  }
+}
+
+/* CCS page specific styles */
+@media (max-width: 768px) {
+  .ccs-container {
+    flex-direction: column;
+  }
+
+  .ccs-sidebar {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .ccs-content {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .ccs-programs {
+    grid-template-columns: 1fr;
+  }
+
+  .ccs-faculty {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ESU Campuses page specific styles */
+@media (max-width: 768px) {
+  .esu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .esu-campus-card {
+    margin-bottom: 1rem;
+  }
+
+  .esu-map {
+    height: 300px;
+  }
+
+  .esu-contact {
+    flex-direction: column;
+  }
+}
+
+/* Admissions pages specific styles */
+@media (max-width: 768px) {
+  .admission-steps {
+    flex-direction: column;
+  }
+
+  .admission-step {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .admission-form {
+    padding: 1rem;
+  }
+
+  .admission-form input,
+  .admission-form select,
+  .admission-form textarea {
+    width: 100%;
+  }
+
+  .fees-table {
+    font-size: 0.8rem;
+  }
+
+  .fees-table th,
+  .fees-table td {
+    padding: 0.3rem;
+  }
+}
+
+/* Enrollment page specific styles */
+@media (max-width: 768px) {
+  .enrollment-timeline {
+    flex-direction: column;
+  }
+
+  .enrollment-step {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Online Registration page specific styles */
+@media (max-width: 768px) {
+  .registration-form {
+    padding: 1rem;
+  }
+
+  .registration-form .form-group {
+    flex-direction: column;
+  }
+
+  .registration-form .form-group label {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .registration-form .form-group input,
+  .registration-form .form-group select {
+    width: 100%;
+  }
+}
+
+/* Graduate Studies page specific styles */
+@media (max-width: 768px) {
+  .grad-programs {
+    grid-template-columns: 1fr;
+  }
+
+  .grad-requirements {
+    padding: 1rem;
+  }
+}
+
+/* Undergraduate page specific styles */
+@media (max-width: 768px) {
+  .undergrad-programs {
+    grid-template-columns: 1fr;
+  }
+
+  .undergrad-requirements {
+    padding: 1rem;
+  }
+}

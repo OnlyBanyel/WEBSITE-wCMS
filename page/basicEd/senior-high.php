@@ -145,6 +145,7 @@ foreach ($strandsData as $item) {
         
         .value-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
         .value-card h3 {
@@ -198,13 +199,66 @@ foreach ($strandsData as $item) {
             border-bottom: none;
         }
         
+        /* Mobile responsiveness */
         @media (max-width: 768px) {
-            .value-card {
-                min-width: 100%;
+            .department-title {
+                font-size: 1.8rem;
+                padding: 0 1rem;
             }
             
+            .content {
+                padding: 1.5rem;
+            }
+            
+            .value-card {
+                min-width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .values-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .strand-card {
+                padding: 1.2rem;
+            }
+            
+            .strand-title {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .strand-icon {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+            
+            .banner-img {
+                max-height: 250px;
+            }
+        }
+        
+        /* Small mobile devices */
+        @media (max-width: 480px) {
             .department-title {
-                font-size: 2rem;
+                font-size: 1.5rem;
+            }
+            
+            .content h1 {
+                font-size: 1.5rem;
+            }
+            
+            .content h2 {
+                font-size: 1.3rem;
+            }
+            
+            .content {
+                padding: 1.2rem;
+            }
+            
+            .strand-card {
+                padding: 1rem;
             }
         }
     </style>
@@ -264,25 +318,25 @@ foreach ($strandsData as $item) {
                     <h1>Academic Strands Offered</h1>
 
                 <?php
-                foreach ($strands as $strand){
-
+                foreach ($strands as $strandName => $strand){
                 ?>
-                    <div class="strand-card" id="stem-strand">
+                    <div class="strand-card">
                         <div class="strand-title">
-                            <div class="strand-icon"></div>
+                            <div class="strand-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
                             <h2><?php echo $strand['name'] ?></h2>
                         </div>
-                        <p> <?php echo $strand['desc'] ?></p>
+                        <p><?php echo $strand['desc'] ?></p>
                         
                         <h3>Core Subjects Include:</h3>
                         <ul class="subject-list">
-
                             <?php foreach ($strand['outcomes'] as $item){ ?>
-                            <li> <?php echo $item ?></li>
+                            <li><i class="fas fa-check-circle text-primary mr-2"></i> <?php echo $item ?></li>
                             <?php } ?>
                         </ul>
                         
-                        <p>STEM graduates are well-prepared for university programs in medicine, engineering, computer science, architecture, mathematics, and various scientific fields, as well as careers in research, technology development, and innovation.</p>
+                        <p><?php echo $strand['end-desc'] ?></p>
                     </div>
                 <?php } ?>
                 </div>
@@ -308,26 +362,26 @@ foreach ($strandsData as $item) {
                 content.style.opacity = '1';
             }, 300);
             
-            // Interactive value cards
-            const valueCards = document.querySelectorAll('.value-card');
-            valueCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    this.style.backgroundColor = '#ffe6e6';
-                    setTimeout(() => {
-                        this.style.backgroundColor = '#f9f9f9';
-                    }, 300);
+            // Responsive navigation for mobile
+            const navToggle = document.querySelector('.nav-toggle');
+            if (navToggle) {
+                navToggle.addEventListener('click', function() {
+                    const navMenu = document.querySelector('.nav-menu');
+                    navMenu.classList.toggle('active');
                 });
-            });
+            }
             
-            // Interactive strand cards
-            const strandCards = document.querySelectorAll('.strand-card');
-            strandCards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.borderTopWidth = '8px';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.borderTopWidth = '5px';
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }
                 });
             });
         });

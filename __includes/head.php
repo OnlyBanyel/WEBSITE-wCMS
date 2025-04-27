@@ -12,6 +12,7 @@ $baseUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/WEBSITE-WCMS';
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/footer.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/ESUCampuses.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/output.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/responsive.css">
 
 
 <script src="<?php echo $baseUrl; ?>/vendors/jquery-3.7.1/jquery-3.7.1.min.js"></script>

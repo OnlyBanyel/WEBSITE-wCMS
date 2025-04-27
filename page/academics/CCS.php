@@ -519,6 +519,35 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
           .dept-card-container {
               padding: 1rem !important;
           }
+          
+          .grid-cols-3 {
+              grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+          }
+          
+          .grid-cols-2 {
+              grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+          }
+          
+          .order-1, .order-2 {
+              order: 0 !important;
+          }
+          
+          .h-\[650px\], .h-\[700px\] {
+              height: 500px !important;
+          }
+          
+          .text-3xl {
+              font-size: 1.5rem !important;
+          }
+          
+          .text-4xl, .text-5xl, .text-6xl {
+              font-size: 2rem !important;
+          }
+          
+          .h-48, .h-80, .w-48, .w-80 {
+              height: auto !important;
+              width: 150px !important;
+          }
       }
 
       /* Add additional styling for better content spacing */
@@ -601,14 +630,14 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
               <!-- College Logo & Title Overlay -->
               <div class="absolute inset-0 flex flex-col items-center justify-center z-10 px-4 md:px-8">
                   <div class="bg-primary/10 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl animate-fade">
-                      <img src="<?php echo $carouselLogoImage ?>" class="h-48 w-48 md:h-80 md:w-80 drop-shadow-lg animate-pulse-slow" alt="CCS Logo">
+                      <img src="<?php echo $carouselLogoImage ?>" class="h-32 w-32 sm:h-48 sm:w-48 md:h-80 md:w-80 drop-shadow-lg animate-pulse-slow" alt="CCS Logo">
                   </div>
                   <div class="mt-6 md:mt-8 text-center">
-                      <h1 class="text-3xl md:text-6xl font-bold text-white mt-4 md:mt-6 text-center drop-shadow-lg font-montserrat animate-slide-up">
+                      <h1 class="text-2xl sm:text-3xl md:text-6xl font-bold text-white mt-4 md:mt-6 text-center drop-shadow-lg font-montserrat animate-slide-up">
                           <?php echo $carouselLogo?>
                       </h1>
                       <div class="w-16 md:w-24 h-1 bg-primary mx-auto mt-3 md:mt-4 rounded-full animate-slide-up"></div>
-                      <p class="text-white text-lg md:text-xl mt-3 md:mt-4 max-w-2xl mx-auto px-4 animate-slide-up">Empowering Future Innovators Through Technology and Computing Excellence</p>
+                      <p class="text-white text-base sm:text-lg md:text-xl mt-3 md:mt-4 max-w-2xl mx-auto px-4 animate-slide-up">Empowering Future Innovators Through Technology and Computing Excellence</p>
                   </div>
               </div>
           </div>
@@ -618,20 +647,21 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
       <section class="py-12 md:py-20 bg-gradient-to-b from-white to-secondary">
           <div class="section-container">
               <div class="text-center mb-10 md:mb-16 px-4">
-                  <h2 class="text-3xl md:text-5xl font-bold gradient-text font-montserrat mb-4">College Overview</h2>
+                  <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold gradient-text font-montserrat mb-4">College Overview</h2>
                   <div class="w-16 md:w-24 h-1 bg-primary mx-auto rounded-full"></div>
                   <p class="text-neutral mt-4 md:mt-6 max-w-3xl mx-auto">Discover our commitment to excellence in computing education and research</p>
               </div>
               
-              <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+
                   <!-- Text Content -->
                   <div class="space-y-8 md:space-y-10 order-2 md:order-1">
                       <?php for ($i = 0; $i < count($genInfoBackHead); $i++) { ?>
                           <div class="card-content space-y-4 bg-white p-8 rounded-xl shadow-card border-l-4 border-primary transform transition-all duration-300 hover:shadow-xl">
-                              <h2 class="text-2xl md:text-3xl font-bold text-primaryDark font-montserrat red-underline inline-block">
+                              <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-primaryDark font-montserrat red-underline inline-block">
                                   <?php echo $genInfoTitles[$i] ?>
                               </h2>
-                              <p class="text-lg md:text-xl font-semibold text-gray-700">
+                              <p class="text-base sm:text-lg md:text-xl font-semibold text-gray-700">
                                   <?php echo $genInfoBackHead[$i]?>
                               </p>
                               <ul class="space-y-2 md:space-y-3 text-neutral custom-list">
@@ -663,12 +693,12 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
       <section class="py-12 md:py-20 bg-white">
           <div class="section-container">
               <div class="text-center mb-10 md:mb-16 px-4">
-                  <h2 class="text-3xl md:text-5xl font-bold gradient-text font-montserrat mb-4">Our Departments</h2>
+                  <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold gradient-text font-montserrat mb-4">Our Departments</h2>
                   <div class="w-16 md:w-24 h-1 bg-primary mx-auto rounded-full"></div>
                   <p class="text-neutral mt-4 md:mt-6 max-w-3xl mx-auto">Specialized academic units dedicated to different areas of computing sciences</p>
               </div>
               
-              <div class="dept-card-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              <div class="dept-card-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                   <?php $i = 0; foreach ($departments as $items) { ?>
                       <div class="dept-card rounded-2xl overflow-hidden shadow-card h-64 md:h-72 relative group border border-primary/10">
                           <!-- Background Image with Overlay -->
@@ -685,7 +715,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
                                       </svg>
                                   </div>
                               </div>
-                              <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white text-center mb-2">
+                              <h3 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white text-center mb-2">
                                   <?php echo $items['content']; ?>
                               </h3>
                               <div class="w-10 md:w-12 h-1 bg-white rounded-full mb-2 md:mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -703,7 +733,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
       <section class="py-12 md:py-20 bg-gradient-to-b from-white to-secondary">
           <div class="section-container">
               <div class="text-center mb-10 md:mb-16 px-4">
-                  <h2 class="text-3xl md:text-5xl font-bold gradient-text font-montserrat mb-4">Academic Programs</h2>
+                  <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold gradient-text font-montserrat mb-4">Academic Programs</h2>
                   <div class="w-16 md:w-24 h-1 bg-primary mx-auto rounded-full"></div>
                   <p class="text-neutral mt-4 md:mt-6 max-w-3xl mx-auto">Comprehensive educational pathways designed to prepare students for successful careers in computing</p>
               </div>
@@ -711,7 +741,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
               <!-- Undergraduate Programs -->
               <div class="accordion-container mb-12 md:mb-20">
                   <div class="bg-primary py-4 md:py-6 px-4 md:px-8 rounded-t-2xl">
-                      <h2 class="text-2xl md:text-4xl font-bold text-white text-center font-montserrat">
+                      <h2 class="text-xl sm:text-2xl md:text-4xl font-bold text-white text-center font-montserrat">
                           Undergraduate Programs
                       </h2>
                   </div>
@@ -820,7 +850,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
                <!-- Graduate Programs -->
                <div class="accordion-container">
                    <div class="bg-primary py-4 md:py-6 px-4 md:px-8 rounded-t-2xl">
-                       <h2 class="text-2xl md:text-4xl font-bold text-white text-center font-montserrat">
+                       <h2 class="text-xl sm:text-2xl md:text-4xl font-bold text-white text-center font-montserrat">
                            Graduate Programs
                        </h2>
                    </div>
@@ -943,7 +973,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
        <section class="py-12 md:py-16 bg-primary">
            <div class="section-container">
                <div class="max-w-4xl mx-auto text-center text-white">
-                   <h2 class="text-2xl md:text-4xl font-bold font-montserrat mb-4 md:mb-6">Ready to Shape the Future of Technology?</h2>
+                   <h2 class="text-xl sm:text-2xl md:text-4xl font-bold font-montserrat mb-4 md:mb-6">Ready to Shape the Future of Technology?</h2>
                    <p class="text-base md:text-lg mb-6 md:mb-8 text-white/90">Join our community of innovators, problem-solvers, and digital pioneers</p>
                    <div class="flex flex-wrap justify-center gap-3 md:gap-4">
                        <a href="#" class="px-6 md:px-8 py-2.5 md:py-3 bg-white text-primary font-semibold rounded-full shadow-lg hover:bg-gray-100 transition-colors duration-300">
@@ -962,19 +992,19 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
            <div class="section-container">
                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                    <div class="stats-card text-center p-4 md:p-6 rounded-xl bg-white shadow-card">
-                       <div class="text-3xl md:text-5xl font-bold text-primary mb-1 md:mb-2">500+</div>
+                       <div class="text-2xl sm:text-3xl md:text-5xl font-bold text-primary mb-1 md:mb-2">500+</div>
                        <p class="text-gray-600 red-underline inline-block text-sm md:text-base">Students Enrolled</p>
                    </div>
                    <div class="stats-card text-center p-4 md:p-6 rounded-xl bg-white shadow-card">
-                       <div class="text-3xl md:text-5xl font-bold text-primary mb-1 md:mb-2">30+</div>
+                       <div class="text-2xl sm:text-3xl md:text-5xl font-bold text-primary mb-1 md:mb-2">30+</div>
                        <p class="text-gray-600 red-underline inline-block text-sm md:text-base">Expert Faculty</p>
                    </div>
                    <div class="stats-card text-center p-4 md:p-6 rounded-xl bg-white shadow-card">
-                       <div class="text-3xl md:text-5xl font-bold text-primary mb-1 md:mb-2">95%</div>
+                       <div class="text-2xl sm:text-3xl md:text-5xl font-bold text-primary mb-1 md:mb-2">95%</div>
                        <p class="text-gray-600 red-underline inline-block text-sm md:text-base">Employment Rate</p>
                    </div>
                    <div class="stats-card text-center p-4 md:p-6 rounded-xl bg-white shadow-card">
-                       <div class="text-3xl md:text-5xl font-bold text-primary mb-1 md:mb-2">20+</div>
+                       <div class="text-2xl sm:text-3xl md:text-5xl font-bold text-primary mb-1 md:mb-2">20+</div>
                        <p class="text-gray-600 red-underline inline-block text-sm md:text-base">Industry Partners</p>
                    </div>
                </div>
