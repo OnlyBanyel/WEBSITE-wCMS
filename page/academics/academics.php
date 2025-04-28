@@ -28,7 +28,7 @@ $acadSubpages = $acadSubpagesObj->fetchCollegeSubpages(3);
         <div class="max-w-6xl mx-auto px-4 py-6">
             <!-- Colleges Section -->
             <div class="mb-4">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-1">Colleges and Schools</h2>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-1 mt-5">Colleges and Schools</h2>
                 <div class="h-px bg-red-500"></div>
             </div>
 
@@ -36,7 +36,7 @@ $acadSubpages = $acadSubpagesObj->fetchCollegeSubpages(3);
                 <?php 
                 foreach ($acadSubpages as $item) {
                 ?>
-                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-white rounded-lg border  shadow-md hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-start p-4">
                         <img src="<?php echo $item['imagePath'] ?>" 
                              class="w-12 h-12 object-contain mr-3 rounded-lg" 

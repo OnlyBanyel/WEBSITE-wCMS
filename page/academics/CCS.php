@@ -589,7 +589,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
 
 <body class="font-inter antialiased text-gray-800 overflow-x-hidden bg-gray-50">
   <!-- Header Section -->
-  <section class="header">
+  <section class="header sticky top-0 z-[9999] bg-white" style="isolation: isolate;">
       <?php require_once '../../__includes/navbar.php'?>
   </section>
 
@@ -625,7 +625,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
               </div>
               
               <!-- College Logo & Title Overlay -->
-              <div class="absolute inset-0 flex flex-col items-center justify-center z-10 px-4 md:px-8">
+              <div class="absolute inset-0 flex flex-col items-center justify-center z-0 px-4 md:px-8">
                   <div class="bg-primary/10 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl animate-fade">
                       <img src="<?php echo $carouselLogoImage ?>" class="h-32 w-32 sm:h-48 sm:w-48 md:h-80 md:w-80 drop-shadow-lg animate-pulse-slow" alt="CCS Logo">
                   </div>

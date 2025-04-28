@@ -16,13 +16,30 @@ $messagesObj = new Messages();
 $user_id = $_SESSION['account']['id'];
 
 // Handle message actions
-if (isset($_POST['action'])) {
-    $message_id = isset($_POST['message_id']) ? $_POST['message_id'] : null;
+if (isset($_POST['action']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $message_id = isset($_POST['message_id']) ? (int)$_POST['message_id'] : null;
     
     if ($_POST['action'] == 'mark_read' && $message_id) {
         $messagesObj->markAsRead($message_id);
+        // Return JSON response for AJAX calls
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true]);
+            exit;
+        }
     } elseif ($_POST['action'] == 'delete' && $message_id) {
-        $messagesObj->deleteMessage($message_id, $user_id);
+        $success = $messagesObj->deleteMessage($message_id, $user_id);
+        // Return JSON response for AJAX calls
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => $success]);
+            exit;
+        }
+        // For non-AJAX requests, reload the page
+        if ($success) {
+            header("Location: messages.php");
+            exit;
+        }
     }
 }
 
@@ -207,30 +224,22 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between">
-                                    <p class="message-sender text-sm text-gray-900 styleable <?php echo isset($message['styles']) ? implode(' ', json_decode($message['styles'], true) ?? []) : ''; ?>" 
-   data-section-id="<?php echo $message['id']; ?>" 
-   data-element-name="Sender: <?php echo htmlspecialchars($message['sender_name']); ?>">
-    <?php echo htmlspecialchars($message['sender_name']); ?>
-    <?php if ($is_guest): ?>
-        <span class="ml-1 text-xs bg-gray-200 text-gray-800 px-1.5 py-0.5 rounded">Guest</span>
-    <?php endif; ?>
-</p>
-<span class="message-time styleable <?php echo isset($message['styles_time']) ? implode(' ', json_decode($message['styles_time'], true) ?? []) : ''; ?>" 
-      data-section-id="<?php echo $message['id']; ?>_time" 
-      data-element-name="Time: <?php echo date('M d, Y', strtotime($message['created_at'])); ?>">
-    <?php echo date('M d, Y', strtotime($message['created_at'])); ?>
-</span>
+                                    <p class="message-sender text-sm text-gray-900">
+                                        <?php echo htmlspecialchars($message['sender_name']); ?>
+                                        <?php if ($is_guest): ?>
+                                            <span class="ml-1 text-xs bg-gray-200 text-gray-800 px-1.5 py-0.5 rounded">Guest</span>
+                                        <?php endif; ?>
+                                    </p>
+                                    <span class="message-time">
+                                        <?php echo date('M d, Y', strtotime($message['created_at'])); ?>
+                                    </span>
                                 </div>
-                                <h3 class="message-subject text-base text-gray-900 mt-1 styleable <?php echo isset($message['styles_subject']) ? implode(' ', json_decode($message['styles_subject'], true) ?? []) : ''; ?>" 
-    data-section-id="<?php echo $message['id']; ?>_subject" 
-    data-element-name="Subject: <?php echo htmlspecialchars($message['subject']); ?>">
-    <?php echo htmlspecialchars($message['subject']); ?>
-</h3>
-                                <p class="message-preview text-sm mt-1 styleable <?php echo isset($message['styles_message']) ? implode(' ', json_decode($message['styles_message'], true) ?? []) : ''; ?>" 
-   data-section-id="<?php echo $message['id']; ?>_message" 
-   data-element-name="Message: <?php echo substr(htmlspecialchars($message['message']), 0, 30) . '...'; ?>">
-    <?php echo htmlspecialchars($message['message']); ?>
-</p>
+                                <h3 class="message-subject text-base text-gray-900 mt-1">
+                                    <?php echo htmlspecialchars($message['subject']); ?>
+                                </h3>
+                                <p class="message-preview text-sm mt-1">
+                                    <?php echo htmlspecialchars($message['message']); ?>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -247,7 +256,6 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
-                                        
                                     </button>
                                 </div>
                                 
@@ -279,16 +287,12 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
                                 </div>
                                 
                                 <div class="flex justify-end space-x-3">
-                                    <form method="post" action="" onsubmit="return confirm('Are you sure you want to delete this message?');">
-                                        <input type="hidden" name="message_id" value="<?php echo $message['id']; ?>">
-                                        <input type="hidden" name="action" value="delete">
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                            Delete
-                                        </button>
-                                    </form>
+                                    <button type="button" onclick="deleteMessage(<?php echo $message['id']; ?>)" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Delete
+                                    </button>
                                     <button onclick="closeMessageModal(<?php echo $message['id']; ?>)" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         Close
                                     </button>
@@ -301,8 +305,6 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
         </div>
     </div>
 </div>
-
-<!-- Include Font Awesome for icons -->
 
 <script>
     // Open message modal and mark as read
@@ -322,8 +324,12 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
                 
                 fetch(window.location.href, {
                     method: 'POST',
-                    body: formData
-                }).then(() => {
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }).then(response => response.json())
+                .then(() => {
                     // Remove unread styling
                     messageCard.classList.remove('unread');
                     
@@ -364,13 +370,60 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
     
     // Close modal with Escape key
     document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        const modals = document.querySelectorAll('.modal-overlay.active');
-        modals.forEach(modal => {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }); 
-    } 
-}); 
+        if (event.key === 'Escape') {
+            const modals = document.querySelectorAll('.modal-overlay.active');
+            modals.forEach(modal => {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }); 
+        } 
+    });
 
+    // Delete message function
+    function deleteMessage(messageId) {
+        if (!confirm('Are you sure you want to delete this message?')) {
+            return false;
+        }
+        
+        const formData = new FormData();
+        formData.append('message_id', messageId);
+        formData.append('action', 'delete');
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close the modal if open
+                const modal = document.getElementById('messageModal' + messageId);
+                if (modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+                
+                // Remove the message from the list
+                const messageCard = document.querySelector(`.message-card[onclick*="${messageId}"]`);
+                if (messageCard) {
+                    messageCard.remove();
+                }
+                
+                // Show success message
+                alert('Message deleted successfully');
+                
+                // Reload the page to update the list
+                window.location.reload();
+            } else {
+                alert('Failed to delete message');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the message');
+        });
+    }
 </script>
