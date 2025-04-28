@@ -14,23 +14,11 @@ if (isset($_POST['courseType'])) {
     $subpage = $_SESSION['account']['subpage_assigned'];
     
     // Get the current highest index for this course type
-    $coursesAndPrograms = [];
-    foreach ($_SESSION['collegeData'] as $data) {
-        if ($data['indicator'] === 'Courses and Programs') {
-            $coursesAndPrograms[] = $data;
-        }
-    }
-    
     $highestIndex = 0;
-    foreach ($coursesAndPrograms as $item) {
-        if ($item["description"] === "course-header-" . $courseType) {
-            // Extract the index from existing courses
-            if (preg_match('/' . $courseType . '-course-list-items-(\d+)$/', $item["description"], $matches)) {
-                $index = (int)$matches[1];
-                if ($index > $highestIndex) {
-                    $highestIndex = $index;
-                }
-            }
+    foreach ($_SESSION['collegeData'] as $data) {
+        if ($data['indicator'] === 'Courses and Programs' && 
+            strpos($data['description'], 'course-header-' . $courseType) !== false) {
+            $highestIndex++;
         }
     }
     
@@ -65,11 +53,11 @@ if (isset($_POST['courseType'])) {
         // Refresh session data
         $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
         
-        // Return JSON response instead of redirecting
         echo json_encode([
             "success" => true,
             "message" => "New course added successfully",
-            "redirect" => "../page-views/courses-offered.php"
+            "newCourseID" => $newCourseID,
+            "newIndex" => $newIndex
         ]);
         exit;
     } else {

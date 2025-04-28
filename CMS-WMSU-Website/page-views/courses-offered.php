@@ -259,8 +259,13 @@ if (empty($gradCourses)) {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <?php foreach ($undergradCourses as $courseName => $courseData) { ?>
                     <div class="bg-white rounded-lg shadow-md overflow-hidden courses-item-container">
-                        <div class="bg-primary text-white p-4">
+                        <div class="flex justify-between bg-primary text-white p-4">
                             <h3 class="font-semibold"><?php echo strpos($courseData['sectionID'], 'temp_') === 0 ? 'Add Course' : 'Edit '.$courseName; ?></h3>
+                            <button type="button" class="deleteCourse bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors"
+                                data-sectionid="<?php echo $courseData['sectionID']; ?>"
+                                data-coursetype="<?php echo strpos($courseData['sectionID'], 'grad') !== false ? 'grad' : 'undergrad'; ?>">
+                            Delete Course
+                        </button>
                         </div>
                         <div class="p-5">
                             <form action="../page-functions/updateCourse.php" method="POST" class="space-y-4 course-form" name="<?php echo $courseName?>-items" id="<?php echo $courseName?>-items">
@@ -346,8 +351,14 @@ if (empty($gradCourses)) {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <?php foreach ($gradCourses as $courseName => $courseData) { ?>
                     <div class="bg-white rounded-lg shadow-md overflow-hidden courses-item-container">
-                        <div class="bg-primary text-white p-4">
+                        <div class="flex justify-between bg-primary text-white p-4">
                             <h3 class="font-semibold"><?php echo strpos($courseData['sectionID'], 'temp_') === 0 ? 'Add Course' : 'Edit '.$courseName; ?></h3>
+                            <!-- Inside each course card (after the Save Changes button) -->
+                        <button type="button" class="deleteCourse bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors"
+                                data-sectionid="<?php echo $courseData['sectionID']; ?>"
+                                data-coursetype="<?php echo strpos($courseData['sectionID'], 'grad') !== false ? 'grad' : 'undergrad'; ?>">
+                            Delete Course
+                        </button>
                         </div>
                         <div class="p-5">
                             <form action="../page-functions/updateCourse.php" method="POST" class="space-y-4 course-form" name="<?php echo $courseName?>-items" id="<?php echo $courseName?>-items">
@@ -410,6 +421,7 @@ if (empty($gradCourses)) {
                                     <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors" data-course="grad-<?php echo $courseData['index']; ?>">Add Outcome</button>
                                     <input type="submit" value="Save Changes" class="submitCourse bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors">
                                 </div>
+
                             </form>
                         </div>
                     </div>
@@ -445,101 +457,254 @@ if (empty($gradCourses)) {
     });
     
     // Add new course buttons
-    document.getElementById('addNewUndergradCourse').addEventListener('click', function() {
-        // Create a form to submit
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '../page-functions/addCourse.php';
-        
-        // Create hidden inputs
-        const typeInput = document.createElement('input');
-        typeInput.type = 'hidden';
-        typeInput.name = 'courseType';
-        typeInput.value = 'undergrad';
-        
-        // Append inputs to the form
-        form.appendChild(typeInput);
-        
-        // Append the form to the body and submit it
-        document.body.appendChild(form);
-        form.submit();
-    });
+    // Add new course functionality with AJAX
+document.getElementById('addNewUndergradCourse').addEventListener('click', function() {
+    addCourse('undergrad');
+});
+
+document.getElementById('addNewGradCourse').addEventListener('click', function() {
+    addCourse('grad');
+});
+
+function addCourse(courseType) {
+    const button = this;
+    const originalHTML = button.innerHTML;
     
-    document.getElementById('addNewGradCourse').addEventListener('click', function() {
-        // Create a form to submit
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '../page-functions/addCourse.php';
-        
-        // Create hidden inputs
-        const typeInput = document.createElement('input');
-        typeInput.type = 'hidden';
-        typeInput.name = 'courseType';
-        typeInput.value = 'grad';
-        
-        // Append inputs to the form
-        form.appendChild(typeInput);
-        
-        // Append the form to the body and submit it
-        document.body.appendChild(form);
-        form.submit();
-    });
-    
-    // Form submission with AJAX
-    document.querySelectorAll('.course-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+    // Show loading state
+    button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span class="font-medium">Adding Course...</span>
+    `;
+    button.disabled = true;
+
+    // Make AJAX request
+    fetch('../page-functions/addCourse.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `courseType=${courseType}`
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Create the new course card HTML
+            const newCourseHTML = `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden courses-item-container">
+                    <div class="bg-primary text-white p-4">
+                        <h3 class="font-semibold">Edit ${courseType === 'undergrad' ? 'Undergraduate' : 'Graduate'} Course</h3>
+                    </div>
+                    <div class="p-5">
+                        <form action="../page-functions/updateCourse.php" method="POST" class="space-y-4 course-form">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Course Title</label>
+                                <input type="text" name="courseTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent courseTitle" value="New ${courseType === 'undergrad' ? 'Undergraduate' : 'Graduate'} Course">
+                                <input type="hidden" name="titleSectionID" value="${data.newCourseID}">
+                                <input type="hidden" name="courseIndex" value="${data.newIndex}">
+                                <input type="hidden" name="isNew" value="1">
+                                <input type="hidden" name="courseType" value="${courseType}">
+                            </div>
+                            
+                            <div class="border-t border-gray-200 my-4"></div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Program Objectives/Outcomes</label>
+                                <ul class="outcomes-container space-y-3" id="outcomes-${courseType}-${data.newIndex}">
+                                    <li class="flex items-center gap-2">
+                                        <input type="text" 
+                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                                            name="outcome_content[]" 
+                                            value="Program outcome description">
+                                        <input type="hidden" name="outcome_sectionid[]" value="temp_new_outcome_1">
+                                        <input type="hidden" name="outcome_isnew[]" value="1">
+                                        <button type="button" class="remove-outcome btn btn-danger">
+                                            ×
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="flex justify-between mt-4">
+                                <button type="button" class="deleteCourse bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors"
+                                        data-sectionid="${data.newCourseID}"
+                                        data-coursetype="${courseType}">
+                                    Delete Course
+                                </button>
+                                <input type="submit" value="Save Changes" class="submitCourse bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            // Insert the new course before the "Add New" button
+            const addButtonContainer = document.getElementById(`addNew${courseType === 'undergrad' ? 'Undergrad' : 'Grad'}Course`).closest('div');
+            addButtonContainer.insertAdjacentHTML('beforebegin', newCourseHTML);
+
+            // Reattach event listeners to the new form
+            const newForm = document.querySelector(`input[name="titleSectionID"][value="${data.newCourseID}"]`).closest('form');
+            setupFormSubmitHandler(newForm);
             
-            // Collect all outcomes data
-            const outcomes = [];
-            this.querySelectorAll('.outcome-input').forEach(input => {
-                const sectionId = input.getAttribute('data-sectionid');
-                const isNew = sectionId.startsWith('temp_') || sectionId.startsWith('temp_new_outcome_');
-                outcomes.push({
-                    content: input.value,
-                    sectionID: sectionId,
-                    isNew: isNew
-                });
+            // Attach remove outcome handler
+            newForm.querySelector('.remove-outcome').addEventListener('click', function() {
+                this.closest('li').remove();
             });
+
+            // Attach delete handler
+            newForm.querySelector('.deleteCourse').addEventListener('click', function() {
+                if (confirm('Are you sure you want to delete this course?')) {
+                    deleteCourse(this);
+                }
+            });
+
+            // Show success message
+            showSuccessMessage('Course added successfully!');
+        } else {
+            showErrorMessage(data.message || 'Failed to add course');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorMessage('An error occurred while adding the course');
+    })
+    .finally(() => {
+        // Restore button state
+        button.innerHTML = originalHTML;
+        button.disabled = false;
+    });
+}
+
+// Setup form submit handler (for both new and existing forms)
+function setupFormSubmitHandler(form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Collect all outcomes data
+        const outcomes = [];
+        this.querySelectorAll('.outcome-input').forEach(input => {
+            const sectionId = input.getAttribute('data-sectionid') || input.closest('li').querySelector('input[name="outcome_sectionid[]"]').value;
+            const isNew = sectionId.startsWith('temp_') || sectionId.startsWith('temp_new_outcome_');
+            outcomes.push({
+                content: input.value,
+                sectionID: sectionId,
+                isNew: isNew
+            });
+        });
+        
+        // Create FormData object
+        const formData = new FormData(this);
+        formData.append('outcomes', JSON.stringify(outcomes));
+        
+        // Check if this is a new course
+        const isNewCourse = formData.get('isNew') === '1';
+        
+        // Disable the submit button to prevent double submission
+        const submitButton = this.querySelector('input[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.value = 'Saving...';
+        
+        // Send AJAX request
+        fetch(this.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage('Course ' + (isNewCourse ? 'added' : 'updated') + ' successfully!');
+                
+                // Update the form to mark it as no longer new
+                if (isNewCourse) {
+                    this.querySelector('input[name="isNew"]').value = '0';
+                }
+            } else {
+                showErrorMessage(data.message || 'Failed to save course');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('An error occurred while saving the course');
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.value = 'Save Changes';
+        });
+    });
+}
+
+    // Course deletion functionality
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('deleteCourse')) {
+        const button = e.target;
+        const card = button.closest('.courses-item-container');
+        const sectionID = button.dataset.sectionid;
+        const courseType = button.dataset.coursetype;
+        
+        if (confirm('Are you sure you want to delete this course and all its outcomes?')) {
+            // Show loading state
+            const originalText = button.textContent;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.disabled = true;
             
-            // Create FormData object
-            const formData = new FormData(this);
-            formData.append('outcomes', JSON.stringify(outcomes));
-            
-            // Check if this is a new course
-            const isNewCourse = formData.get('isNew') === '1';
-            
-            // Disable the submit button to prevent double submission
-            const submitButton = this.querySelector('input[type="submit"]');
-            submitButton.disabled = true;
-            submitButton.value = 'Saving...';
-            
-            // Send AJAX request
-            fetch(this.action, {
+            // Make AJAX request
+            fetch('../page-functions/deleteCourse.php', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `sectionID=${sectionID}&courseType=${courseType}`
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    alert('Course ' + (isNewCourse ? 'added' : 'updated') + ' successfully!');
-                    // Reload the page to show updated content
-                    window.location.reload();
+                    // Remove the card with animation
+                    card.style.opacity = '0';
+                    card.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => {
+                        card.remove();
+                        
+                        // Show success message
+                        const successMsg = document.createElement('div');
+                        successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+                        successMsg.textContent = 'Course deleted successfully!';
+                        document.body.appendChild(successMsg);
+                        
+                        setTimeout(() => {
+                            successMsg.remove();
+                        }, 3000);
+                    }, 300);
                 } else {
-                    alert('Error: ' + (data.message || 'Failed to save course.'));
-                    console.error(data);
-                    // Re-enable the button if there was an error
-                    submitButton.disabled = false;
-                    submitButton.value = 'Save Changes';
+                    alert(data.message || 'Failed to delete course');
+                    button.textContent = originalText;
+                    button.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-                // Re-enable the button if there was an error
-                submitButton.disabled = false;
-                submitButton.value = 'Save Changes';
+                alert('An error occurred while deleting the course');
+                button.textContent = originalText;
+                button.disabled = false;
             });
-        });
-    });
+        }
+    }
+});
 </script>

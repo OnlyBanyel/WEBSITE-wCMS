@@ -167,6 +167,14 @@ while (count($genInfoImgs) < count($departments)) {
                             </div>
                             <input type="submit" id="changeDeptImg" class="changeDeptImg bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Save">
                         </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <button type="button" class="deleteDeptBtn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" 
+                                    data-textid="<?php echo $items['sectionID']?>"
+                                    data-isnew="<?php echo strpos($items['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
+                                Delete
+                            </button>
+                            <input type="submit" class="changeDeptImg bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Save">
+                        </div>
                     </form>
                 </div>
             </div>
@@ -199,24 +207,190 @@ while (count($genInfoImgs) < count($departments)) {
         previewContent.classList.toggle('hidden');
     });
     
-    // Add new department functionality
-    document.getElementById('addNewDepartment').addEventListener('click', function() {
-        // Create a form to submit
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '../page-functions/addDepartment.php';
+   // Add new department functionality with AJAX
+// Add new department functionality with AJAX (no refresh)
+document.getElementById('addNewDepartment').addEventListener('click', function() {
+    const button = this;
+    const originalHTML = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span class="font-medium">Adding Department...</span>
+    `;
+    button.disabled = true;
+
+    // Make AJAX request
+    fetch('../page-functions/addDepartment.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: 'addNewDepartment=1'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Create the new department card
+            const newDeptHTML = `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-primary text-white p-4">
+                        <h3 class="font-semibold">Edit New Department</h3>
+                    </div>
+                    <div class="p-5">
+                        <form action="../page-functions/uploadDeptImgs.php" method="POST" class="departmentForm space-y-4" id="departmentForm-temp_${Date.now()}" enctype="multipart/form-data">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
+                                <input type="text" name="deptName" class="deptName w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="New Department">
+                                <input type="hidden" name="textID" value="temp_${Date.now()}">
+                                <input type="hidden" name="isNew" value="1">
+                            </div>
+                            
+                            <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-40 flex items-center justify-center">
+                                <div class="text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p class="text-gray-500">No image uploaded</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="relative flex-1 mr-4">
+                                    <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="deptImg" id="deptImg-temp_${Date.now()}" accept="image/*">
+                                    <input type="hidden" name="sectionID" value="temp_img_${Date.now()}">
+                                    <input type="hidden" name="imgIsNew" value="1">
+                                    <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
+                                        <span class="file-name">Choose a new image...</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <input type="submit" class="changeDeptImg bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Save">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            // Insert the new department before the "Add New" button
+            const addButtonContainer = button.closest('div');
+            addButtonContainer.insertAdjacentHTML('beforebegin', newDeptHTML);
+
+            // Reattach file input event listener
+            document.getElementById(`deptImg-temp_${Date.now()}`).addEventListener('change', function() {
+                const fileName = this.files[0]?.name || 'Choose a file...';
+                this.parentElement.querySelector('.file-name').textContent = fileName;
+            });
+
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+            successMsg.textContent = 'Department added successfully!';
+            document.body.appendChild(successMsg);
+            
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+        } else {
+            // Show error message
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+            errorMsg.textContent = data.message || 'Failed to add department';
+            document.body.appendChild(errorMsg);
+            
+            setTimeout(() => {
+                errorMsg.remove();
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+        errorMsg.textContent = 'An error occurred while adding the department';
+        document.body.appendChild(errorMsg);
         
-        // Create a hidden input for the new department
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'addNewDepartment';
-        input.value = '1';
-        
-        // Append the input to the form
-        form.appendChild(input);
-        
-        // Append the form to the body and submit it
-        document.body.appendChild(form);
-        form.submit();
+        setTimeout(() => {
+            errorMsg.remove();
+        }, 3000);
+    })
+    .finally(() => {
+        // Restore button state
+        button.innerHTML = originalHTML;
+        button.disabled = false;
     });
+});
+
+// Department deletion functionality
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('deleteDeptBtn')) {
+        const button = e.target;
+        const card = button.closest('.bg-white.rounded-lg');
+        const textID = button.dataset.textid;
+        const isNew = button.dataset.isnew === '1';
+        
+        if (confirm('Are you sure you want to delete this department?')) {
+            // Show loading state
+            const originalText = button.textContent;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.disabled = true;
+            
+            // Make AJAX request
+            fetch('../page-functions/uploadDeptImgs.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `deleteDepartment=1&textID=${textID}&isNew=${isNew}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Remove the card with animation
+                    card.style.opacity = '0';
+                    card.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => {
+                        card.remove();
+                        
+                        // Show success message
+                        const successMsg = document.createElement('div');
+                        successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+                        successMsg.textContent = 'Department deleted successfully!';
+                        document.body.appendChild(successMsg);
+                        
+                        setTimeout(() => {
+                            successMsg.remove();
+                        }, 3000);
+                    }, 300);
+                } else {
+                    alert(data.message || 'Failed to delete department');
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the department');
+                button.textContent = originalText;
+                button.disabled = false;
+            });
+        }
+    }
+});
 </script>

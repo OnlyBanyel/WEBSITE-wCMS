@@ -6,6 +6,32 @@ require_once '../classes/pages.class.php';
 $loginObj = new Login;
 $pagesObj = new Pages;
 
+header('Content-Type: application/json');
+
+// Handle carousel image deletion
+if (isset($_POST['deleteCarouselImage'])) {
+    $sectionID = $_POST['sectionID'];
+    $isNew = $_POST['isNew'] === '1';
+    $subpage = $_SESSION['account']['subpage_assigned'];
+    
+    if (!$isNew) {
+        // Only delete from database if it's not a temporary image
+        $result = $pagesObj->deleteContent($sectionID, $subpage);
+        
+        if (!$result) {
+            echo json_encode(["success" => false, "message" => "Failed to delete carousel image."]);
+            exit;
+        }
+    }
+    
+    // Refresh session data
+    $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
+    
+    echo json_encode(["success" => true]);
+    exit;
+}
+
+// Handle image upload (your existing code)
 if (isset($_FILES['logoImage'])) {
     $imageIndex = $_POST['imageIndex']; 
     $isNew = isset($_POST['isNew']) && $_POST['isNew'] === '1';

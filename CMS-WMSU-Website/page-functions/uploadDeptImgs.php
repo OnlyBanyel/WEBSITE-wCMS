@@ -8,7 +8,30 @@ $pagesObj = new Pages;
 
 header('Content-Type: application/json');
 
-// Handle both text and image updates
+// Handle department deletion
+if (isset($_POST['deleteDepartment'])) {
+    $textID = $_POST['textID'];
+    $isNew = $_POST['isNew'] === '1';
+    $subpage = $_SESSION['account']['subpage_assigned'];
+    
+    if (!$isNew) {
+        // Only delete from database if it's not a temporary department
+        $result = $pagesObj->deleteContent($textID);
+        
+        if (!$result) {
+            echo json_encode(["success" => false, "message" => "Failed to delete department."]);
+            exit;
+        }
+    }
+    
+    // Refresh session data
+    $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
+    
+    echo json_encode(["success" => true]);
+    exit;
+}
+
+// Handle both text and image updates (your existing code)
 if (isset($_POST['deptName']) && isset($_POST['textID'])) {
     $value = $_POST['deptName'];
     $textID = $_POST['textID'];

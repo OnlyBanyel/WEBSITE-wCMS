@@ -296,11 +296,29 @@ if (empty($collegeName)) {
                                 </svg>
                             </div>
                         </div>
+                    </div>
+                                        <!-- Inside each carousel image form (after the upload button) -->
+                    <div class="flex items-center justify-between mt-4">
+                        <button type="button" class="deleteCarouselImage bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors"
+                                data-sectionid="<?php echo $img['sectionID']; ?>"
+                                data-isnew="<?php echo empty($img['imagePath']) || strpos($img['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
+                            Delete
+                        </button>
                         <input type="submit" name="submitImg" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Upload">
                     </div>
                 </form>
             </div>
         <?php } ?>
+                <!-- After the existing carousel image forms in college-profile.php -->
+        <!-- Add New Carousel Image Button -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center">
+            <button id="addNewCarouselImage" class="p-5 w-full h-full flex flex-col items-center justify-center text-gray-500 hover:text-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <span class="font-medium">Add New Carousel Image</span>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -438,4 +456,234 @@ if (empty($collegeName)) {
             });
         });
     });
+
+    // Add new carousel image functionality with AJAX
+    document.getElementById('addNewCarouselImage').addEventListener('click', function() {
+    const button = this;
+    const originalHTML = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span class="font-medium">Adding Image...</span>
+    `;
+    button.disabled = true;
+
+    // Make AJAX request
+    fetch('../page-functions/addCarouselImage.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: 'addNewCarouselImage=1'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Create the new carousel image form dynamically
+            const newIndex = data.newIndex; // This should be returned from the server
+            const newSectionID = data.sectionID; // This should be returned from the server
+            
+            const newImageFormHTML = `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-primary text-white p-4">
+                        <h3 class="font-semibold">Add Carousel Image ${newIndex}</h3>
+                    </div>
+                    <div class="p-5">
+                        <form action="../page-functions/uploadProfileImgs.php" method="POST" id="carouselForm-${newSectionID}" enctype="multipart/form-data" class="space-y-4">
+                            <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-48 flex items-center justify-center">
+                                <div class="text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p class="text-gray-500">No image uploaded</p>
+                                </div>
+                            </div>
+                            
+                            <input type="hidden" name="imageIndex" value="${newSectionID}">
+                            <input type="hidden" name="isNew" value="1">
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="relative flex-1 mr-4">
+                                    <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="logoImage" id="carouselImage-${newIndex}" accept="image/*">
+                                    <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
+                                        <span class="file-name">Choose a file...</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <input type="submit" name="submitImg" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Upload">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            // Insert the new form before the "Add New" button
+            const addButtonContainer = button.closest('div');
+            addButtonContainer.insertAdjacentHTML('beforebegin', newImageFormHTML);
+            
+            // Add event listener for the new form
+            document.getElementById(`carouselForm-${newSectionID}`).addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const form = this;
+                const formData = new FormData(form);
+                const submitButton = form.querySelector('input[type="submit"]');
+                
+                submitButton.disabled = true;
+                submitButton.value = 'Uploading...';
+                
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the image preview
+                        const imgContainer = form.querySelector('.rounded-lg');
+                        imgContainer.innerHTML = `
+                            <img src="${data.newPath}" alt="Carousel Image ${newIndex}" class="max-w-full max-h-full object-contain">
+                        `;
+                        
+                        // Change the form header to "Change"
+                        const formHeader = form.closest('.bg-white').querySelector('h3');
+                        formHeader.textContent = `Change Carousel Image ${newIndex}`;
+                        
+                        // Update the isNew hidden input to 0 since it's no longer new
+                        form.querySelector('input[name="isNew"]').value = '0';
+                    } else {
+                        alert('Error: ' + (data.message || 'Failed to update image.'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.value = 'Upload';
+                });
+            });
+            
+            // Add file input display functionality for the new input
+            document.getElementById(`carouselImage-${newIndex}`).addEventListener('change', function() {
+                const fileName = this.files[0]?.name || 'Choose a file...';
+                this.parentElement.querySelector('.file-name').textContent = fileName;
+            });
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+            successMsg.textContent = 'New carousel image slot added successfully!';
+            document.body.appendChild(successMsg);
+            
+            // Remove message after 3 seconds
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+        } else {
+            // Show error message
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+            errorMsg.textContent = data.message || 'Failed to add carousel image';
+            document.body.appendChild(errorMsg);
+            
+            // Remove message after 3 seconds
+            setTimeout(() => {
+                errorMsg.remove();
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+        errorMsg.textContent = 'An error occurred while adding the carousel image';
+        document.body.appendChild(errorMsg);
+        
+        // Remove message after 3 seconds
+        setTimeout(() => {
+            errorMsg.remove();
+        }, 3000);
+    })
+    .finally(() => {
+        // Restore button state
+        button.innerHTML = originalHTML;
+        button.disabled = false;
+    });
+});
+
+// Carousel image deletion functionality
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('deleteCarouselImage')) {
+        const button = e.target;
+        const card = button.closest('.bg-white.rounded-lg');
+        const sectionID = button.dataset.sectionid;
+        const isNew = button.dataset.isnew === '1';
+        
+        if (confirm('Are you sure you want to delete this carousel image?')) {
+            // Show loading state
+            const originalText = button.textContent;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.disabled = true;
+            
+            // Make AJAX request
+            fetch('../page-functions/uploadProfileImgs.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `deleteCarouselImage=1&sectionID=${sectionID}&isNew=${isNew}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Remove the card with animation
+                    card.style.opacity = '0';
+                    card.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => {
+                        card.remove();
+                        
+                        // Show success message
+                        const successMsg = document.createElement('div');
+                        successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+                        successMsg.textContent = 'Carousel image deleted successfully!';
+                        document.body.appendChild(successMsg);
+                        
+                        setTimeout(() => {
+                            successMsg.remove();
+                        }, 3000);
+                    }, 300);
+                } else {
+                    alert(data.message || 'Failed to delete carousel image');
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the carousel image');
+                button.textContent = originalText;
+                button.disabled = false;
+            });
+        }
+    }
+});
 </script>

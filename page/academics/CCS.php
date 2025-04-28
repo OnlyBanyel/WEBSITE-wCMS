@@ -589,7 +589,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
 
 <body class="font-inter antialiased text-gray-800 overflow-x-hidden bg-gray-50">
   <!-- Header Section -->
-  <section class="header sticky top-0 z-[9999] bg-white" style="isolation: isolate;">
+  <section class="header sticky top-0 z-[1000] bg-white" style="isolation: isolate;">
       <?php require_once '../../__includes/navbar.php'?>
   </section>
 

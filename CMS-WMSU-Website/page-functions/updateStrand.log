@@ -442,3 +442,195 @@ Array
         )
 
 )
+Array
+(
+    [subpage] => 31
+    [strandID] => 969
+    [descID] => 
+    [endDescID] => 
+    [isNew] => 0
+    [strandName] => HUMSS (Humanities and Social Sciences)
+    [strandDesc] => The HUMSS strand focuses on human behavior, culture, society, politics, and community development. This strand is designed for students interested in careers related to social sciences, communication, education, law, and public service.
+    [strandEndDesc] => HUMSS graduates pursue degrees in fields such as psychology, sociology, political science, education, communication, law, international studies, and other liberal arts disciplines, preparing them for careers in teaching, journalism, law, social work, and public administration.
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 969
+    [descID] => 
+    [endDescID] => 
+    [isNew] => 0
+    [strandName] => HUMSS (Humanities and Social Sciences)
+    [strandDesc] => The HUMSS strand focuses on human behavior, culture, society, politics, and community development. This strand is designed for students interested in careers related to social sciences, communication, education, law, and public service.
+    [strandEndDesc] => HUMSS graduates pursue degrees in fields such as psychology, sociology, political science, education, communication, law, international studies, and other liberal arts disciplines, preparing them for careers in teaching, journalism, law, social work, and public administration.
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 969
+    [descID] => 
+    [endDescID] => 
+    [isNew] => 0
+    [strandName] => HUMSS (Humanities and Social Sciences)
+    [strandDesc] => The HUMSS strand focuses on human behavior, culture, society, politics, and community development. This strand is designed for students interested in careers related to social sciences, communication, education, law, and public service.
+    [strandEndDesc] => HUMSS graduates pursue degrees in fields such as psychology, sociology, political science, education, communication, law, international studies, and other liberal arts disciplines, preparing them for careers in teaching, journalism, law, social work, and public administration
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 969
+    [descID] => 
+    [endDescID] => 
+    [isNew] => 0
+    [strandName] => HUMSS (Humanities and Social Sciences)
+    [strandDesc] => The HUMSS strand focuses on human behavior, culture, society, politics, and community development. This strand is designed for students interested in careers related to social sciences, communication, education, law, and public service.
+    [strandEndDesc] => HUMSS graduates pursue degrees in fields such as psychology, sociology, political science, education, communication, law, international studies, and other liberal arts disciplines, preparing them for careers in teaching, journalism, law, social work, and public administration
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 969
+    [descID] => 
+    [endDescID] => 
+    [isNew] => 0
+    [strandName] => HUMSS (Humanities and Social Sciences)
+    [strandDesc] => HELLO HUMMS
+    [strandEndDesc] => HELLOOO
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 969
+    [descID] => 
+    [endDescID] => 
+    [isNew] => 0
+    [strandName] => HUMSS (Humanities and Social Sciences)
+    [strandDesc] => HI
+    [strandEndDesc] => HEY
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 969
+    [descID] => 
+    [endDescID] => 
+    [isNew] => 0
+    [strandName] => HUMSS (Humanities and Social Sciences)
+    [strandDesc] => HEY HUMS
+    [strandEndDesc] => HUMSSSS
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 959
+    [descID] => 
+    [endDescID] => 
+    [isNew] => 0
+    [strandName] => STEM (Science, Technology, Engineering, and Mathematics)
+    [strandDesc] => FCK
+    [strandEndDesc] => FAFAFA
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 1032
+    [descID] => 
+    [endDescID] => 
+    [isNew] => 0
+    [strandName] => GAS
+    [strandDesc] => HEY
+    [strandEndDesc] => HWEY
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 1063
+    [descID] => 1064
+    [endDescID] => 1065
+    [isNew] => 0
+    [strandName] => STEM (Science, Technology, Engineering, and Mathematics)
+    [strandDesc] => stem is good great wow
+    [outcomeContent] => Array
+        (
+            [0] => bababaaba
+        )
+
+    [strandEndDesc] => stem is great
+    [outcome_content] => Array
+        (
+            [0] => bababaaba
+        )
+
+    [outcome_sectionid] => Array
+        (
+            [0] => 
+        )
+
+    [outcome_isnew] => Array
+        (
+            [0] => 1
+        )
+
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 1063
+    [descID] => 1064
+    [endDescID] => 1065
+    [isNew] => 0
+    [strandName] => STEM (Science, Technology, Engineering, and Mathematics)
+    [strandDesc] => stem is good great wow
+    [outcomeContent] => Array
+        (
+            [0] => WAHAHHAHA
+        )
+
+    [strandEndDesc] => stem is great
+    [outcome_content] => Array
+        (
+            [0] => WAHAHHAHA
+        )
+
+    [outcome_sectionid] => Array
+        (
+            [0] => 
+        )
+
+    [outcome_isnew] => Array
+        (
+            [0] => 1
+        )
+
+)
+Array
+(
+    [subpage] => 31
+    [strandID] => 1032
+    [descID] => 1061
+    [endDescID] => 1062
+    [isNew] => 0
+    [strandName] => GAS
+    [strandDesc] => HEY
+    [outcomeContent] => Array
+        (
+            [0] => hey
+        )
+
+    [strandEndDesc] => HWEY
+    [outcome_content] => Array
+        (
+            [0] => hey
+        )
+
+    [outcome_sectionid] => Array
+        (
+            [0] => 
+        )
+
+    [outcome_isnew] => Array
+        (
+            [0] => 1
+        )
+
+)
