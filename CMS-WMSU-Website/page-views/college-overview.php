@@ -1,7 +1,9 @@
 <?php 
 session_start();
 require_once "../classes/pages.class.php";
+require_once "../classes/element_styler.class.php";
 $collegeProfileObj = new Pages;
+$styler = new ElementStyler();
 $collegeOverview = [];
 
 foreach($_SESSION['collegeData'] as $data){
@@ -151,59 +153,107 @@ if (empty($genInfoImgs)) {
         border: 1px solid #e5e7eb;
         border-radius: 0.375rem;
     }
+    
+    /* Style for elements being edited */
+    .style-editing {
+        outline: 2px dashed #BD0F03 !important;
+        position: relative;
+    }
+    
+    .style-editing::after {
+        content: "Editing";
+        position: absolute;
+        top: -20px;
+        right: 0;
+        background-color: #BD0F03;
+        color: white;
+        padding: 2px 6px;
+        font-size: 10px;
+        border-radius: 3px;
+        z-index: 100;
+    }
+    
+    /* Style for styleable elements when in edit mode */
+    body.style-edit-mode .styleable {
+        cursor: pointer;
+        position: relative;
+    }
+    
+    body.style-edit-mode .styleable:hover {
+        outline: 2px dotted #BD0F03;
+    }
+    
+    body.style-edit-mode .styleable:hover::after {
+        content: "Click to edit";
+        position: absolute;
+        top: -20px;
+        right: 0;
+        background-color: #BD0F03;
+        color: white;
+        padding: 2px 6px;
+        font-size: 10px;
+        border-radius: 3px;
+        z-index: 100;
+    }
 </style>
 
 <div class="bg-gray-50 min-h-screen p-4 md:p-6">
     <!-- Page Header -->
-    <div class="mb-8">
+    <div class="mb-8 styleable" data-section-id="page_header" data-element-name="Page Header">
         <h1 class="text-3xl font-bold text-gray-800">College Overview Management</h1>
         <p class="text-gray-600 mt-2">Edit and manage the college overview section of your website</p>
     </div>
 
     <!-- Preview Section -->
     <div class="bg-white rounded-xl shadow-md p-6 mb-8 preview-section cursor-pointer" id="previewSection">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center mb-4 styleable" data-section-id="preview_header" data-element-name="Preview Header">
             <h2 class="text-xl font-semibold text-primary">Preview</h2>
             <span class="text-sm text-gray-500">Click to expand/collapse</span>
         </div>
         
-<div class="preview-content" id="previewContent">
-    <?php if (!empty($collegeOverview)) { ?>
-        <div class="flex flex-col md:flex-row gap-8">
-            <div class="md:w-1/2 space-y-6">
-                <?php for ($i = 0; $i < count($genInfoBackHead); $i ++) { ?>
-                    <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary">
-                        <h4 class="text-lg font-bold text-primary mb-2"><?php echo $genInfoTitles[$i]['content'] ?></h4>
-                        <p class="text-gray-700 mb-3"><?php echo $genInfoBackHead[$i]['content']?></p>
-                        <ul class="space-y-2 pl-5 list-disc text-gray-600">
-                            <?php foreach ($genInfoBackLists[$i] as $item) { ?>
-                                <li><?php echo $item['content']; ?></li>
-                            <?php } ?>
-                        </ul>
+        <div class="preview-content" id="previewContent">
+            <?php if (!empty($collegeOverview)) { ?>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="md:w-1/2 space-y-6">
+                        <?php for ($i = 0; $i < count($genInfoBackHead); $i ++) { ?>
+                            <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary styleable" data-section-id="overview_section_<?php echo $i; ?>" data-element-name="Overview Section <?php echo $i + 1; ?>">
+                                <h4 class="text-lg font-bold text-primary mb-2 styleable <?php echo $styler->getElementClassString($genInfoTitles[$i]['sectionID']); ?>" data-section-id="<?php echo $genInfoTitles[$i]['sectionID']; ?>" data-element-name="Section Title">
+                                    <?php echo $genInfoTitles[$i]['content'] ?>
+                                </h4>
+                                <p class="text-gray-700 mb-3 styleable <?php echo $styler->getElementClassString($genInfoBackHead[$i]['sectionID']); ?>" data-section-id="<?php echo $genInfoBackHead[$i]['sectionID']; ?>" data-element-name="Section Content">
+                                    <?php echo $genInfoBackHead[$i]['content']?>
+                                </p>
+                                <ul class="space-y-2 pl-5 list-disc text-gray-600">
+                                    <?php foreach ($genInfoBackLists[$i] as $item) { ?>
+                                        <li class="styleable <?php echo $styler->getElementClassString($item['sectionID']); ?>" data-section-id="<?php echo $item['sectionID']; ?>" data-element-name="List Item">
+                                            <?php echo $item['content']; ?>
+                                        </li>
+                                    <?php } ?>
+                                </ul>
+                            </div>
+                        <?php } ?>
                     </div>
-                <?php } ?>
-            </div>
-            <div class="md:w-1/2">
-                <div class="rounded-lg overflow-hidden shadow-md">
-                    <?php if (isset($genInfoImgs) && !empty($genInfoImgs) && !empty($genInfoImgs[1]['imagePath'])) { ?>
-                        <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" class="w-full h-64 object-cover" alt="Overview Image">
-                    <?php } else { ?>
-                        <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
-                            <p class="text-gray-600">No image available</p>
+                    <div class="md:w-1/2">
+                        <div class="rounded-lg overflow-hidden shadow-md">
+                            <?php if (isset($genInfoImgs) && !empty($genInfoImgs) && !empty($genInfoImgs[1]['imagePath'])) { ?>
+                                <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" class="w-full h-64 object-cover" alt="Overview Image">
+                            <?php } else { ?>
+                                <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                                    <p class="text-gray-600">No image available</p>
+                                </div>
+                            <?php } ?>
                         </div>
-                    <?php } ?>
+                    </div>
                 </div>
-            </div>
+            <?php } else { ?>
+                <div class="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-lg styleable" data-section-id="empty_preview" data-element-name="Empty Preview">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p class="text-gray-600">No overview content available. Add content below to see preview.</p>
+                </div>
+            <?php } ?>
         </div>
-    <?php } else { ?>
-        <div class="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p class="text-gray-600">No overview content available. Add content below to see preview.</p>
-        </div>
-    <?php } ?>
-</div>
     </div>
 
     <!-- Edit Forms Section -->
@@ -224,15 +274,15 @@ if (empty($genInfoImgs)) {
                 
                 $listTypes = ['CG-list-item', 'CM-list-item', 'CV-list-item'];
             ?> 
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div class="bg-primary text-white p-4">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden styleable" data-section-id="form_container_<?php echo $q; ?>" data-element-name="Form Container <?php echo $sectionNames[$q]; ?>">
+                    <div class="bg-primary text-white p-4 styleable" data-section-id="form_header_<?php echo $q; ?>" data-element-name="Form Header <?php echo $sectionNames[$q]; ?>">
                         <h3 class="font-semibold"><?php echo !empty($titleContent) ? 'Edit '.$titleContent : 'Add '.$sectionNames[$q]; ?></h3>
                     </div>
-                    <div class="p-5">
+                    <div class="p-5 styleable" data-section-id="form_body_<?php echo $q; ?>" data-element-name="Form Body <?php echo $sectionNames[$q]; ?>">
                         <form action="../page-functions/updateOverviewItem.php" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
-                                <input type="text" name="overviewTitle" disabled data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>">
+                                <input type="text" name="overviewTitle" disabled data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle styleable <?php echo $styler->getElementClassString($titleSectionID); ?>" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>" data-section-id="<?php echo $titleSectionID; ?>" data-element-name="Section Title Input">
                                 <input type="hidden" name="overviewSectionID" value="<?php echo $titleSectionID; ?>">
                                 <input type="hidden" name="isNew" value="<?php echo strpos($titleSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
                                 <input type="hidden" name="sectionType" value="<?php echo $q; ?>">
@@ -242,7 +292,7 @@ if (empty($genInfoImgs)) {
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Section Content</label>
-                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>">
+                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input">
                                 <input type="hidden" name="topContentSectionID" value="<?php echo $headSectionID; ?>">
                                 <input type="hidden" name="topContentIsNew" value="<?php echo strpos($headSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
                             </div>
@@ -257,11 +307,13 @@ if (empty($genInfoImgs)) {
                                     ?>
                                         <li class="flex items-center gap-2">
                                             <input type="text" 
-                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable <?php echo $styler->getElementClassString($item['sectionID']); ?>"
                                                 name="outcome_content[]" 
                                                 id="<?php echo $titleContent; ?>-<?php echo $i; ?>-outcomes" 
                                                 data-sectionid="<?php echo $item['sectionID']; ?>" 
-                                                value="<?php echo $item['content']; ?>">
+                                                value="<?php echo $item['content']; ?>"
+                                                data-section-id="<?php echo $item['sectionID']; ?>" 
+                                                data-element-name="Outcome Input">
                                             <input type="hidden" name="outcome_sectionid[]" value="<?php echo $item['sectionID']; ?>">
                                             <input type="hidden" name="outcome_isnew[]" value="0">
                                             <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']; ?>">
@@ -276,11 +328,13 @@ if (empty($genInfoImgs)) {
                                     ?>
                                         <li class="flex items-center gap-2">
                                             <input type="text" 
-                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
                                                 name="outcome_content[]" 
                                                 id="<?php echo $titleContent; ?>-1-outcomes" 
                                                 data-sectionid="temp_outcome_<?php echo $q; ?>_1" 
-                                                value="">
+                                                value=""
+                                                data-section-id="temp_outcome_<?php echo $q; ?>_1" 
+                                                data-element-name="Outcome Input">
                                             <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $q; ?>_1">
                                             <input type="hidden" name="outcome_isnew[]" value="1">
                                             <input type="hidden" name="outcome_type[]" value="<?php echo $listTypes[$q]; ?>">
@@ -293,8 +347,8 @@ if (empty($genInfoImgs)) {
                             </div>
                             
                             <div class="flex justify-between">
-                                <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors" data-section="<?php echo $q; ?>" data-type="<?php echo $listTypes[$q]; ?>">Add Outcome</button>
-                                <input type="submit" value="Save Changes" class="submitCourse bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors">
+                                <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listTypes[$q]; ?>">Add Outcome</button>
+                                <input type="submit" value="Save Changes" class="submitCourse bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable">
                             </div>
                         </form>
                     </div>

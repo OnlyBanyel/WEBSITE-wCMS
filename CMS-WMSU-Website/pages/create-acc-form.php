@@ -117,13 +117,23 @@ if ((isset($_POST['submit'])) && ($_SERVER['REQUEST_METHOD'] === 'POST')){
                 <div>
                     <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
                     <select name="role" id="role" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-wmsu-red/30 focus:border-wmsu-red outline-none transition-colors form-select appearance-none" required>
-                        <option value="1">Super Admin</option>
                         <option value="2">Content Manager</option>
                     </select>
                 </div>
                 
                 <!-- Container for subpage selection (dynamically populated) -->
-                <div id="contentmanagerpage-container"></div>
+                <div id="contentmanagerpage-container">
+                        <div>
+                            <label for="subpage_assigned" class="block text-sm font-medium text-gray-700 mb-1">Select College/Department:</label>
+                            <select name="subpage_assigned" id="subpage_assigned" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-wmsu-red/30 focus:border-wmsu-red outline-none transition-colors form-select appearance-none" required>
+                                <?php foreach ($collegeData as $college) { ?>
+                                    <option value="<?php echo $college['subpageID']; ?>">
+                                        <?php echo $college['subPageName']; ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                </div>
                 
                 <!-- Terms checkbox -->
                 <div class="flex items-center">
@@ -144,7 +154,7 @@ if ((isset($_POST['submit'])) && ($_SERVER['REQUEST_METHOD'] === 'POST')){
         </div>
     </div>
 
-    <script>
+    <!-- <script>
         $(document).ready(function() {
             $("#role").change(function() {
                 var selectedValue = $(this).val(); // Get selected value
@@ -168,6 +178,6 @@ if ((isset($_POST['submit'])) && ($_SERVER['REQUEST_METHOD'] === 'POST')){
                 }
             });
         });
-    </script>
+    </script> -->
 </body>
 </html>
