@@ -287,12 +287,12 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
                                 </div>
                                 
                                 <div class="flex justify-end space-x-3">
-                                    <button type="button" onclick="deleteMessage(<?php echo $message['id']; ?>)" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Delete
-                                    </button>
+                                <button type="button" onclick="deleteMessage(<?php echo $message['id']; ?>)" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Delete
+                                </button>
                                     <button onclick="closeMessageModal(<?php echo $message['id']; ?>)" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                         Close
                                     </button>
@@ -318,29 +318,26 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
             const messageCard = modal.previousElementSibling;
             if (messageCard && messageCard.classList.contains('unread')) {
                 // Send AJAX request to mark as read
-                const formData = new FormData();
-                formData.append('message_id', messageId);
-                formData.append('action', 'mark_read');
-                
-                fetch(window.location.href, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                }).then(response => response.json())
-                .then(() => {
-                    // Remove unread styling
-                    messageCard.classList.remove('unread');
-                    
-                    // Update unread count in header
-                    const unreadBadge = document.querySelector('.bg-white.text-primary.rounded-full');
-                    if (unreadBadge) {
-                        const currentCount = parseInt(unreadBadge.textContent);
-                        if (currentCount > 1) {
-                            unreadBadge.textContent = (currentCount - 1) + ' unread';
-                        } else {
-                            unreadBadge.remove();
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        message_id: messageId,
+                        action: 'mark_read'
+                    },
+                    success: function() {
+                        // Remove unread styling
+                        messageCard.classList.remove('unread');
+                        
+                        // Update unread count in header
+                        const unreadBadge = document.querySelector('.bg-white.text-primary.rounded-full');
+                        if (unreadBadge) {
+                            const currentCount = parseInt(unreadBadge.textContent);
+                            if (currentCount > 1) {
+                                unreadBadge.textContent = (currentCount - 1) + ' unread';
+                            } else {
+                                unreadBadge.remove();
+                            }
                         }
                     }
                 });
@@ -385,45 +382,39 @@ $unread_count = $messagesObj->getUnreadCount($user_id);
             return false;
         }
         
-        const formData = new FormData();
-        formData.append('message_id', messageId);
-        formData.append('action', 'delete');
-        
-        fetch(window.location.href, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Close the modal if open
-                const modal = document.getElementById('messageModal' + messageId);
-                if (modal) {
-                    modal.classList.remove('active');
-                    document.body.style.overflow = '';
+        $.ajax({
+            url: '../page-functions/deleteMessage.php',
+            type: 'POST',
+            data: { message_id: messageId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Close the modal if open
+                    const modal = document.getElementById('messageModal' + messageId);
+                    if (modal) {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                    
+                    // Remove the message from the list
+                    const messageCard = document.querySelector(`.message-card[onclick*="${messageId}"]`);
+                    if (messageCard) {
+                        messageCard.remove();
+                    }
+                    
+                    // Show success message
+                    alert(response.message);
+                    
+                    // Reload the page to update the list
+                    window.location.reload();
+                } else {
+                    alert(response.message || 'Failed to delete message');
                 }
-                
-                // Remove the message from the list
-                const messageCard = document.querySelector(`.message-card[onclick*="${messageId}"]`);
-                if (messageCard) {
-                    messageCard.remove();
-                }
-                
-                // Show success message
-                alert('Message deleted successfully');
-                
-                // Reload the page to update the list
-                window.location.reload();
-            } else {
-                alert('Failed to delete message');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the message');
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the message');
         });
     }
 </script>

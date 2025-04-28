@@ -158,7 +158,6 @@ class Messages {
      * @return bool Success or failure
      */
     public function deleteMessage($message_id, $user_id = null) {
-        try {
             // If user_id is provided, mark as deleted only for that user
             if ($user_id) {
                 $sql = "SELECT * FROM messages WHERE id = :message_id";
@@ -188,10 +187,6 @@ class Messages {
                 $qry->bindParam(':message_id', $message_id);
                 return $qry->execute();
             }
-        } catch (PDOException $e) {
-            error_log("Error deleting message: " . $e->getMessage());
-            return false;
-        }
     }
     
     /**
