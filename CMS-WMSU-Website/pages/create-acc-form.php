@@ -94,7 +94,7 @@ if ((isset($_POST['submit'])) && ($_SERVER['REQUEST_METHOD'] === 'POST')){
         <div class="p-6 md:p-8">
             <!-- Form header -->
             <div class="text-center mb-8">
-                <img src="https://wmsu.edu.ph/wp-content/uploads/2019/08/wmsu-logo.png" alt="WMSU Logo" class="h-16 mx-auto mb-4">
+                <img src="../../imgs/WMSU-Logo.png" alt="WMSU Logo" class="h-16 mx-auto mb-4">
                 <h2 class="text-2xl font-bold text-wmsu-red mb-1">Create Account</h2>
                 <p class="text-gray-600 text-sm">Enter your details to create a new account</p>
             </div>

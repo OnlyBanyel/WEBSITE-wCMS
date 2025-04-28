@@ -25,7 +25,7 @@ if (isset($_POST['collegeName'])) {
     if (isset($_FILES['collegeLogo']) && $_FILES['collegeLogo']['error'] == 0) {
         $logoFile = $_FILES['collegeLogo'];
         $logoFileName = time() . '_' . basename($logoFile['name']);
-        $logoUploadDir = '../uploads/colleges/logos/';
+        $logoUploadDir = '/WEBSITE-wCMS/CMS-WMSU-Website/uploads/colleges/logos/';
         
         // Create directory if it doesn't exist
         if (!file_exists($logoUploadDir)) {

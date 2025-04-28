@@ -106,11 +106,7 @@ while (count($genInfoImgs) < count($departments)) {
                         <div class="dept-card rounded-lg overflow-hidden shadow-md h-48 relative">
                             <div class="absolute inset-0 bg-primary/70" style="background: linear-gradient(rgba(189, 15, 3, 0.7), rgba(189, 15, 3, 0.7)), url('<?php echo !empty($genInfoImgs[$i]['imagePath']) ? $genInfoImgs[$i]['imagePath'] : ''; ?>') no-repeat center center; background-size: cover;"></div>
                             <div class="absolute inset-0 flex items-center justify-center p-4">
-                                <h3 class="text-xl font-bold text-white text-center styleable <?php echo isset($items['styles']) ? implode(' ', json_decode($items['styles'], true) ?? []) : ''; ?>"
-                                    data-section-id="<?php echo $items['sectionID']; ?>" 
-                                    data-element-name="Department: <?php echo htmlspecialchars($items['content']); ?>">
-                                    <?php echo $items['content']; ?>
-                                </h3>
+                                <h3 class="text-xl font-bold text-white text-center"><?php echo $items['content']; ?></h3>
                             </div>
                         </div>
                     <?php $i++; } ?>
@@ -127,7 +123,7 @@ while (count($genInfoImgs) < count($departments)) {
     </div>
 
     <!-- Edit Forms Section -->
-    <div class="flex flex-col justify-between gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php 
         $i = 0;
         foreach ($departments as $items) { ?>
@@ -139,62 +135,14 @@ while (count($genInfoImgs) < count($departments)) {
                     <form action="../page-functions/uploadDeptImgs.php" method="POST" class="departmentForm space-y-4" id="departmentForm-<?php echo isset($genInfoImgs[$i]) ? $genInfoImgs[$i]['sectionID'] : 'temp_'.$i; ?>" enctype="multipart/form-data">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
-                            <input type="text" name="deptName" class="deptName w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent styleable <?php echo isset($items['styles']) ? implode(' ', json_decode($items['styles'], true) ?? []) : ''; ?>" id="deptName" data-textid="<?php echo $items['sectionID']?>" value="<?php echo $items['content']?>" data-section-id="<?php echo $items['sectionID']; ?>" data-element-name="Department Name: <?php echo htmlspecialchars($items['content']); ?>">
+                            <input type="text" name="deptName" class="deptName w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="deptName" data-textid="<?php echo $items['sectionID']?>" value="<?php echo $items['content']?>">
                             <input type="hidden" name="textID" value="<?php echo $items['sectionID']?>">
                             <input type="hidden" name="isNew" value="<?php echo strpos($items['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
-                        </div>
-
-                        <div class="mt-2 mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Department Name Styling</label>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs text-gray-500 mb-1">Font</label>
-                                    <select name="dept_font_style" class="w-full border border-gray-300 rounded-md p-2 text-sm">
-                                        <option value="">Default</option>
-                                        <option value="font-[Inter]" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['font']) && json_decode($items['styles'], true)['font'] === 'font-[Inter]' ? 'selected' : ''; ?>>Inter</option>
-                                        <option value="font-[Roboto]" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['font']) && json_decode($items['styles'], true)['font'] === 'font-[Roboto]' ? 'selected' : ''; ?>>Roboto</option>
-                                        <option value="font-[Poppins]" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['font']) && json_decode($items['styles'], true)['font'] === 'font-[Poppins]' ? 'selected' : ''; ?>>Poppins</option>
-                                        <option value="font-[Merriweather]" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['font']) && json_decode($items['styles'], true)['font'] === 'font-[Merriweather]' ? 'selected' : ''; ?>>Merriweather</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-500 mb-1">Text Color</label>
-                                    <select name="dept_text_color" class="w-full border border-gray-300 rounded-md p-2 text-sm">
-                                        <option value="">Default</option>
-                                        <option value="text-red-500" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-color']) && json_decode($items['styles'], true)['text-color'] === 'text-red-500' ? 'selected' : ''; ?>>Red</option>
-                                        <option value="text-blue-500" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-color']) && json_decode($items['styles'], true)['text-color'] === 'text-blue-500' ? 'selected' : ''; ?>>Blue</option>
-                                        <option value="text-green-500" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-color']) && json_decode($items['styles'], true)['text-color'] === 'text-green-500' ? 'selected' : ''; ?>>Green</option>
-                                        <option value="text-yellow-500" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-color']) && json_decode($items['styles'], true)['text-color'] === 'text-yellow-500' ? 'selected' : ''; ?>>Yellow</option>
-                                        <option value="text-purple-500" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-color']) && json_decode($items['styles'], true)['text-color'] === 'text-purple-500' ? 'selected' : ''; ?>>Purple</option>
-                                        <option value="text-white" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-color']) && json_decode($items['styles'], true)['text-color'] === 'text-white' ? 'selected' : ''; ?>>White</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-500 mb-1">Text Size</label>
-                                    <select name="dept_text_size" class="w-full border border-gray-300 rounded-md p-2 text-sm">
-                                        <option value="">Default</option>
-                                        <option value="text-sm" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-size']) && json_decode($items['styles'], true)['text-size'] === 'text-sm' ? 'selected' : ''; ?>Small</option>
-
-                                        <option value="text-base" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-size']) && json_decode($items['styles'], true)['text-size'] === 'text-base' ? 'selected' : ''; ?>>Base</option>
-                                        <option value="text-lg" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-size']) && json_decode($items['styles'], true)['text-size'] === 'text-lg' ? 'selected' : ''; ?>>Large</option>
-                                        <option value="text-xl" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-size']) && json_decode($items['styles'], true)['text-size'] === 'text-xl' ? 'selected' : ''; ?>>Extra Large</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-500 mb-1">Text Weight</label>
-                                    <select name="dept_text_weight" class="w-full border border-gray-300 rounded-md p-2 text-sm">
-                                        <option value="">Default</option>
-                                        <option value="font-normal" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-weight']) && json_decode($items['styles'], true)['text-weight'] === 'font-normal' ? 'selected' : ''; ?>>Normal</option>
-                                        <option value="font-medium" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-weight']) && json_decode($items['styles'], true)['text-weight'] === 'font-medium' ? 'selected' : ''; ?>>Medium</option>
-                                        <option value="font-bold" <?php echo isset($items['styles']) && isset(json_decode($items['styles'], true)['text-weight']) && json_decode($items['styles'], true)['text-weight'] === 'font-bold' ? 'selected' : ''; ?>>Bold</option>
-                                    </select>
-                                </div>
-                            </div>
                         </div>
                         
                         <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-40 flex items-center justify-center">
                             <?php if (!empty($genInfoImgs[$i]['imagePath'])) { ?>
-                                <img src="<?php echo $genInfoImgs[$i]['imagePath'] ?>" alt="Department Image" class="max-w-full max-h-full object-contain styleable" data-section-id="<?php echo $genInfoImgs[$i]['sectionID']; ?>" data-element-name="Department Image">
+                                <img src="<?php echo $genInfoImgs[$i]['imagePath'] ?>" alt="Department Image" class="max-w-full max-h-full object-contain">
                             <?php } else { ?>
                                 <div class="text-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">

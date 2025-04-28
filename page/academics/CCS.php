@@ -2,7 +2,9 @@
 session_start();
 require_once "../../CMS-WMSU-Website/classes/pages.class.php"; 
 require_once "../../CMS-WMSU-Website/classes/messages.class.php"; // Added messages class
+require_once "../../CMS-WMSU-Website/classes/element_styler.class.php";
 $ccsPage = new Pages;
+$styler = new ElementStyler();
 
 $_SESSION['subpage'] = 1;
 // Get unread message count for the notification bubble
