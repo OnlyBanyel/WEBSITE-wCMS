@@ -2,7 +2,7 @@
 $baseUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/WEBSITE-WCMS';
 ;
 ?>
-
+<head>
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/vendors/bootstrap-5.3.3-dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/vendors/datatable-2.1.8/datatables.min.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/navbar.css">
@@ -13,11 +13,12 @@ $baseUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/WEBSITE-WCMS';
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/ESUCampuses.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/output.css">
 <link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/responsive.css">
-
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 <script src="<?php echo $baseUrl; ?>/vendors/jquery-3.7.1/jquery-3.7.1.min.js"></script>
 <script src="<?php echo $baseUrl; ?>/vendors/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
 <script src="<?php echo $baseUrl; ?>/vendors/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo $baseUrl; ?>/js/navbar.js"></script>
     <?php # Lateef Fonts ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

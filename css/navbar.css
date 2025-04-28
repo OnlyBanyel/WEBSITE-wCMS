@@ -1,258 +1,259 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box; /* Ensure consistent box-sizing */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Ensure consistent box-sizing */
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden; /* Stops side scrolling */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Stops side scrolling */
 }
 
-nav{
-    width: 100vw;
-    height: 100px;
+nav {
+  width: 100vw;
+  height: 100px;
 }
 
 .nav-cont {
-    display: flex;
-    justify-content: space-between;
-    background-color: white;
-    width: 100%;
-    height: 100%;
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  width: 100%;
+  height: 100%;
 }
 
 .WMSU-Logo-cont {
-    display: flex;
-    align-items: center;
-    height: 100px;
-    margin-left: 35px;
+  display: flex;
+  align-items: center;
+  height: 100px;
+  margin-left: 35px;
 }
 
 .WMSU-Logo {
-    height: 60px;
-    width: 60px;
+  height: 60px;
+  width: 60px;
 }
 
 .logo-text {
-    display: flex;
-    align-items: center;
-    margin-left: 15px;
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
 }
 
 .nav-logo-line {
-    height: 50px;
-    width: 1px;
-    border: 1px solid #BD0F03;
+  height: 50px;
+  width: 1px;
+  border: 1px solid #bd0f03;
 }
 
 .nav-title-cont {
-    display: flex;
-    flex-direction: column;
-    color: #BD0F03;
-    margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  color: #bd0f03;
+  margin-left: 10px;
 }
 
 .nav-logo-title {
-    font-size: 14px;
-    margin-top: -5px;
+  font-size: 14px;
+  margin-top: -5px;
 }
 
 .nav-logo-subtitle {
-    font-size: 10px;
-    margin-top: -5px;
+  font-size: 10px;
+  margin-top: -5px;
 }
 
 .nav-links {
-    display: flex;
-    align-items: center;
-    margin-left: 125px;
-    margin-right: 35px;
+  display: flex;
+  align-items: center;
+  margin-left: 125px;
+  margin-right: 35px;
 }
 
 .nav-links > a {
-    text-decoration: none;
-    color: #BD0F03;
-    font-size: 12px;
-    margin-right: 25px;
+  text-decoration: none;
+  color: #bd0f03;
+  font-size: 12px;
+  margin-right: 25px;
 }
 
 .nav-links > a img {
-    margin-top: -3px;
+  margin-top: -3px;
 }
 
 .nav-links > a:hover {
-    font-family: "Inter", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 900;
-    font-style: normal;
-    text-decoration: underline;
-    transition: ease-in-out .2s;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 900;
+  font-style: normal;
+  text-decoration: underline;
+  transition: ease-in-out 0.2s;
 }
 
 .nav-links > a:not(:hover) {
-    transition: ease-out .2s;
+  transition: ease-out 0.2s;
 }
 
 .nav-links > a:hover img {
-    transform: scaleY(-1);
-    transition: ease-in-out .2s;
+  transform: scaleY(-1);
+  transition: ease-in-out 0.2s;
 }
 
 .nav-links > a:not(:hover) img {
-    transition: ease-out .2s;
+  transition: ease-out 0.2s;
 }
 
 .MyWmsu-link {
-    text-decoration: none;
-    color: white;
-    border: 1px solid #BD0F03;
-    border-radius: 30px 0 30px 0;
-    background-color: #BD0F03;
-    font-size: 13px;
-    padding: 8px 25px;
+  text-decoration: none;
+  color: white;
+  border: 1px solid #bd0f03;
+  border-radius: 30px 0 30px 0;
+  background-color: #bd0f03;
+  font-size: 13px;
+  padding: 8px 25px;
 }
 
 .MyWmsu-link:hover {
-    background-color: white;
-    color: #BD0F03;
-    transition: ease-in-out .2s;
+  background-color: white;
+  color: #bd0f03;
+  transition: ease-in-out 0.2s;
 }
 
 .MyWmsu-link:not(:hover) {
-    transition: ease-out .2s;
+  transition: ease-out 0.2s;
 }
 
 .nav-dropdown {
-    visibility: hidden;
-    position: absolute;
-    top: 100px; /* Aligns below navbar */
-    left: 0;
-    background-color: white;
-    width: 100%;
-    height: 400px;
-    opacity: .70;
-    transition: opacity 0.3s ease-in-out, transform 0.4s ease-in-out, visibility .1s linear .1s;
-    transform: translateY(-15px);
-    display: flex;
-    justify-content: center;
-    z-index: 3;
+  visibility: hidden;
+  position: absolute;
+  top: 100px; /* Aligns below navbar */
+  left: 0;
+  background-color: white;
+  width: 100%;
+  height: 400px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease-in-out, transform 0.4s ease-in-out,
+    visibility 0.1s linear 0.1s;
+  transform: translateY(-15px);
+  display: flex;
+  justify-content: center;
+  z-index: 3;
 }
 
 .nav-dropdown::before {
-    content: "";
-    position: absolute;
-    top: -10px; /* Extends hover area just above the dropdown */
-    left: 0;
-    width: 100%; /* Matches the dropdown width instead of full screen */
-    height: 10px; /* Invisible hover buffer */
-    background: transparent;
-    pointer-events: auto; /* Ensures it remains interactive */
-    z-index: 1;
+  content: "";
+  position: absolute;
+  top: -10px; /* Extends hover area just above the dropdown */
+  left: 0;
+  width: 100%; /* Matches the dropdown width instead of full screen */
+  height: 10px; /* Invisible hover buffer */
+  background: transparent;
+  pointer-events: auto; /* Ensures it remains interactive */
+  z-index: 1;
 }
 
 .nav-links > #About:hover ~ #About-dropdown,
 #About-dropdown:hover {
-    visibility: visible;
-    opacity: .75;
-    transform: translateY(0);
+  visibility: visible;
+  opacity: 0.75;
+  transform: translateY(0);
 }
 
 .nav-links > #Admissions:hover ~ #Admissions-dropdown,
 #Admissions-dropdown:hover {
-    visibility: visible;
-    opacity: .75;
-    transform: translateY(0);
+  visibility: visible;
+  opacity: 0.75;
+  transform: translateY(0);
 }
 
 .nav-links > #Academic:hover ~ #Academic-dropdown,
 #Academic-dropdown:hover {
-    visibility: visible;
-    opacity: .75;
-    transform: translateY(0);
+  visibility: visible;
+  opacity: 0.75;
+  transform: translateY(0);
 }
 
-.nav-links>#Administration:hover ~ #Administration-dropdown,
+.nav-links > #Administration:hover ~ #Administration-dropdown,
 #Administration-dropdown:hover {
-    visibility: visible;
-    opacity: .75;
-    transform: translateY(0);
+  visibility: visible;
+  opacity: 0.75;
+  transform: translateY(0);
 }
 
 .nav-links > #Research:hover ~ #Research-dropdown,
 #Research-dropdown:hover {
-    visibility: visible;
-    opacity: .75;
-    transform: translateY(0);
+  visibility: visible;
+  opacity: 0.75;
+  transform: translateY(0);
 }
 
 .nav-links > #Other-Links:hover ~ #Other-dropdown,
 #Other-dropdown:hover {
-    visibility: visible;
-    opacity: .75;
-    transform: translateY(0);
+  visibility: visible;
+  opacity: 0.75;
+  transform: translateY(0);
 }
 
 .dropdown-cont {
-    margin-top: 15px;
+  margin-top: 15px;
 }
 
 .dropdown-title {
-    color: #BD0F03;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    align-content: center;
+  color: #bd0f03;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  align-content: center;
 }
 
 .dropdown-content {
-    margin: 0 30px;
+  margin: 0 30px;
 }
 .inline-align {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .dropdown-content h6 {
-    color: #7C0A02;
-    font-size: 17px;
-    margin-bottom: 20px;
-    margin-top: 10px;
+  color: #7c0a02;
+  font-size: 17px;
+  margin-bottom: 20px;
+  margin-top: 10px;
 }
 
 .dropdown-content p {
-    color: #BD0F03;
-    font-size: 12px;
-    margin-top: -10px;
+  color: #bd0f03;
+  font-size: 12px;
+  margin-top: -10px;
 }
 
 .dropdown-content h2 {
-    color: #BD0F03;
-    font-size: 14px;
-    margin-top: 20px;
-    margin-bottom: 10px;
+  color: #bd0f03;
+  font-size: 14px;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
 .dropdown-content h5 {
-    color: #BD0F03;
-    font-size: 12px;
-    margin-top: -5px;
+  color: #bd0f03;
+  font-size: 12px;
+  margin-top: -5px;
 }
 
 .nav-divider {
-    width: .5px;
-    height: 300px;
-    background-color: black;
-    margin: -80px -20px;
+  width: 0.5px;
+  height: 300px;
+  background-color: black;
+  margin: -80px -20px;
 }
 
-.two-columns{
-    display: flex;
-    justify-content: space-between;
-    gap: 30px;
+.two-columns {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
 }
