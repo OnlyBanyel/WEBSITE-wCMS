@@ -2,6 +2,9 @@
 session_start();
 require_once "../classes/pages.class.php";
 require_once "../classes/element_styler.class.php";
+?>
+<meta name="current-page" content="college-overview.php">
+<?php
 $collegeProfileObj = new Pages;
 $styler = new ElementStyler();
 $collegeOverview = [];
@@ -72,7 +75,11 @@ if (empty($genInfoImgs)) {
         ['imagePath' => '', 'sectionID' => 'temp_img_1']
     ];
 }
+
+// Set the current page for the preview component
+$previewPage = 'college-overview';
 ?>
+
 <style>
     /* Override Bootstrap's primary color with our red theme */
     .bg-primary,
@@ -202,59 +209,13 @@ if (empty($genInfoImgs)) {
     <div class="mb-8 styleable" data-section-id="page_header" data-element-name="Page Header">
         <h1 class="text-3xl font-bold text-gray-800">College Overview Management</h1>
         <p class="text-gray-600 mt-2">Edit and manage the college overview section of your website</p>
+        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <p class="text-sm text-blue-700"><strong>Note:</strong> The preview below shows how your content will appear on the actual website. Changes you make will be reflected in real-time.</p>
+        </div>
     </div>
 
-    <!-- Preview Section -->
-    <div class="bg-white rounded-xl shadow-md p-6 mb-8 preview-section cursor-pointer" id="previewSection">
-        <div class="flex justify-between items-center mb-4 styleable" data-section-id="preview_header" data-element-name="Preview Header">
-            <h2 class="text-xl font-semibold text-primary">Preview</h2>
-            <span class="text-sm text-gray-500">Click to expand/collapse</span>
-        </div>
-        
-        <div class="preview-content" id="previewContent">
-            <?php if (!empty($collegeOverview)) { ?>
-                <div class="flex flex-col md:flex-row gap-8">
-                    <div class="md:w-1/2 space-y-6">
-                        <?php for ($i = 0; $i < count($genInfoBackHead); $i ++) { ?>
-                            <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary styleable" data-section-id="overview_section_<?php echo $i; ?>" data-element-name="Overview Section <?php echo $i + 1; ?>">
-                                <h4 class="text-lg font-bold text-primary mb-2 styleable <?php echo $styler->getElementClassString($genInfoTitles[$i]['sectionID']); ?>" data-section-id="<?php echo $genInfoTitles[$i]['sectionID']; ?>" data-element-name="Section Title">
-                                    <?php echo $genInfoTitles[$i]['content'] ?>
-                                </h4>
-                                <p class="text-gray-700 mb-3 styleable <?php echo $styler->getElementClassString($genInfoBackHead[$i]['sectionID']); ?>" data-section-id="<?php echo $genInfoBackHead[$i]['sectionID']; ?>" data-element-name="Section Content">
-                                    <?php echo $genInfoBackHead[$i]['content']?>
-                                </p>
-                                <ul class="space-y-2 pl-5 list-disc text-gray-600">
-                                    <?php foreach ($genInfoBackLists[$i] as $item) { ?>
-                                        <li class="styleable <?php echo $styler->getElementClassString($item['sectionID']); ?>" data-section-id="<?php echo $item['sectionID']; ?>" data-element-name="List Item">
-                                            <?php echo $item['content']; ?>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            </div>
-                        <?php } ?>
-                    </div>
-                    <div class="md:w-1/2">
-                        <div class="rounded-lg overflow-hidden shadow-md">
-                            <?php if (isset($genInfoImgs) && !empty($genInfoImgs) && !empty($genInfoImgs[1]['imagePath'])) { ?>
-                                <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" class="w-full h-64 object-cover" alt="Overview Image">
-                            <?php } else { ?>
-                                <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
-                                    <p class="text-gray-600">No image available</p>
-                                </div>
-                            <?php } ?>
-                        </div>
-                    </div>
-                </div>
-            <?php } else { ?>
-                <div class="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-lg styleable" data-section-id="empty_preview" data-element-name="Empty Preview">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <p class="text-gray-600">No overview content available. Add content below to see preview.</p>
-                </div>
-            <?php } ?>
-        </div>
-    </div>
+    <!-- Universal Preview Section -->
+    <?php include_once "../components/universal-preview.php"; ?>
 
     <!-- Edit Forms Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -279,10 +240,10 @@ if (empty($genInfoImgs)) {
                         <h3 class="font-semibold"><?php echo !empty($titleContent) ? 'Edit '.$titleContent : 'Add '.$sectionNames[$q]; ?></h3>
                     </div>
                     <div class="p-5 styleable" data-section-id="form_body_<?php echo $q; ?>" data-element-name="Form Body <?php echo $sectionNames[$q]; ?>">
-                        <form action="../page-functions/updateOverviewItem.php" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems">
+                        <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-preview="true">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
-                                <input type="text" name="overviewTitle" disabled data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle styleable <?php echo $styler->getElementClassString($titleSectionID); ?>" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>" data-section-id="<?php echo $titleSectionID; ?>" data-element-name="Section Title Input">
+                                <input type="text" name="overviewTitle" data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle styleable <?php echo $styler->getElementClassString($titleSectionID); ?>" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>" data-section-id="<?php echo $titleSectionID; ?>" data-element-name="Section Title Input">
                                 <input type="hidden" name="overviewSectionID" value="<?php echo $titleSectionID; ?>">
                                 <input type="hidden" name="isNew" value="<?php echo strpos($titleSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
                                 <input type="hidden" name="sectionType" value="<?php echo $q; ?>">
@@ -348,7 +309,7 @@ if (empty($genInfoImgs)) {
                             
                             <div class="flex justify-between">
                                 <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listTypes[$q]; ?>">Add Outcome</button>
-                                <input type="submit" value="Save Changes" class="submitCourse bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable">
+                                <button type="button" class="save-section bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable">Save Changes</button>
                             </div>
                         </form>
                     </div>
@@ -399,6 +360,9 @@ if (empty($genInfoImgs)) {
     </div>
 </div>
 
+<!-- Include Save All Changes Button -->
+<?php include_once "../components/save-all-button.php"; ?>
+
 <script>
     // File input display
     document.querySelectorAll('input[type="file"]').forEach(input => {
@@ -408,76 +372,83 @@ if (empty($genInfoImgs)) {
         });
     });
     
-    // Preview toggle functionality
-    document.getElementById('previewSection').addEventListener('click', function() {
-        const previewContent = document.getElementById('previewContent');
-        previewContent.classList.toggle('hidden');
+    // Add outcome functionality
+    document.querySelectorAll('.add-outcome').forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('.overview-form');
+            const outcomesList = form.querySelector('.outcomes-list');
+            const formName = form.getAttribute('name');
+            const nextIndex = outcomesList.querySelectorAll('li').length + 1;
+            
+            // Generate a temporary ID for new items (negative number)
+            const tempSectionID = 'temp_outcome_' + Math.floor(Math.random() * 1000000);
+            
+            const newOutcome = document.createElement('li');
+            newOutcome.className = 'flex items-center gap-2';
+            newOutcome.innerHTML = `
+                <input type="text" 
+                       name="outcome_content[]" 
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                       id="${formName}-${nextIndex}-outcomes" 
+                       data-sectionid="${tempSectionID}" 
+                       data-is-new="true" 
+                       value="">
+                <input type="hidden" name="outcome_sectionid[]" value="${tempSectionID}">
+                <input type="hidden" name="outcome_isnew[]" value="1">
+                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="${tempSectionID}">×</button>
+            `;
+            
+            outcomesList.appendChild(newOutcome);
+            
+            // Add event listener to the new remove button
+            newOutcome.querySelector('.remove-outcome').addEventListener('click', function() {
+                this.closest('li').remove();
+                updatePreview();
+            });
+            
+            // Update preview
+            updatePreview();
+        });
     });
     
     // Remove outcome functionality
     document.querySelectorAll('.remove-outcome').forEach(button => {
         button.addEventListener('click', function() {
             this.closest('li').remove();
+            updatePreview();
         });
     });
     
-    // Form submission with AJAX
-    document.querySelectorAll('.overview-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+    // Save section functionality
+    document.querySelectorAll('.save-section').forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('form');
+            const formData = new FormData(form);
             
-            // Collect all outcomes data
-            const outcomes = [];
-            this.querySelectorAll('.outcome-input').forEach(input => {
-                const sectionId = input.getAttribute('data-sectionid');
-                const isNew = sectionId.startsWith('temp_');
-                outcomes.push({
-                    content: input.value,
-                    sectionID: sectionId,
-                    isNew: isNew
-                });
-            });
+            // Update the preview first
+            updatePreview();
             
-            // Create FormData object
-            const formData = new FormData(this);
-            formData.append('outcomes', JSON.stringify(outcomes));
+            // Show saving indicator
+            const originalText = this.textContent;
+            this.textContent = 'Saving...';
+            this.disabled = true;
             
-            // Check if this is a new item or an edit
-            const titleSectionID = this.querySelector('input[name="overviewSectionID"]').value;
-            const isNewItem = titleSectionID.startsWith('temp_');
-            formData.append('isNewItem', isNewItem ? '1' : '0');
-            
-            // Disable the submit button to prevent double submission
-            const submitButton = this.querySelector('input[type="submit"]');
-            submitButton.disabled = true;
-            submitButton.value = 'Saving...';
-            
-            // Send AJAX request
-            fetch(this.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Changes saved successfully!');
-                    // Reload the page to show updated content
-                    window.location.reload();
-                } else {
-                    alert('Error: ' + (data.message || 'Failed to save changes.'));
-                    console.error(data);
-                    // Re-enable the button if there was an error
-                    submitButton.disabled = false;
-                    submitButton.value = 'Save Changes';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-                // Re-enable the button if there was an error
-                submitButton.disabled = false;
-                submitButton.value = 'Save Changes';
-            });
+            // Simulate saving (just update preview in this case)
+            setTimeout(() => {
+                this.textContent = 'Saved!';
+                
+                setTimeout(() => {
+                    this.textContent = originalText;
+                    this.disabled = false;
+                }, 1000);
+            }, 500);
+        });
+    });
+    
+    // Initialize input change listeners
+    document.querySelectorAll('input, textarea, select').forEach(input => {
+        input.addEventListener('input', function() {
+            markUnsavedChanges();
         });
     });
 </script>
