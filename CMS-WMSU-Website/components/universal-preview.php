@@ -13,6 +13,52 @@ if (!isset($_SESSION['preview_data'])) {
 
 // Get the current page identifier
 $currentPage = isset($previewPage) ? $previewPage : 'default';
+
+// Define available page types for the selector
+$availablePageTypes = [
+    'college-overview.php' => 'College Overview',
+    'college-profile.php' => 'College Profile',
+    'courses-offered.php' => 'Courses Offered',
+    'departments.php' => 'Departments',
+    'shs.php' => 'Senior High School'
+];
+
+// Try to determine the current page from URL or other sources
+$detectedPage = 'college-overview.php'; // Default
+$pathParts = explode('/', $_SERVER['REQUEST_URI']);
+foreach ($pathParts as $part) {
+    if (in_array($part, array_keys($availablePageTypes))) {
+        $detectedPage = $part;
+        break;
+    }
+}
+
+// Check if we're in a specific admin page
+if (strpos($_SERVER['REQUEST_URI'], 'college-profile') !== false) {
+    $detectedPage = 'college-profile.php';
+} elseif (strpos($_SERVER['REQUEST_URI'], 'courses-offered') !== false) {
+    $detectedPage = 'courses-offered.php';
+} elseif (strpos($_SERVER['REQUEST_URI'], 'departments') !== false) {
+    $detectedPage = 'departments.php';
+} elseif (strpos($_SERVER['REQUEST_URI'], 'shs') !== false) {
+    $detectedPage = 'shs.php';
+}
+
+// Get the subpage ID dynamically from session
+$subpageId = null;
+
+// First check if we have a subpage ID directly in the session
+if (isset($_SESSION['subpage'])) {
+    $subpageId = $_SESSION['subpage'];
+} 
+// Then check if it's in the account data
+elseif (isset($_SESSION['account']['subpage_id'])) {
+    $subpageId = $_SESSION['account']['subpage_id'];
+}
+// Then check if it's in the subpageData
+elseif (isset($_SESSION['subpageData']['id'])) {
+    $subpageId = $_SESSION['subpageData']['id'];
+}
 ?>
 
 <div class="bg-white rounded-xl shadow-md p-6 mb-8 preview-section" id="universal-preview-container">
@@ -34,6 +80,23 @@ $currentPage = isset($previewPage) ? $previewPage : 'default';
                 <span>Toggle Preview</span>
             </button>
         </div>
+    </div>
+    
+    <!-- Page Type Selector -->
+    <div class="mb-4 flex items-center">
+        <label for="page-type-selector" class="text-sm font-medium text-gray-700 mr-2">Preview Page Type:</label>
+        <select id="page-type-selector" class="form-select rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+            <?php foreach ($availablePageTypes as $pageFile => $pageName): ?>
+                <option value="<?php echo $pageFile; ?>" <?php echo ($pageFile === $detectedPage) ? 'selected' : ''; ?>>
+                    <?php echo $pageName; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <button id="refresh-preview-btn" class="ml-2 p-1 text-gray-500 hover:text-primary" title="Refresh Preview">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+        </button>
     </div>
     
     <div class="preview-content overflow-auto max-h-[800px] border border-gray-200 rounded-lg" id="universal-preview-content">
@@ -62,6 +125,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toggle preview visibility
     const togglePreviewBtn = document.getElementById('toggle-preview-btn');
     const previewContent = document.getElementById('universal-preview-content');
+    const pageTypeSelector = document.getElementById('page-type-selector');
+    const refreshPreviewBtn = document.getElementById('refresh-preview-btn');
     
     togglePreviewBtn.addEventListener('click', function() {
         previewContent.classList.toggle('hidden');
@@ -85,6 +150,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Add event listener for page type selector
+    pageTypeSelector.addEventListener('change', function() {
+        updatePreview();
+    });
+    
+    // Add event listener for refresh button
+    refreshPreviewBtn.addEventListener('click', function() {
+        updatePreview();
+    });
+    
     // Add debug panel toggle (press Ctrl+Shift+D to toggle)
     document.addEventListener('keydown', function(e) {
         if (e.ctrlKey && e.shiftKey && e.key === 'D') {
@@ -95,11 +170,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Function to update the preview with current form data
+// Add debug information to help troubleshoot path issues
 function updatePreview() {
     const previewContainer = document.getElementById('universal-preview-content');
     const emptyPlaceholder = document.getElementById('empty-preview-placeholder');
     const debugContent = document.getElementById('preview-debug-content');
+    const pageTypeSelector = document.getElementById('page-type-selector');
     
     // Collect all form data
     const forms = document.querySelectorAll('form[data-preview="true"]');
@@ -112,23 +188,8 @@ function updatePreview() {
         emptyPlaceholder.style.display = 'none';
     }
     
-    // Determine the current page
-    let pageName = 'college-overview.php'; // Default to college overview
-    
-    // Try to get the page name from various sources
-    const metaTag = document.querySelector('meta[name="current-page"]');
-    if (metaTag && metaTag.getAttribute('content')) {
-        pageName = metaTag.getAttribute('content');
-    } else {
-        // Try to extract from URL
-        const pathParts = window.location.pathname.split('/');
-        for (let i = 0; i < pathParts.length; i++) {
-            if (pathParts[i].endsWith('.php')) {
-                pageName = pathParts[i];
-                break;
-            }
-        }
-    }
+    // Get the selected page type
+    const pageName = pageTypeSelector.value;
     
     // Collect form data
     const formData = collectFormData();
@@ -156,6 +217,16 @@ function updatePreview() {
     // Add this debug information to the page
     console.log('Preview endpoint:', previewEndpoint);
     console.log('Current path:', window.location.pathname);
+    console.log('Selected page type:', pageName);
+    console.log('Form data:', formData);
+
+    // Show loading indicator
+    previewContainer.innerHTML = `
+        <div class="flex justify-center items-center p-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <span class="ml-3 text-gray-600">Loading preview...</span>
+        </div>
+    `;
 
     // Request preview HTML from server
     fetch(previewEndpoint, {
@@ -168,7 +239,12 @@ function updatePreview() {
             preview_data: JSON.stringify(formData)
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
         // Update debug panel if it exists
         if (debugContent) {

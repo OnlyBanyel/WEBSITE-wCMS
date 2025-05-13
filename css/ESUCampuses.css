@@ -235,8 +235,7 @@
   width: 700px;
   height: 700px;
   border-radius: 100%;
-  background: linear-gradient(rgba(209, 14, 0, 0.3), rgba(209, 14, 0, 0.3)),
-    url(../imgs/CTE-Field.png);
+  background: linear-gradient(rgba(209, 14, 0, 0.3), rgba(209, 14, 0, 0.3)), url(../imgs/CTE-Field.png);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -280,8 +279,7 @@
   width: 700px;
   height: 700px;
   border-radius: 100%;
-  background: linear-gradient(rgba(209, 14, 0, 0.3), rgba(209, 14, 0, 0.3)),
-    url(../imgs/CTE-Field.png);
+  background: linear-gradient(rgba(209, 14, 0, 0.3), rgba(209, 14, 0, 0.3)), url(../imgs/CTE-Field.png);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -316,4 +314,16 @@
   bottom: -65%;
   right: 40%;
   text-align: right;
+}
+
+/* Adjust any absolute positioned elements in ESUCampuses.css */
+.camp-cont-left,
+.camp-cont-right {
+  position: relative;
+  z-index: 1; /* Lower than navbar */
+}
+
+.camp-text {
+  position: relative;
+  z-index: 2; /* Higher than container but lower than navbar */
 }

@@ -202,6 +202,89 @@ $previewPage = 'college-overview';
         border-radius: 3px;
         z-index: 100;
     }
+    
+    /* Tab styles */
+    .tab-nav {
+        display: flex;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 1rem;
+        overflow-x: auto;
+    }
+    
+    .tab-button {
+        padding: 0.75rem 1.25rem;
+        font-weight: 500;
+        color: #6b7280;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+    
+    .tab-button:hover {
+        color: #4b5563;
+    }
+    
+    .tab-button.active {
+        color: #BD0F03;
+        border-bottom-color: #BD0F03;
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    /* Table styles */
+    .overview-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .overview-table th {
+        text-align: left;
+        padding: 0.75rem;
+        background-color: #f9fafb;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .overview-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: middle;
+    }
+    
+    .overview-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .overview-table tr:hover {
+        background-color: #f9fafb;
+    }
+    
+    /* Image preview container */
+    .image-preview {
+        width: 100%;
+        height: 200px;
+        background-color: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 0.375rem;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .image-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
 </style>
 
 <div class="bg-gray-50 min-h-screen p-4 md:p-6">
@@ -217,144 +300,385 @@ $previewPage = 'college-overview';
     <!-- Universal Preview Section -->
     <?php include_once "../components/universal-preview.php"; ?>
 
-    <!-- Edit Forms Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Overview Items -->
-        <div class="space-y-6">
-            <?php for ($q = 0; $q < 3; $q++) { 
+    <!-- Tabbed Interface -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <div class="tab-button active" data-tab="college-goals">College Goals</div>
+            <div class="tab-button" data-tab="college-mission">College Mission</div>
+            <div class="tab-button" data-tab="college-vision">College Vision</div>
+            <div class="tab-button" data-tab="overview-image">Overview Image</div>
+        </div>
+        
+        <!-- Tab Content -->
+        <div class="p-5">
+            <!-- College Goals Tab -->
+            <div class="tab-content active" id="college-goals-tab">
+                <?php 
+                $q = 0; // College Goals index
                 $titleContent = isset($genInfoTitles[$q]) ? $genInfoTitles[$q]['content'] : '';
                 $titleSectionID = isset($genInfoTitles[$q]) ? $genInfoTitles[$q]['sectionID'] : 'temp_title_'.$q;
                 $headContent = isset($genInfoBackHead[$q]) ? $genInfoBackHead[$q]['content'] : '';
                 $headSectionID = isset($genInfoBackHead[$q]) ? $genInfoBackHead[$q]['sectionID'] : 'temp_head_'.$q;
                 $listItems = isset($genInfoBackLists[$q]) ? $genInfoBackLists[$q] : [];
                 
-                $sectionNames = ['College Goals', 'College Mission', 'College Vision'];
                 if (empty($titleContent)) {
-                    $titleContent = $sectionNames[$q];
+                    $titleContent = 'College Goals';
                 }
                 
-                $listTypes = ['CG-list-item', 'CM-list-item', 'CV-list-item'];
-            ?> 
-                <div class="bg-white rounded-lg shadow-md overflow-hidden styleable" data-section-id="form_container_<?php echo $q; ?>" data-element-name="Form Container <?php echo $sectionNames[$q]; ?>">
-                    <div class="bg-primary text-white p-4 styleable" data-section-id="form_header_<?php echo $q; ?>" data-element-name="Form Header <?php echo $sectionNames[$q]; ?>">
-                        <h3 class="font-semibold"><?php echo !empty($titleContent) ? 'Edit '.$titleContent : 'Add '.$sectionNames[$q]; ?></h3>
-                    </div>
-                    <div class="p-5 styleable" data-section-id="form_body_<?php echo $q; ?>" data-element-name="Form Body <?php echo $sectionNames[$q]; ?>">
-                        <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-preview="true">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
-                                <input type="text" name="overviewTitle" data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle styleable <?php echo $styler->getElementClassString($titleSectionID); ?>" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>" data-section-id="<?php echo $titleSectionID; ?>" data-element-name="Section Title Input">
-                                <input type="hidden" name="overviewSectionID" value="<?php echo $titleSectionID; ?>">
-                                <input type="hidden" name="isNew" value="<?php echo strpos($titleSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
-                                <input type="hidden" name="sectionType" value="<?php echo $q; ?>">
-                            </div>
-                            
-                            <div class="border-t border-gray-200 my-4"></div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Section Content</label>
-                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input">
-                                <input type="hidden" name="topContentSectionID" value="<?php echo $headSectionID; ?>">
-                                <input type="hidden" name="topContentIsNew" value="<?php echo strpos($headSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Outcomes</label>
-                                <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>">
-                                    <?php 
-                                    $i = 1; 
-                                    if (!empty($listItems)) {
-                                        foreach ($listItems as $item) { 
-                                    ?>
-                                        <li class="flex items-center gap-2">
-                                            <input type="text" 
-                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable <?php echo $styler->getElementClassString($item['sectionID']); ?>"
-                                                name="outcome_content[]" 
-                                                id="<?php echo $titleContent; ?>-<?php echo $i; ?>-outcomes" 
-                                                data-sectionid="<?php echo $item['sectionID']; ?>" 
-                                                value="<?php echo $item['content']; ?>"
-                                                data-section-id="<?php echo $item['sectionID']; ?>" 
-                                                data-element-name="Outcome Input">
-                                            <input type="hidden" name="outcome_sectionid[]" value="<?php echo $item['sectionID']; ?>">
-                                            <input type="hidden" name="outcome_isnew[]" value="0">
-                                            <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']; ?>">
-                                                ×
-                                            </button>
-                                        </li>
-                                    <?php 
-                                        $i++; 
-                                        }
-                                    } else {
-                                        // Add empty input field if no items exist
-                                    ?>
-                                        <li class="flex items-center gap-2">
-                                            <input type="text" 
-                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
-                                                name="outcome_content[]" 
-                                                id="<?php echo $titleContent; ?>-1-outcomes" 
-                                                data-sectionid="temp_outcome_<?php echo $q; ?>_1" 
-                                                value=""
-                                                data-section-id="temp_outcome_<?php echo $q; ?>_1" 
-                                                data-element-name="Outcome Input">
-                                            <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $q; ?>_1">
-                                            <input type="hidden" name="outcome_isnew[]" value="1">
-                                            <input type="hidden" name="outcome_type[]" value="<?php echo $listTypes[$q]; ?>">
-                                            <button type="button" class="remove-outcome btn btn-danger" data-sectionid="temp_outcome_<?php echo $q; ?>_1">
-                                                ×
-                                            </button>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            </div>
-                            
-                            <div class="flex justify-between">
-                                <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listTypes[$q]; ?>">Add Outcome</button>
-                                <button type="button" class="save-section bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable">Save Changes</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            <?php } ?>
-        </div>
-
-        <!-- Image Section -->
-        <div>
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="bg-primary text-white p-4">
-                    <h3 class="font-semibold"><?php echo !empty($genInfoImgs) && !empty($genInfoImgs[1]['imagePath']) ? 'Change Overview Image' : 'Add Overview Image'; ?></h3>
-                </div>
-                <div class="p-5">
-                    <form action="../page-functions/uploadOverviewImg.php" method="POST" id="overviewImg-<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>" enctype="multipart/form-data" class="space-y-4">
-                        <div class="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-64 flex items-center justify-center">
-                            <?php if (isset($genInfoImgs[1]) && !empty($genInfoImgs[1]['imagePath'])) { ?>
-                                <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" alt="Overview Image" class="max-w-full max-h-full object-contain">
-                            <?php } else { ?>
-                                <div class="text-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <p class="text-gray-500">No image uploaded</p>
-                                </div>
-                            <?php } ?>
-                        </div>
-                        
-                        <input type="hidden" name="imageIndex" value="<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>">
-                        <input type="hidden" name="isNew" value="<?php echo (!isset($genInfoImgs[1]) || strpos($genInfoImgs[1]['sectionID'], 'temp_') === 0) ? '1' : '0'; ?>">
-                        
-                        <div class="flex items-center justify-between">
-                            <div class="relative flex-1 mr-4">
-                                <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="overviewImg" id="overviewImg-<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>" accept="image/*">
-                                <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
-                                    <span class="file-name">Choose a file...</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <input type="submit" name="submitImg" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Upload">
-                        </div>
-                    </form>
-                </div>
+                $listType = 'CG-list-item';
+                ?>
+                
+                <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-preview="true">
+                    <table class="overview-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">College Goals Information</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td width="200" class="font-medium">Section Title</td>
+                                <td>
+                                    <input type="text" name="overviewTitle" data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle styleable <?php echo $styler->getElementClassString($titleSectionID); ?>" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>" data-section-id="<?php echo $titleSectionID; ?>" data-element-name="Section Title Input">
+                                    <input type="hidden" name="overviewSectionID" value="<?php echo $titleSectionID; ?>">
+                                    <input type="hidden" name="isNew" value="<?php echo strpos($titleSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
+                                    <input type="hidden" name="sectionType" value="<?php echo $q; ?>">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium">Section Content</td>
+                                <td>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input">
+                                    <input type="hidden" name="topContentSectionID" value="<?php echo $headSectionID; ?>">
+                                    <input type="hidden" name="topContentIsNew" value="<?php echo strpos($headSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium align-top pt-4">Outcomes</td>
+                                <td>
+                                    <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>">
+                                        <?php 
+                                        $i = 1; 
+                                        if (!empty($listItems)) {
+                                            foreach ($listItems as $item) { 
+                                        ?>
+                                            <li class="flex items-center gap-2">
+                                                <input type="text" 
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable <?php echo $styler->getElementClassString($item['sectionID']); ?>"
+                                                    name="outcome_content[]" 
+                                                    id="<?php echo $titleContent; ?>-<?php echo $i; ?>-outcomes" 
+                                                    data-sectionid="<?php echo $item['sectionID']; ?>" 
+                                                    value="<?php echo $item['content']; ?>"
+                                                    data-section-id="<?php echo $item['sectionID']; ?>" 
+                                                    data-element-name="Outcome Input">
+                                                <input type="hidden" name="outcome_sectionid[]" value="<?php echo $item['sectionID']; ?>">
+                                                <input type="hidden" name="outcome_isnew[]" value="0">
+                                                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']; ?>">
+                                                    ×
+                                                </button>
+                                            </li>
+                                        <?php 
+                                            $i++; 
+                                            }
+                                        } else {
+                                            // Add empty input field if no items exist
+                                        ?>
+                                            <li class="flex items-center gap-2">
+                                                <input type="text" 
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
+                                                    name="outcome_content[]" 
+                                                    id="<?php echo $titleContent; ?>-1-outcomes" 
+                                                    data-sectionid="temp_outcome_<?php echo $q; ?>_1" 
+                                                    value=""
+                                                    data-section-id="temp_outcome_<?php echo $q; ?>_1" 
+                                                    data-element-name="Outcome Input">
+                                                <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $q; ?>_1">
+                                                <input type="hidden" name="outcome_isnew[]" value="1">
+                                                <input type="hidden" name="outcome_type[]" value="<?php echo $listType; ?>">
+                                                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="temp_outcome_<?php echo $q; ?>_1">
+                                                    ×
+                                                </button>
+                                            </li>
+                                        <?php } ?>
+                                    </ul>
+                                    <div class="mt-3">
+                                        <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listType; ?>">Add Outcome</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="text-right">
+                                    <button type="button" class="save-section bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable">Save Changes</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            
+            <!-- College Mission Tab -->
+            <div class="tab-content" id="college-mission-tab">
+                <?php 
+                $q = 1; // College Mission index
+                $titleContent = isset($genInfoTitles[$q]) ? $genInfoTitles[$q]['content'] : '';
+                $titleSectionID = isset($genInfoTitles[$q]) ? $genInfoTitles[$q]['sectionID'] : 'temp_title_'.$q;
+                $headContent = isset($genInfoBackHead[$q]) ? $genInfoBackHead[$q]['content'] : '';
+                $headSectionID = isset($genInfoBackHead[$q]) ? $genInfoBackHead[$q]['sectionID'] : 'temp_head_'.$q;
+                $listItems = isset($genInfoBackLists[$q]) ? $genInfoBackLists[$q] : [];
+                
+                if (empty($titleContent)) {
+                    $titleContent = 'College Mission';
+                }
+                
+                $listType = 'CM-list-item';
+                ?>
+                
+                <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-preview="true">
+                    <table class="overview-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">College Mission Information</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td width="200" class="font-medium">Section Title</td>
+                                <td>
+                                    <input type="text" name="overviewTitle" data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle styleable <?php echo $styler->getElementClassString($titleSectionID); ?>" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>" data-section-id="<?php echo $titleSectionID; ?>" data-element-name="Section Title Input">
+                                    <input type="hidden" name="overviewSectionID" value="<?php echo $titleSectionID; ?>">
+                                    <input type="hidden" name="isNew" value="<?php echo strpos($titleSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
+                                    <input type="hidden" name="sectionType" value="<?php echo $q; ?>">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium">Section Content</td>
+                                <td>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input">
+                                    <input type="hidden" name="topContentSectionID" value="<?php echo $headSectionID; ?>">
+                                    <input type="hidden" name="topContentIsNew" value="<?php echo strpos($headSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium align-top pt-4">Outcomes</td>
+                                <td>
+                                    <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>">
+                                        <?php 
+                                        $i = 1; 
+                                        if (!empty($listItems)) {
+                                            foreach ($listItems as $item) { 
+                                        ?>
+                                            <li class="flex items-center gap-2">
+                                                <input type="text" 
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable <?php echo $styler->getElementClassString($item['sectionID']); ?>"
+                                                    name="outcome_content[]" 
+                                                    id="<?php echo $titleContent; ?>-<?php echo $i; ?>-outcomes" 
+                                                    data-sectionid="<?php echo $item['sectionID']; ?>" 
+                                                    value="<?php echo $item['content']; ?>"
+                                                    data-section-id="<?php echo $item['sectionID']; ?>" 
+                                                    data-element-name="Outcome Input">
+                                                <input type="hidden" name="outcome_sectionid[]" value="<?php echo $item['sectionID']; ?>">
+                                                <input type="hidden" name="outcome_isnew[]" value="0">
+                                                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']; ?>">
+                                                    ×
+                                                </button>
+                                            </li>
+                                        <?php 
+                                            $i++; 
+                                            }
+                                        } else {
+                                            // Add empty input field if no items exist
+                                        ?>
+                                            <li class="flex items-center gap-2">
+                                                <input type="text" 
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
+                                                    name="outcome_content[]" 
+                                                    id="<?php echo $titleContent; ?>-1-outcomes" 
+                                                    data-sectionid="temp_outcome_<?php echo $q; ?>_1" 
+                                                    value=""
+                                                    data-section-id="temp_outcome_<?php echo $q; ?>_1" 
+                                                    data-element-name="Outcome Input">
+                                                <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $q; ?>_1">
+                                                <input type="hidden" name="outcome_isnew[]" value="1">
+                                                <input type="hidden" name="outcome_type[]" value="<?php echo $listType; ?>">
+                                                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="temp_outcome_<?php echo $q; ?>_1">
+                                                    ×
+                                                </button>
+                                            </li>
+                                        <?php } ?>
+                                    </ul>
+                                    <div class="mt-3">
+                                        <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listType; ?>">Add Outcome</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="text-right">
+                                    <button type="button" class="save-section bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable">Save Changes</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            
+            <!-- College Vision Tab -->
+            <div class="tab-content" id="college-vision-tab">
+                <?php 
+                $q = 2; // College Vision index
+                $titleContent = isset($genInfoTitles[$q]) ? $genInfoTitles[$q]['content'] : '';
+                $titleSectionID = isset($genInfoTitles[$q]) ? $genInfoTitles[$q]['sectionID'] : 'temp_title_'.$q;
+                $headContent = isset($genInfoBackHead[$q]) ? $genInfoBackHead[$q]['content'] : '';
+                $headSectionID = isset($genInfoBackHead[$q]) ? $genInfoBackHead[$q]['sectionID'] : 'temp_head_'.$q;
+                $listItems = isset($genInfoBackLists[$q]) ? $genInfoBackLists[$q] : [];
+                
+                if (empty($titleContent)) {
+                    $titleContent = 'College Vision';
+                }
+                
+                $listType = 'CV-list-item';
+                ?>
+                
+                <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-preview="true">
+                    <table class="overview-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">College Vision Information</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td width="200" class="font-medium">Section Title</td>
+                                <td>
+                                    <input type="text" name="overviewTitle" data-overviewsectionid="<?php echo $titleSectionID; ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overviewTitle styleable <?php echo $styler->getElementClassString($titleSectionID); ?>" id="<?php echo $titleContent; ?>" value="<?php echo $titleContent; ?>" data-section-id="<?php echo $titleSectionID; ?>" data-element-name="Section Title Input">
+                                    <input type="hidden" name="overviewSectionID" value="<?php echo $titleSectionID; ?>">
+                                    <input type="hidden" name="isNew" value="<?php echo strpos($titleSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
+                                    <input type="hidden" name="sectionType" value="<?php echo $q; ?>">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium">Section Content</td>
+                                <td>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input">
+                                    <input type="hidden" name="topContentSectionID" value="<?php echo $headSectionID; ?>">
+                                    <input type="hidden" name="topContentIsNew" value="<?php echo strpos($headSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium align-top pt-4">Outcomes</td>
+                                <td>
+                                    <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>">
+                                        <?php 
+                                        $i = 1; 
+                                        if (!empty($listItems)) {
+                                            foreach ($listItems as $item) { 
+                                        ?>
+                                            <li class="flex items-center gap-2">
+                                                <input type="text" 
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable <?php echo $styler->getElementClassString($item['sectionID']); ?>"
+                                                    name="outcome_content[]" 
+                                                    id="<?php echo $titleContent; ?>-<?php echo $i; ?>-outcomes" 
+                                                    data-sectionid="<?php echo $item['sectionID']; ?>" 
+                                                    value="<?php echo $item['content']; ?>"
+                                                    data-section-id="<?php echo $item['sectionID']; ?>" 
+                                                    data-element-name="Outcome Input">
+                                                <input type="hidden" name="outcome_sectionid[]" value="<?php echo $item['sectionID']; ?>">
+                                                <input type="hidden" name="outcome_isnew[]" value="0">
+                                                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']; ?>">
+                                                    ×
+                                                </button>
+                                            </li>
+                                        <?php 
+                                            $i++; 
+                                            }
+                                        } else {
+                                            // Add empty input field if no items exist
+                                        ?>
+                                            <li class="flex items-center gap-2">
+                                                <input type="text" 
+                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input styleable"
+                                                    name="outcome_content[]" 
+                                                    id="<?php echo $titleContent; ?>-1-outcomes" 
+                                                    data-sectionid="temp_outcome_<?php echo $q; ?>_1" 
+                                                    value=""
+                                                    data-section-id="temp_outcome_<?php echo $q; ?>_1" 
+                                                    data-element-name="Outcome Input">
+                                                <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $q; ?>_1">
+                                                <input type="hidden" name="outcome_isnew[]" value="1">
+                                                <input type="hidden" name="outcome_type[]" value="<?php echo $listType; ?>">
+                                                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="temp_outcome_<?php echo $q; ?>_1">
+                                                    ×
+                                                </button>
+                                            </li>
+                                        <?php } ?>
+                                    </ul>
+                                    <div class="mt-3">
+                                        <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listType; ?>">Add Outcome</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="text-right">
+                                    <button type="button" class="save-section bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable">Save Changes</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            
+            <!-- Overview Image Tab -->
+            <div class="tab-content" id="overview-image-tab">
+                <form action="../page-functions/uploadOverviewImg.php" method="POST" id="overviewImg-<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>" enctype="multipart/form-data" class="space-y-4">
+                    <table class="overview-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">Overview Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td width="200" class="font-medium">Current Image</td>
+                                <td>
+                                    <div class="image-preview">
+                                        <?php if (isset($genInfoImgs[1]) && !empty($genInfoImgs[1]['imagePath'])) { ?>
+                                            <img src="<?php echo $genInfoImgs[1]['imagePath']; ?>" alt="Overview Image" class="max-w-full max-h-full object-contain">
+                                        <?php } else { ?>
+                                            <div class="text-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <p class="text-gray-500">No image uploaded</p>
+                                            </div>
+                                        <?php } ?>
+                                    </div>
+                                    
+                                    <input type="hidden" name="imageIndex" value="<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>">
+                                    <input type="hidden" name="isNew" value="<?php echo (!isset($genInfoImgs[1]) || strpos($genInfoImgs[1]['sectionID'], 'temp_') === 0) ? '1' : '0'; ?>">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium">Upload New Image</td>
+                                <td>
+                                    <div class="relative flex-1">
+                                        <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="overviewImg" id="overviewImg-<?php echo isset($genInfoImgs[1]) ? $genInfoImgs[1]['sectionID'] : 'temp_img'; ?>" accept="image/*">
+                                        <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
+                                            <span class="file-name">Choose a file...</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="text-right">
+                                    <input type="submit" name="submitImg" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors" value="Upload">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
             </div>
         </div>
     </div>
@@ -369,6 +693,24 @@ $previewPage = 'college-overview';
         input.addEventListener('change', function() {
             const fileName = this.files[0]?.name || 'Choose a file...';
             this.parentElement.querySelector('.file-name').textContent = fileName;
+        });
+    });
+    
+    // Tab functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId + '-tab').classList.add('active');
         });
     });
     

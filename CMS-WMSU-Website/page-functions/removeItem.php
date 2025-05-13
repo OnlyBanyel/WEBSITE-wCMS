@@ -20,7 +20,7 @@ try {
     $subpage = $_SESSION['account']['subpage_assigned'];
 
     // Delete the item
-    $deleteSuccess = $pagesObj->deleteContent($sectionID, $subpage);
+    $deleteSuccess = $pagesObj->deleteContent($sectionID);
     
 
     if ($deleteSuccess) {

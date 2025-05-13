@@ -47,10 +47,29 @@
         z-index: 1050;
         transition: right 0.3s ease;
         overflow-y: auto;
+        resize: horizontal;
+        min-width: 300px;
+        max-width: 800px;
     }
 
     #preview-sidebar.open {
         right: 0;
+    }
+
+    /* Resize handle styling */
+    #preview-sidebar::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background-color: rgba(189, 15, 3, 0.2);
+        cursor: ew-resize;
+    }
+
+    #preview-sidebar:hover::after {
+        background-color: rgba(189, 15, 3, 0.4);
     }
 
     .preview-toggle-btn {
@@ -71,6 +90,7 @@
 
     .preview-toggle-btn.open {
         right: 400px;
+        transition: right 0.3s ease;
     }
 
     .preview-content {
@@ -420,8 +440,6 @@ foreach ($words as $word) {
     </div>
 </div>
 
-<?php } ?>
-
 <!-- Preview Sidebar -->
 <div id="preview-sidebar">
     <div class="preview-header">
@@ -490,5 +508,5 @@ foreach ($words as $word) {
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
     </svg>
 </button>
-
+<?php }?>
 <script src="../js/script.js"></script>

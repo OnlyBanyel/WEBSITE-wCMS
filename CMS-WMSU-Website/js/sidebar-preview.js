@@ -19,6 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize preview state
   let previewOpen = false
+  const initialWidth = 400
+  let currentWidth = initialWidth
+  let isResizing = false
+  let startX, startWidth
 
   // Try to detect the current page from URL
   const detectCurrentPage = () => {
@@ -69,9 +73,13 @@ document.addEventListener("DOMContentLoaded", () => {
       previewSidebar.classList.add("open")
       previewToggleBtn.classList.add("open")
       updateSidebarPreview()
+
+      // Set the toggle button position based on current sidebar width
+      previewToggleBtn.style.right = `${currentWidth}px`
     } else {
       previewSidebar.classList.remove("open")
       previewToggleBtn.classList.remove("open")
+      previewToggleBtn.style.right = "0"
     }
   }
 
@@ -131,7 +139,110 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 
-  // Function to update the sidebar preview
+  // Resize functionality
+  if (previewSidebar) {
+    // Mouse down on the resize handle (left edge of sidebar)
+    previewSidebar.addEventListener("mousedown", (e) => {
+      // Only trigger resize if clicking on the left 5px of the sidebar
+      if (e.offsetX <= 5) {
+        isResizing = true
+        startX = e.clientX
+        startWidth = Number.parseInt(getComputedStyle(previewSidebar).width, 10)
+
+        document.body.style.cursor = "ew-resize"
+        document.body.style.userSelect = "none"
+
+        // Prevent text selection during resize
+        e.preventDefault()
+      }
+    })
+
+    // Mouse move to resize
+    document.addEventListener("mousemove", (e) => {
+      if (!isResizing) return
+
+      const width = startWidth - (e.clientX - startX)
+
+      // Apply min and max constraints
+      if (width >= 300 && width <= 800) {
+        currentWidth = width
+        previewSidebar.style.width = `${width}px`
+
+        // Update toggle button position
+        if (previewOpen) {
+          previewToggleBtn.style.right = `${width}px`
+        }
+      }
+    })
+
+    // Mouse up to stop resizing
+    document.addEventListener("mouseup", () => {
+      if (isResizing) {
+        isResizing = false
+        document.body.style.cursor = ""
+        document.body.style.userSelect = ""
+      }
+    })
+  }
+
+  // Add JavaScript to handle the resizable preview sidebar
+  // Add this to the document ready function or wherever appropriate
+
+  // Update the toggle button position when the sidebar is resized
+  if (previewSidebar && previewToggleBtn) {
+    // Create a ResizeObserver to watch for changes to the sidebar width
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // When the sidebar is resized, update the toggle button position
+        if (entry.target.classList.contains("open")) {
+          const sidebarWidth = entry.contentRect.width
+          previewToggleBtn.style.right = `${sidebarWidth}px`
+        }
+      }
+    })
+
+    // Start observing the sidebar
+    resizeObserver.observe(previewSidebar)
+
+    // Update toggle button behavior
+    if (togglePreviewSidebar) {
+      togglePreviewSidebar.addEventListener("click", () => {
+        previewSidebar.classList.toggle("open")
+        previewToggleBtn.classList.toggle("open")
+
+        if (previewSidebar.classList.contains("open")) {
+          const sidebarWidth = previewSidebar.offsetWidth
+          previewToggleBtn.style.right = `${sidebarWidth}px`
+        } else {
+          previewToggleBtn.style.right = "0"
+        }
+      })
+    }
+
+    // Same for the toggle button itself
+    previewToggleBtn.addEventListener("click", () => {
+      previewSidebar.classList.toggle("open")
+      previewToggleBtn.classList.toggle("open")
+
+      if (previewSidebar.classList.contains("open")) {
+        const sidebarWidth = previewSidebar.offsetWidth
+        previewToggleBtn.style.right = `${sidebarWidth}px`
+      } else {
+        previewToggleBtn.style.right = "0"
+      }
+    })
+
+    // And for the close button
+    if (previewCloseBtn) {
+      previewCloseBtn.addEventListener("click", () => {
+        previewSidebar.classList.remove("open")
+        previewToggleBtn.classList.remove("open")
+        previewToggleBtn.style.right = "0"
+      })
+    }
+  }
+
+  // Add additional debugging for the sidebar preview
   function updateSidebarPreview() {
     if (!sidebarPreviewContent || !sidebarPageTypeSelector) return
 
@@ -170,14 +281,15 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Preview endpoint:", previewEndpoint)
     console.log("Current path:", window.location.pathname)
     console.log("Selected page type:", pageName)
+    console.log("Form data:", formData)
 
     // Show loading indicator
     sidebarPreviewContent.innerHTML = `
-            <div class="flex justify-center items-center p-8">
-                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                <span class="ml-3 text-gray-600">Loading preview...</span>
-            </div>
-        `
+        <div class="flex justify-center items-center p-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <span class="ml-3 text-gray-600">Loading preview...</span>
+        </div>
+    `
 
     // Request preview HTML from server
     fetch(previewEndpoint, {
@@ -209,24 +321,24 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           console.error("Error generating preview:", data.message)
           sidebarPreviewContent.innerHTML = `
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-                        <p>Error generating preview: ${data.message}</p>
-                        <p class="mt-2 text-sm">Page requested: ${pageName}</p>
-                        <p class="mt-2 text-sm">Preview endpoint: ${previewEndpoint}</p>
-                        <p class="text-sm">Try pressing Ctrl+Shift+D to view debug information.</p>
-                    </div>
-                `
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+                    <p>Error generating preview: ${data.message}</p>
+                    <p class="mt-2 text-sm">Page requested: ${pageName}</p>
+                    <p class="mt-2 text-sm">Preview endpoint: ${previewEndpoint}</p>
+                    <p class="text-sm">Try pressing Ctrl+Shift+D to view debug information.</p>
+                </div>
+            `
         }
       })
       .catch((error) => {
         console.error("Error:", error)
         sidebarPreviewContent.innerHTML = `
-                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-                    <p>Error generating preview. Please try again.</p>
-                    <p class="mt-2 text-sm">Technical details: ${error.message}</p>
-                    <p class="mt-2 text-sm">Preview endpoint: ${previewEndpoint}</p>
-                </div>
-            `
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+                <p>Error generating preview. Please try again.</p>
+                <p class="mt-2 text-sm">Technical details: ${error.message}</p>
+                <p class="mt-2 text-sm">Preview endpoint: ${previewEndpoint}</p>
+            </div>
+        `
       })
   }
 

@@ -1,32 +1,11 @@
 <?php
 session_start();
-require_once "../classes/account.class.php";
+require_once "../../classes/pages.class.php";
 
-// Check if user is logged in
-if (!isset($_SESSION['account']) || !isset($_SESSION['account']['id'])) {
-    // Redirect to login page if not logged in
-    header("Location: login.php");
-    exit;
-}
+$accManagementObj = new Pages;
 
-// Get user ID from session
-$userId = $_SESSION['account']['id'];
-
-// Initialize Accounts class
-$accountsObj = new Accounts();
-
-// Fetch user data from database
-$userData = $accountsObj->getUserData($userId);
-
-// If user data couldn't be fetched, use session data as fallback
-if (!$userData) {
-    $userData = [
-        'profileImg' => isset($_SESSION['account']['profileImg']) ? $_SESSION['account']['profileImg'] : null,
-        'firstName' => isset($_SESSION['account']['firstName']) ? $_SESSION['account']['firstName'] : '',
-        'lastName' => isset($_SESSION['account']['lastName']) ? $_SESSION['account']['lastName'] : '',
-        'email' => isset($_SESSION['account']['email']) ? $_SESSION['account']['email'] : '',
-    ];
-}
+// Fetch content managers
+$contentManage = $accManagementObj->fetchContentManagers();
 ?>
 
 <!DOCTYPE html>
@@ -34,223 +13,439 @@ if (!$userData) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Management</title>
-    <!-- jQuery (required for AJAX) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Content Manager Accounts</title>
     <style>
-        /* Override Bootstrap's primary color with our red theme */
-        .bg-primary,
-        .bg-primary.active,
-        .bg-primary:not([class*="bg-opacity"]) {
-            --tw-bg-opacity: 1 !important;
-            --bs-bg-opacity: 1 !important;
-            background-color: rgb(189 15 3 / var(--tw-bg-opacity)) !important;
-        }
-        
-        .btn-primary,
-        .btn-primary:hover,
-        .btn-primary:focus,
-        .btn-primary:active {
-            background-color: rgb(189 15 3 / var(--tw-bg-opacity)) !important;
-            border-color: rgb(189 15 3 / var(--tw-bg-opacity)) !important;
-        }
-        
-        :root {
-            --bs-primary: #BD0F03 !important;
-            --bs-primary-rgb: 189, 15, 3 !important;
-        }
-        
-        /* Custom styles for sections */
-        .account-section {
-            transition: all 0.3s ease;
-        }
-        
-        .account-section:hover {
-            box-shadow: 0 10px 25px -5px rgba(189, 15, 3, 0.1), 0 8px 10px -6px rgba(189, 15, 3, 0.1);
-        }
-        
-        /* Profile picture upload area */
-        .profile-upload-area {
+        /* File input styling */
+        .custom-file-input {
             position: relative;
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin: 0 auto;
-            border: 3px solid #BD0F03;
+            display: inline-block;
+            width: 100%;
         }
         
-        .profile-upload-area img {
+        .custom-file-input input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            cursor: pointer;
+            z-index: 10;
         }
         
-        .profile-upload-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(189, 15, 3, 0.7);
-            color: white;
-            padding: 8px 0;
-            text-align: center;
-            font-size: 14px;
-            cursor: pointer;
+        .custom-file-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            color: #4b5563;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-file-input:hover .custom-file-label {
+            border-color: #9ca3af;
+        }
+        
+        /* Card hover effect */
+        .college-card {
             transition: all 0.3s ease;
         }
         
-        .profile-upload-overlay:hover {
-            background: rgba(189, 15, 3, 0.9);
-        }
-        
-        /* Form focus styles */
-        input:focus, textarea:focus {
-            border-color: #BD0F03 !important;
-            --tw-ring-color: rgba(189, 15, 3, 0.5) !important;
+        .college-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(189, 15, 3, 0.1), 0 8px 10px -6px rgba(189, 15, 3, 0.1);
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto p-4 md:p-6">
-        <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Account Management</h1>
-            <p class="text-gray-600 mt-2">Update your personal information and account settings</p>
-        </div>
+<body class="bg-gray-50">
+    <div class="container mx-auto py-10 px-4">
+        <h1 class="text-3xl font-bold text-center mb-10">Academic Management</h1>
         
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column: Profile Picture -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl shadow-md p-6 account-section">
-                    <h2 class="text-xl font-semibold text-primary mb-6">Profile Picture</h2>
+        <?php if(isset($_SESSION['success_msg'])): ?>
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded" role="alert">
+                <div class="flex">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span><?php echo $_SESSION['success_msg']; ?></span>
+                </div>
+            </div>
+            <?php unset($_SESSION['success_msg']); ?>
+        <?php endif; ?>
+        
+        <?php if(isset($_SESSION['error_msg'])): ?>
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded" role="alert">
+                <div class="flex">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span><?php echo $_SESSION['error_msg']; ?></span>
+                </div>
+            </div>
+            <?php unset($_SESSION['error_msg']); ?>
+        <?php endif; ?>
+        
+        <!-- Add College Department Section -->
+<div class="mb-12 bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="bg-primary text-white p-4">
+        <h2 class="text-xl font-semibold">Add New College Department</h2>
+        <p class="text-sm text-white/80 mt-1">This will automatically create a content manager account for the department</p>
+    </div>
+    <div class="p-6">
+        <form id="addCollegeForm" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Department Information -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="collegeName" class="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
+                        <input type="text" id="collegeName" name="collegeName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter department name (e.g. College of Computing Studies)" required>
+                        <p class="mt-1 text-xs text-gray-500">An account will be created with email: <span id="emailPreview" class="font-medium">departmentname@wmsu.edu.ph</span></p>
+                    </div>
                     
-                    <!-- Important: No action attribute, let AJAX handle it -->
-                    <form method="POST" id="profilePictureForm" enctype="multipart/form-data">
-                        <input type="hidden" name="formType" value="profilePicture">
-                        <div class="profile-upload-area mb-6">
-                            <img id="profilePreview" src="<?php echo !empty($userData['profileImg']) ? $userData['profileImg'] : '/placeholder.svg?height=150&width=150'; ?>" alt="Profile Picture">
-                            <div class="profile-upload-overlay" id="uploadOverlay">
-                                <span>Change Photo</span>
-                            </div>
-                            <input type="file" name="profilePicture" id="profilePicture" class="hidden" accept="image/*">
-                        </div>
-                        
-                        <div class="text-center">
-                            <p class="text-sm text-gray-500 mb-4">Upload a new profile picture. JPG, PNG or GIF, max 5MB.</p>
-                            <button type="submit" name="updateProfilePicture" id="updateProfilePicture" class="bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors">
-                                Save Profile Picture
+                    <div>
+                        <label for="defaultPassword" class="block text-sm font-medium text-gray-700 mb-1">Default Password</label>
+                        <div class="relative">
+                            <input type="password" id="defaultPassword" name="defaultPassword" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="wmsu123" required>
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
                             </button>
                         </div>
-                    </form>
+                        <p class="mt-1 text-xs text-gray-500">The content manager will need to change this on first login</p>
+                    </div>
+                </div>
+                
+                <!-- Department Logo Upload -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Department Logo</label>
+                        <div class="border border-dashed border-gray-300 rounded-lg p-4 text-center">
+                            <div class="mb-4">
+                                <img id="logoPreview" src="../../imgs/default-dept-img.png" alt="Logo Preview" class="mx-auto h-32 w-32 object-contain">
+                            </div>
+                            
+                            <div class="custom-file-input">
+                                <input type="file" name="collegeLogo" id="collegeLogo" accept="image/*" onchange="previewLogo(this)">
+                                <div class="custom-file-label">
+                                    <span id="fileNameDisplay">Choose logo file...</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <p class="mt-2 text-xs text-gray-500">Recommended: Square image, 512x512px or larger</p>
+                        </div>
+                    </div>                            
                 </div>
             </div>
             
-            <!-- Right Column: Account Information -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Personal Information Section -->
-                <div class="bg-white rounded-xl shadow-md p-6 account-section">
-                    <h2 class="text-xl font-semibold text-primary mb-6">Personal Information</h2>
-                    
-                    <form method="POST" id="personalInfoForm">
-                        <input type="hidden" name="formType" value="personalInfo">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                                <input type="text" name="firstName" id="firstName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="<?php echo htmlspecialchars($userData['firstName']); ?>">
-                            </div>
-                            <div>
-                                <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                                <input type="text" name="lastName" id="lastName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="<?php echo htmlspecialchars($userData['lastName']); ?>">
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-end">
-                            <button type="submit" name="updatePersonalInfo" id="updatePersonalInfo" class="bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors">
-                                Save Changes
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Email Section -->
-                <div class="bg-white rounded-xl shadow-md p-6 account-section">
-                    <h2 class="text-xl font-semibold text-primary mb-6">Email Address</h2>
-                    
-                    <form method="POST" id="emailForm">
-                        <input type="hidden" name="formType" value="email">
-                        <div class="mb-6">
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                            <input type="email" name="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="<?php echo htmlspecialchars($userData['email']); ?>">
-                            <p class="text-sm text-gray-500 mt-1">We'll send a verification link to your new email if changed.</p>
-                        </div>
-                        
-                        <div class="flex justify-end">
-                            <button type="submit" name="updateEmail" id="updateEmail" class="bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors">
-                                Update Email
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Password Section -->
-                <div class="bg-white rounded-xl shadow-md p-6 account-section">
-                    <h2 class="text-xl font-semibold text-primary mb-6">Change Password</h2>
-                    
-                    <form method="POST" id="passwordForm">
-                        <input type="hidden" name="formType" value="password">
-                        <div class="space-y-4 mb-6">
-                            <div>
-                                <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-                                <input type="password" name="currentPassword" id="currentPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                            <div>
-                                <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                                <input type="password" name="newPassword" id="newPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                            <div>
-                                <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
-                                <input type="password" name="confirmPassword" id="confirmPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-end">
-                            <button type="submit" name="updatePassword" id="updatePassword" class="bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors">
-                                Change Password
-                            </button>
-                        </div>
-                    </form>
-                </div>
+            <div class="flex justify-end">
+                <button type="button" onclick="addCollege()" class="px-6 py-3 bg-primary hover:bg-primaryDark text-white font-medium rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Add Department & Create Account
+                    </div>
+                </button>
             </div>
+        </form>
+    </div>
+</div>
+        
+        
+        <!-- Content Manager Accounts Section -->
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Content Manager Accounts</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <?php if(!empty($contentManage)): ?>
+                <?php foreach($contentManage as $manager): ?>
+                    <div class="transform transition duration-300 hover:-translate-y-2 hover:shadow-lg">
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
+                            <div class="bg-gray-100 p-6 border-b-2 border-gray-200 text-center">
+                                <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-3 border-white shadow-md">
+                                    <?php if(!empty($manager['profileImg'])): ?>
+                                        <img src="<?php echo htmlspecialchars($manager['profileImg']); ?>" class="w-full h-full object-cover" alt="Profile Image">
+                                    <?php else: ?>
+                                        <img src="/WEBSITE-wCMS/imgs/profiles/default-profile.png" class="w-full h-full object-cover" alt="Default Profile">
+                                    <?php endif; ?>
+                                </div>
+                                <h5 class="text-xl font-semibold">
+                                    <?php echo htmlspecialchars($manager['firstName'] . ' ' . $manager['lastName']); ?>
+                                </h5>
+                                
+                                <?php if(isset($manager['status']) && $manager['status'] == 0): ?>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 mt-2 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Suspended
+                                    </span>
+                                <?php else: ?>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 mt-2 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Active
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="p-6 flex-grow">
+                                <div class="flex items-center mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-gray-700"><?php echo htmlspecialchars($manager['email']); ?></span>
+                                </div>
+                                
+                                <div class="flex items-center mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-cyan-600 rounded-full">
+                                        <?php 
+                                        echo isset($manager['roleName']) ? htmlspecialchars($manager['roleName']) : 'Role ID: ' . htmlspecialchars($manager['role_id']); 
+                                        ?>
+                                    </span>
+                                </div>
+                                
+                                <div class="flex items-center mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-green-600 rounded-full">
+                                        <?php 
+                                        echo isset($manager['pageName']) ? htmlspecialchars($manager['pageName']) : 'Page ID: ' . htmlspecialchars($manager['pageID']); 
+                                        ?>
+                                    </span>
+                                </div>
+                                
+                                <?php if(!empty($manager['subpage_assigned']) || !empty($manager['subPageName'])): ?>
+                                <div class="flex items-center mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                    </svg>
+                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-amber-500 rounded-full">
+                                        <?php 
+                                        echo isset($manager['subPageName']) ? htmlspecialchars($manager['subPageName']) : htmlspecialchars($manager['subpage_assigned']); 
+                                        ?>
+                                    </span>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 text-center">
+                                <?php if(isset($manager['status']) && $manager['status'] == 0): ?>
+                                    <form method="POST" class="inline status-form">
+                                        <input type="hidden" name="manager_id" value="<?php echo $manager['id']; ?>">
+                                        <input type="hidden" name="reactivate_account" value="1">
+                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Reactivate Account
+                                        </button>
+                                    </form>
+                                <?php else: ?>
+                                    <form method="POST" class="inline status-form">
+                                        <input type="hidden" name="manager_id" value="<?php echo $manager['id']; ?>">
+                                        <input type="hidden" name="suspend_account" value="1">
+                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                            </svg>
+                                            Suspend Account
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="col-span-3">
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded" role="alert">
+                        <div class="flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>No content manager accounts found.</span>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
     <script>
-    $(document).ready(function() {
-        // Profile picture change functionality
-        $("#uploadOverlay").click(function() {
-            $("#profilePicture").click();
-        });
-        
-        // Preview image when selected
-        $("#profilePicture").change(function() {
-            if (this.files && this.files[0]) {
-                var reader = new FileReader();
+        // Preview logo image
+        function previewLogo(input) {
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                document.getElementById('fileNameDisplay').textContent = fileName;
                 
+                const reader = new FileReader();
                 reader.onload = function(e) {
-                    $("#profilePreview").attr("src", e.target.result);
+                    document.getElementById('logoPreview').src = e.target.result;
                 }
-                
-                reader.readAsDataURL(this.files[0]);
+                reader.readAsDataURL(input.files[0]);
             }
-        });
+        }
         
-        // Debug form submission
-        $("#profilePictureForm").on("submit", function() {
-            console.log("Form submitted");
-            console.log("File selected:", $("#profilePicture")[0].files[0] ? "Yes" : "No");
-        });
+        // Preview banner image
+        function previewBanner(input) {
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                document.getElementById('bannerFileNameDisplay').textContent = fileName;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('bannerPreview').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // Add College function (to be implemented by the user)
+        // Add College function
+function addCollege() {
+    // Get form data
+    const form = document.getElementById('addCollegeForm');
+    const collegeName = document.getElementById('collegeName').value;
+    const defaultPassword = document.getElementById('defaultPassword').value;
+    
+    // Basic validation
+    if (!collegeName) {
+        alert('Please enter a college department name');
+        return;
+    }
+    
+    if (!defaultPassword) {
+        alert('Please enter a default password');
+        return;
+    }
+    
+    // Show loading state
+    const submitButton = form.querySelector('button[type="button"]');
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Processing...
+    `;
+    submitButton.disabled = true;
+    
+    // Create FormData and append the password
+    const formData = new FormData(form);
+    formData.append('defaultPassword', defaultPassword);
+    
+    // Use jQuery AJAX
+    $.ajax({
+        url: '../page-functions/addCollegeDept.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(data) {
+            // Reset button state
+            submitButton.innerHTML = originalButtonText;
+            submitButton.disabled = false;
+            
+            if (data.success) {
+                // Show success message
+                const successMessage = $(`
+                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
+                        <div class="flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>${data.message || 'College department added successfully!'}</span>
+                        </div>
+                    </div>
+                `);
+                
+                // Insert success message before the form
+                $(form).before(successMessage);
+                
+                // Remove success message after 5 seconds
+                setTimeout(() => {
+                    successMessage.fadeOut(function() {
+                        $(this).remove();
+                    });
+                }, 5000);
+                
+                // Reset form
+                form.reset();
+                $('#logoPreview').attr('src', '../../imgs/profiles/default-profile.png');
+                $('#fileNameDisplay').text('Choose logo file...');
+                $('#emailPreview').text('departmentname@wmsu.edu.ph');
+                
+                // Reload the page after a short delay to show the new department
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                // Show error message
+                alert(data.message || 'An error occurred while adding the college department.');
+                console.error('Errors:', data.errors);
+            }
+        },
+        error: function(xhr, status, error) {
+            // Reset button state
+            submitButton.innerHTML = originalButtonText;
+            submitButton.disabled = false;
+            
+            console.error('AJAX Error:', status, error);
+            alert('An error occurred. Please try again.');
+        }
     });
+}
+// Generate email preview based on department name
+document.getElementById('collegeName').addEventListener('input', function() {
+    const collegeName = this.value.trim();
+    let emailName = '';
+    
+    // Extract the part after "College of" if it exists
+    if (collegeName.toLowerCase().startsWith('college of ')) {
+        emailName = collegeName.substring(11).trim();
+    } else {
+        emailName = collegeName;
+    }
+    
+    // Remove spaces and special characters
+    emailName = emailName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    // Update the email preview
+    document.getElementById('emailPreview').textContent = emailName + '@wmsu.edu.ph';
+});
+
+// Toggle password visibility
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('defaultPassword');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        this.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+            </svg>
+        `;
+    } else {
+        passwordInput.type = 'password';
+        this.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+        `;
+    }
+});
     </script>
 </body>
 </html>

@@ -1,49 +1,69 @@
-.content{
-    display: flex;
-    justify-content: space-between;
-    gap: 100px;
+.content {
+  display: flex;
+  justify-content: space-between;
+  gap: 100px;
 }
 
-.content a{
-    text-decoration: none;
+.content a {
+  text-decoration: none;
 }
 
-.content-container{
-    display: flex;
-    justify-content: center;
+.content-container {
+  display: flex;
+  justify-content: center;
 }
 
-.col-1, .col-2, .col-3{
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    width: auto;
+.col-1,
+.col-2,
+.col-3 {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: auto;
 }
-.college-container{
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    background-color: #BD0F03;
-    width: 400px;
-    padding: 15px;
-    color: white;
-    border-radius: 20px;
-    height: 150px;
-}
-
-.alt-color{
-    background-color: #ee948e;
+.college-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background-color: #bd0f03;
+  width: 400px;
+  padding: 15px;
+  color: white;
+  border-radius: 20px;
+  height: 150px;
 }
 
-.college-container h2{
-    font-size: 21px;
+.alt-color {
+  background-color: #ee948e;
 }
 
-.logo-item{
-    width: 100px;
-    height: 100px;
+.college-container h2 {
+  font-size: 21px;
 }
 
-.content{
-    padding: 50px
+.logo-item {
+  width: 100px;
+  height: 100px;
+}
+
+.content {
+  padding: 50px;
+}
+
+/* Adjust any absolute positioned elements in academics.css */
+.carousel-item {
+  position: relative;
+  z-index: 1; /* Lower than navbar */
+}
+
+.carousel-caption {
+  position: absolute;
+  z-index: 2; /* Higher than carousel item but lower than navbar */
+}
+
+/* Ensure any other absolute positioned elements have appropriate z-index */
+.section-header,
+.section-container {
+  position: relative;
+  z-index: 1; /* Lower than navbar */
 }
