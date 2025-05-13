@@ -95,7 +95,7 @@
 
         .mission-vision-content {
             background-color:rgb(231, 219, 219);
-            border-radius: 15px;
+            border-radius: 1px;
             padding: 30px 25px 20px 25px;
             margin-left: 40px;
         }
@@ -239,6 +239,9 @@
     </style>
 </head>
 <body>
+<div class="relative z-10 subnav-container">
+              <?php require_once '../../__includes/subnav_academics.php'?>
+          </div>
     <div class="container">
         <header>
             <h1>Western Mindanao State University</h1>

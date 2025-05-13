@@ -272,7 +272,7 @@ if (empty($strands)) {
                             
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Outcomes</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Core Subjects</label>
                                 <ul class="outcomes-list" id="outcome-list-<?php echo $strand['sectionID']; ?>">
                                     <?php foreach ($strand['outcomes'] as $outcome) { ?>
                                         <li>
@@ -329,7 +329,7 @@ if (empty($strands)) {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Outcomes</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Core Subjects</label>
             <ul class="outcomes-list" id="outcome-list-new">
             </ul>
             <button type="button" class="add-outcome bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" data-target="new">Add Outcome</button>

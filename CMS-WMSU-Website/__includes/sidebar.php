@@ -34,6 +34,69 @@
         background-color: rgba(189, 15, 3, 0.2);
         border-left: 3px solid #BD0F03;
     }
+
+    /* Preview sidebar styles */
+    #preview-sidebar {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 400px;
+        height: 100vh;
+        background-color: white;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 1050;
+        transition: right 0.3s ease;
+        overflow-y: auto;
+    }
+
+    #preview-sidebar.open {
+        right: 0;
+    }
+
+    .preview-toggle-btn {
+        position: fixed;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        background-color: #BD0F03;
+        color: white;
+        border: none;
+        border-radius: 4px 0 0 4px;
+        padding: 10px;
+        z-index: 1051;
+        cursor: pointer;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+    }
+
+    .preview-toggle-btn.open {
+        right: 400px;
+    }
+
+    .preview-content {
+        padding: 20px;
+    }
+
+    .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .preview-close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6b7280;
+    }
+
+    .preview-body {
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+    }
 </style>
 
 <?php 
@@ -158,6 +221,16 @@ if ($_SESSION['account']['role_id'] == 1){
                     ?>
                     <span class="ml-auto bg-primary text-white text-xs px-2 py-1 rounded-full"><?php echo $unread_count; ?></span>
                     <?php endif; ?>
+                </a>
+            </li>
+            <!-- Live Preview Sidebar Item -->
+            <li class="sidebar-nav-item">
+                <a id="toggle-preview-sidebar" class="flex items-center px-4 py-2 text-gray-700 hover:text-primary cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Live Preview
                 </a>
             </li>
         </ul>
@@ -324,6 +397,16 @@ foreach ($words as $word) {
                     <?php endif; ?>
                 </a>
             </li>
+            <!-- Live Preview Sidebar Item -->
+            <li class="sidebar-nav-item">
+                <a id="toggle-preview-sidebar" class="flex items-center px-4 py-2 text-gray-700 hover:text-primary cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Live Preview
+                </a>
+            </li>
         </ul>
         <?php } ?>
     </div>
@@ -338,4 +421,74 @@ foreach ($words as $word) {
 </div>
 
 <?php } ?>
+
+<!-- Preview Sidebar -->
+<div id="preview-sidebar">
+    <div class="preview-header">
+        <h2 class="text-xl font-semibold text-primary">Live Preview</h2>
+        <button class="preview-close-btn">&times;</button>
+    </div>
+    <div class="preview-body">
+        <div class="p-4">
+            <!-- Page Type Selector -->
+            <div class="mb-4">
+                <label for="sidebar-page-type-selector" class="block text-sm font-medium text-gray-700 mb-1">Preview Page Type:</label>
+                <div class="flex items-center">
+                    <select id="sidebar-page-type-selector" class="form-select rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 flex-grow">
+                        <option value="college-overview.php">College Overview</option>
+                        <option value="college-profile.php">College Profile</option>
+                        <option value="courses-offered.php">Courses Offered</option>
+                        <option value="departments.php">Departments</option>
+                        <option value="shs.php">Senior High School</option>
+                    </select>
+                    <button id="sidebar-refresh-preview-btn" class="ml-2 p-1 text-gray-500 hover:text-primary" title="Refresh Preview">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Preview Status -->
+            <div id="sidebar-preview-status" class="mb-4 text-center">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Unsaved Changes
+                </span>
+            </div>
+            
+            <!-- Preview Content -->
+            <div class="preview-content overflow-auto border border-gray-200 rounded-lg bg-white" id="sidebar-preview-content">
+                <div class="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-lg" id="sidebar-empty-preview-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p class="text-gray-600">Make changes to see a live preview</p>
+                </div>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <p class="text-sm text-gray-500">This preview shows how the content will appear on the actual website</p>
+                <p class="text-sm text-gray-500 mt-1">Remember to click "Save All Changes" to update the database</p>
+            </div>
+            
+            <!-- Debug Panel (hidden by default) -->
+            <div id="sidebar-preview-debug-panel" class="mt-4 p-4 bg-gray-100 rounded-lg hidden">
+                <h3 class="text-sm font-semibold mb-2">Debug Information</h3>
+                <div id="sidebar-preview-debug-content" class="text-xs font-mono overflow-auto max-h-[200px]"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Toggle Button -->
+<button id="preview-toggle-btn" class="preview-toggle-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+</button>
+
 <script src="../js/script.js"></script>
