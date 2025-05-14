@@ -1,4 +1,4 @@
-version: '3'
+version: "3.9"
 
 services:
   web:
@@ -8,21 +8,20 @@ services:
     volumes:
       - .:/var/www/html
     environment:
-      - DB_HOST=db  # The name of the database service
-      - DB_USER=root
-      - DB_PASS=   # Empty password for root
-      - DB_NAME=wmsucms
+      DB_HOST: db
+      DB_USER: root
+      DB_PASS:
+      DB_NAME: wmsucms
     depends_on:
       - db
 
   db:
     image: mariadb:11.4.5
     environment:
-      MYSQL_ROOT_PASSWORD: ""
-      MYSQL_DATABASE: wmsucms
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: wmsucms
     volumes:
       - db_data:/var/lib/mysql
 
 volumes:
   db_data:
-    driver: local
