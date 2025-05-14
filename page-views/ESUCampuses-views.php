@@ -64,10 +64,10 @@
         /* Updated mission-vision styles without icons */
         .mission-vision-container {
             max-width: 900px;
-            margin: 0 auto 30px;
+            margin: 0 auto 60px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 40px;
             position: relative;
         }
 
@@ -94,9 +94,9 @@
         }
 
         .mission-vision-content {
-            background-color: rgb(231, 219, 219);
+            background-color:rgb(231, 219, 219);
             border-radius: 15px;
-            padding: 20px 15px 15px 15px;
+            padding: 30px 25px 20px 25px;
             margin-left: 40px;
         }
 
@@ -111,7 +111,7 @@
         .columns {
             display: flex;
             flex-wrap: wrap;
-            gap: 50px;
+            gap: 30px;
         }
 
         .column {
@@ -123,14 +123,14 @@
             text-align: center;
             padding-bottom: 10px;
             border-bottom: 2px solid #c00000;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .campus-card {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 15px;
+            margin-bottom: 30px;
             overflow: hidden;
             transition: box-shadow 0.3s ease;
         }
@@ -149,7 +149,7 @@
 
         .campus-header {
             background-color: #f8e6e6;
-            padding: 10px;
+            padding: 15px;
         }
 
         .campus-title {
@@ -163,7 +163,7 @@
         }
 
         .campus-content {
-            padding: 10px;
+            padding: 15px;
         }
 
         .programs-button {
@@ -236,9 +236,115 @@
                 padding: 25px 20px 15px 20px;
             }
         }
+
+        /* REGION CARD STYLES (like screenshot) */
+        .region-cards {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .region-card {
+            position: relative;
+            width: 420px;
+            height: 180px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 2px solid transparent;
+            transition: box-shadow 0.2s, border-color 0.2s;
+            background: #eee;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .region-card.active {
+            border-color: #c00000;
+            box-shadow: 0 4px 16px rgba(192,0,0,0.10);
+        }
+        .region-card .region-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.92);
+            z-index: 1;
+        }
+        .region-card .region-label {
+            position: relative;
+            z-index: 2;
+            background: #f8e6e6;
+            padding: 18px 0 12px 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #c00000;
+            letter-spacing: 1px;
+            border-top: 1px solid #f3cccc;
+        }
+        @media (max-width: 900px) {
+            .region-cards { flex-direction: column; align-items: center; }
+            .region-card { width: 98vw; max-width: 420px; }
+        }
+        /* Hide/show campus sections */
+        .campus-sections { margin-bottom: 30px; }
+        .campus-section { display: none; }
+        .campus-section.active { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
+        /* CAMPUS CARD STYLES */
+        .campus-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 0 0 10px 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 160px;
+        }
+        .campus-header {
+            padding: 18px 20px 8px 20px;
+        }
+        .campus-title {
+            color: #c00000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .campus-description {
+            color: #555;
+            font-size: 1rem;
+        }
+        .programs-button {
+            width: 100%;
+            padding: 10px 20px;
+            background: #f8e6e6;
+            border: none;
+            border-top: 1px solid #e0c0c0;
+            color: #c00000;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+        }
+        .programs-button span { font-size: 1.3em; transition: transform 0.2s; }
+        .programs-button.active span { transform: rotate(180deg); }
+        .programs-content {
+            display: none;
+            padding: 10px 30px 0 30px;
+        }
+        .programs-content.active { display: block; }
+        .programs-list { margin: 0; padding-left: 18px; }
+        .programs-list li { margin-bottom: 6px; color: #444; }
     </style>
 </head>
 <body>
+     <div class="relative z-10 subnav-container">
+            <?php require_once '../__includes/subnav_academics.php' ?>
+        </div>
     <div class="container">
         <header>
             <h1>Western Mindanao State University</h1>
@@ -280,326 +386,205 @@
             </div>
         </div>
 
-        <div class="columns">
-            <div class="column">
-                <h2 class="column-title">ZAMBOANGA SIBUGAY</h2>
-                
-                <!-- Alicia Campus -->
+        <!-- REGION CARDS -->
+        <div class="region-cards">
+            <div class="region-card active" id="sibugay-card" onclick="expandRegion('sibugay')">
+                <div class="region-bg" style="background-image:url('../../imgs/Admin-Office2.jpg');"></div>
+                <div class="region-label">ZAMBOANGA SIBUGAY</div>
+            </div>
+            <div class="region-card" id="delsur-card" onclick="expandRegion('delsur')">
+                <div class="region-bg" style="background-image:url('../../imgs/Admin-Office2.jpg');"></div>
+                <div class="region-label">ZAMBOANGA DEL SUR</div>
+            </div>
+        </div>
+        <!-- CAMPUS SECTIONS -->
+        <div class="campus-sections">
+            <div class="campus-section active" id="sibugay-section">
+                <!-- ALL Sibugay campuses -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Alicia Campus</h3>
-                        <p class="campus-description">
-                            Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.
-                        </p>
+                        <div class="campus-title">WMSU Alicia Campus</div>
+                        <div class="campus-description">Extending WMSU's reach in Alicia, Zamboanga Sibugay.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Science in Agriculture (Crop Science)</li>
-                                <li>Bachelor of Elementary Education</li>
-                                <li>Batsilyer ng Sining sa Filipino</li>
-                                <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Science in Agriculture (Crop Science)</li>
+                            <li>Bachelor of Elementary Education</li>
+                            <li>Batsilyer ng Sining sa Filipino</li>
+                            <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Diplahan Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Diplahan Campus</h3>
-                        <p class="campus-description">
-                            Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.
-                        </p>
+                        <div class="campus-title">WMSU Diplahan Campus</div>
+                        <div class="campus-description">Serving Diplahan, Zamboanga Sibugay with quality education.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Elementary Education</li>
-                                <li>Associate in Computer Technology major in Networking (ladderized to BSIT)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Elementary Education</li>
+                            <li>Associate in Computer Technology major in Networking (ladderized to BSIT)</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Rest of Zamboanga Sibugay campuses remain the same -->
-                <!-- Ipil Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Ipil Campus</h3>
-                        <p class="campus-description">
-                            Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.
-                        </p>
+                        <div class="campus-title">WMSU Ipil Campus</div>
+                        <div class="campus-description">Located in Ipil, Zamboanga Sibugay, offering diverse programs.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Elementary Education</li>
-                                <li>BS Computer Science</li>
-                                <li>Bachelor of Secondary Education major in: English, Mathematics, Filipino</li>
-                                <li>Associate in Computer Technology major in Application Development (ladderized to BSCS)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Elementary Education</li>
+                            <li>BS Computer Science</li>
+                            <li>Bachelor of Secondary Education major in: English, Mathematics, Filipino</li>
+                            <li>Associate in Computer Technology major in Application Development (ladderized to BSCS)</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Naga Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Naga Campus</h3>
-                        <p class="campus-description">
-                            Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.
-                        </p>
+                        <div class="campus-title">WMSU Naga Campus</div>
+                        <div class="campus-description">Naga, Zamboanga Sibugay campus for local community needs.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Secondary Education major in Filipino</li>
-                                <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Secondary Education major in Filipino</li>
+                            <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Pagadian Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Pagadian Campus</h3>
-                        <p class="campus-description">
-                            Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.
-                        </p>
+                        <div class="campus-title">WMSU Pagadian Campus</div>
+                        <div class="campus-description">Pagadian, Zamboanga Sibugay campus for higher learning.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>BA Political Science</li>
-                                <li>Bachelor of Elementary Education</li>
-                                <li>Bachelor of Secondary Education major in: English, Science</li>
-                                <li>BS Criminology</li>
-                                <li>BS Computer Science</li>
-                                <li>BS Social Work</li>
-                                <li>Associate in Computer Technology major in Application Development (ladderized to BSCS)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>BA Political Science</li>
+                            <li>Bachelor of Elementary Education</li>
+                            <li>Bachelor of Secondary Education major in: English, Science</li>
+                            <li>BS Criminology</li>
+                            <li>BS Computer Science</li>
+                            <li>BS Social Work</li>
+                            <li>Associate in Computer Technology major in Application Development (ladderized to BSCS)</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Tungawan Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Tungawan Campus</h3>
-                        <p class="campus-description">
-                            Established to extend WMSU's educational reach within Zamboanga Sibugay, the Alicia ESU offers programs tailored to local community needs.
-                        </p>
+                        <div class="campus-title">WMSU Tungawan Campus</div>
+                        <div class="campus-description">Tungawan, Zamboanga Sibugay campus for accessible education.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Elementary Education</li>
-                                <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Elementary Education</li>
+                            <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-
-            <div class="column">
-                <h2 class="column-title">ZAMBOANGA DEL SUR</h2>
-                
-                <!-- Zamboanga Del Sur campuses remain the same -->
-                <!-- Curuan Campus -->
+            <div class="campus-section" id="delsur-section">
+                <!-- ALL Del Sur campuses -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Curuan Campus</h3>
-                        <p class="campus-description">
-                            The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.
-                        </p>
+                        <div class="campus-title">WMSU Curuan Campus</div>
+                        <div class="campus-description">Curuan, Zamboanga del Sur campus for regional development.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Elementary Education</li>
-                                <li>Batsilyer ng Sining sa Filipino</li>
-                                <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Elementary Education</li>
+                            <li>Batsilyer ng Sining sa Filipino</li>
+                            <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Imelda Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Imelda Campus</h3>
-                        <p class="campus-description">
-                            The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.
-                        </p>
+                        <div class="campus-title">WMSU Imelda Campus</div>
+                        <div class="campus-description">Imelda, Zamboanga del Sur campus for higher education.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>BA Political Science</li>
-                                <li>Bachelor of Elementary Education</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>BA Political Science</li>
+                            <li>Bachelor of Elementary Education</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Mabuhay Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Mabuhay Campus</h3>
-                        <p class="campus-description">
-                            The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.
-                        </p>
+                        <div class="campus-title">WMSU Mabuhay Campus</div>
+                        <div class="campus-description">Mabuhay, Zamboanga del Sur campus for academic excellence.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Elementary Education</li>
-                                <li>Bachelor of Secondary Education major in Mathematics</li>
-                                <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Elementary Education</li>
+                            <li>Bachelor of Secondary Education major in Mathematics</li>
+                            <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Malangas Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Malangas Campus</h3>
-                        <p class="campus-description">
-                            The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.
-                        </p>
+                        <div class="campus-title">WMSU Malangas Campus</div>
+                        <div class="campus-description">Malangas, Zamboanga del Sur campus for community growth.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Elementary Education</li>
-                                <li>BS Criminology</li>
-                                <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Elementary Education</li>
+                            <li>BS Criminology</li>
+                            <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Molave Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Molave Campus</h3>
-                        <p class="campus-description">
-                            The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.
-                        </p>
+                        <div class="campus-title">WMSU Molave Campus</div>
+                        <div class="campus-description">Molave, Zamboanga del Sur campus for future leaders.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Elementary Education</li>
-                                <li>Bachelor of Secondary Education major in: English, Filipino, Social Studies</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Elementary Education</li>
+                            <li>Bachelor of Secondary Education major in: English, Filipino, Social Studies</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Qintanga Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Qintanga Campus</h3>
-                        <p class="campus-description">
-                            The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.
-                        </p>
+                        <div class="campus-title">WMSU Qintanga Campus</div>
+                        <div class="campus-description">Qintanga, Zamboanga del Sur campus for accessible learning.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>Bachelor of Elementary Education</li>
-                                <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>Bachelor of Elementary Education</li>
+                            <li>Associate in Computer Technology major in Application Development (Stand Alone)</li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- Siay Campus -->
                 <div class="campus-card">
-                    <div class="campus-image"></div>
                     <div class="campus-header">
-                        <h3 class="campus-title">WMSU Siay Campus</h3>
-                        <p class="campus-description">
-                            The Aurora ESU was developed to provide higher education opportunities in Zamboanga del Sur, focusing on courses relevant to the region's development.
-                        </p>
+                        <div class="campus-title">WMSU Siay Campus</div>
+                        <div class="campus-description">Siay, Zamboanga del Sur campus for diverse programs.</div>
                     </div>
-                    <div class="campus-content">
-                        <button class="programs-button" onclick="togglePrograms(this)">
-                            Programs Available
-                            <span>▼</span>
-                        </button>
-                        <div class="programs-content">
-                            <ul class="programs-list">
-                                <li>BA in Political Science</li>
-                                <li>Bachelor of Elementary Education</li>
-                                <li>BS Computer Science</li>
-                                <li>Associate in Computer Technology major in Application Development (ladderized to BSCS)</li>
-                            </ul>
-                        </div>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <div class="programs-content">
+                        <ul class="programs-list">
+                            <li>BA in Political Science</li>
+                            <li>Bachelor of Elementary Education</li>
+                            <li>BS Computer Science</li>
+                            <li>Associate in Computer Technology major in Application Development (ladderized to BSCS)</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -607,17 +592,34 @@
     </div>
 
     <script>
-        function togglePrograms(button) {
-            const content = button.nextElementSibling;
-            const arrow = button.querySelector('span');
-            
-            if (content.classList.contains('active')) {
-                content.classList.remove('active');
-                arrow.textContent = '▼';
+        function expandRegion(region) {
+            // Single expand: only one region's campuses visible
+            document.getElementById('sibugay-card').classList.remove('active');
+            document.getElementById('delsur-card').classList.remove('active');
+            document.getElementById('sibugay-section').classList.remove('active');
+            document.getElementById('delsur-section').classList.remove('active');
+            if(region==='sibugay') {
+                document.getElementById('sibugay-card').classList.add('active');
+                document.getElementById('sibugay-section').classList.add('active');
             } else {
-                content.classList.add('active');
-                arrow.textContent = '▲';
+                document.getElementById('delsur-card').classList.add('active');
+                document.getElementById('delsur-section').classList.add('active');
             }
+        }
+        function togglePrograms(btn) {
+            const content = btn.nextElementSibling;
+            const arrow = btn.querySelector('span');
+            // Close all other program dropdowns in this section
+            btn.closest('.campus-section').querySelectorAll('.programs-content').forEach(el => {
+                if(el!==content) el.classList.remove('active');
+            });
+            btn.closest('.campus-section').querySelectorAll('.programs-button').forEach(b => {
+                if(b!==btn) b.classList.remove('active');
+            });
+            // Toggle current
+            btn.classList.toggle('active');
+            content.classList.toggle('active');
+            arrow.textContent = content.classList.contains('active') ? '▲' : '▼';
         }
     </script>
 </body>

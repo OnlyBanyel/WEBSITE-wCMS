@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   web:
     build: .
@@ -15,8 +13,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # Add restart policy
-    restart: unless-stopped
 
   db:
     image: mariadb:11.4.5
@@ -25,19 +21,11 @@ services:
       MARIADB_DATABASE: wmsucms
     volumes:
       - db_data:/var/lib/mysql
-      # Add a volume for database initialization
-      - ./database:/docker-entrypoint-initdb.d
-    ports:
-      # Expose MySQL port for external access if needed
-      - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --silent"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
-    # Add restart policy
-    restart: unless-stopped
 
 volumes:
   db_data:
