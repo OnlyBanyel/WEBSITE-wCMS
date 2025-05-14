@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'  # Use a more recent version for better support
 
 services:
   web:
@@ -8,21 +8,20 @@ services:
     volumes:
       - .:/var/www/html
     environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASS=  # Empty password for root
-      - DB_NAME=wmsucms  # The database name
+      DB_HOST: db         # Name of the database service
+      DB_USER: root       # MySQL root user
+      DB_PASS: ""         # Empty password
+      DB_NAME: wmsucms    # Your database name
     depends_on:
       - db
 
   db:
     image: mariadb:11.4.5
     environment:
-      MYSQL_ROOT_PASSWORD: ""  # Empty password for root
-      MYSQL_DATABASE: wmsucms  # Database name
+      MYSQL_ROOT_PASSWORD: ""   # Empty root password
+      MYSQL_DATABASE: wmsucms   # Initialize with this DB
     volumes:
       - db_data:/var/lib/mysql
 
 volumes:
   db_data:
-    driver: local
