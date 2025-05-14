@@ -244,7 +244,7 @@ class Pages {
     }
 
     function fetchColleges() {
-        $sql = "SELECT subpageID, subPageName FROM subpages WHERE isCollege = 1";
+        $sql = "SELECT subpageID, subPageName, established_year FROM subpages WHERE isCollege = 1";
         $qry = $this->db->connect()->prepare($sql);
 
         if ($qry->execute()) {
@@ -375,11 +375,12 @@ class Pages {
     }
 
     function fetchContentManagers() {
-        $sql = "SELECT * 
-        FROM accounts 
-        LEFT JOIN subpages ON accounts.subpage_assigned = subpages.subpageID 
-        LEFT JOIN roles ON accounts.role_id = roles.roleID
-        WHERE accounts.role_id = 2";
+        $sql = "SELECT accounts.*, subpages.subPageName, subpages.established_year, roles.roleName, pages.pageName 
+                FROM accounts 
+                LEFT JOIN subpages ON accounts.subpage_assigned = subpages.subpageID 
+                LEFT JOIN roles ON accounts.role_id = roles.roleID
+                LEFT JOIN pages ON subpages.pagesID = pages.ID
+                WHERE accounts.role_id = 2";
 
         $qry = $this->db->connect()->prepare($sql);
 

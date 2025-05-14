@@ -64,10 +64,10 @@
         /* Updated mission-vision styles without icons */
         .mission-vision-container {
             max-width: 900px;
-            margin: 0 auto 60px;
+            margin: 0 auto 30px;
             display: flex;
             flex-direction: column;
-            gap: 40px;
+            gap: 20px;
             position: relative;
         }
 
@@ -94,9 +94,9 @@
         }
 
         .mission-vision-content {
-            background-color:rgb(231, 219, 219);
-            border-radius: 1px;
-            padding: 30px 25px 20px 25px;
+            background-color: rgb(231, 219, 219);
+            border-radius: 15px;
+            padding: 20px 15px 15px 15px;
             margin-left: 40px;
         }
 
@@ -111,7 +111,7 @@
         .columns {
             display: flex;
             flex-wrap: wrap;
-            gap: 30px;
+            gap: 50px;
         }
 
         .column {
@@ -123,14 +123,14 @@
             text-align: center;
             padding-bottom: 10px;
             border-bottom: 2px solid #c00000;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .campus-card {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             overflow: hidden;
             transition: box-shadow 0.3s ease;
         }
@@ -149,7 +149,7 @@
 
         .campus-header {
             background-color: #f8e6e6;
-            padding: 15px;
+            padding: 10px;
         }
 
         .campus-title {
@@ -163,7 +163,7 @@
         }
 
         .campus-content {
-            padding: 15px;
+            padding: 10px;
         }
 
         .programs-button {
@@ -239,9 +239,6 @@
     </style>
 </head>
 <body>
-<div class="relative z-10 subnav-container">
-              <?php require_once '../../__includes/subnav_academics.php'?>
-          </div>
     <div class="container">
         <header>
             <h1>Western Mindanao State University</h1>

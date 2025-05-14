@@ -1,41 +1,52 @@
 <?php
-
 class Database {
-    private $dbhost;
-    private $dbname;
-    private $user;
+    private $host;
+    private $username;
     private $password;
-    protected $db;
+    private $database;
+    private $connection;
 
     public function __construct() {
-        // These values are pulled from environment variables for Docker use
-        $this->dbhost = getenv('DB_HOST') ?: '127.0.0.1';   // 127.0.0.1 instead of 'localhost' for Docker container
-        $this->dbname = getenv('DB_NAME') ?: 'wmsucms';      // Default 'wmsucms'
-        $this->user = getenv('DB_USER') ?: 'root';           // Default 'root'
-        $this->password = getenv('DB_PASS') ?: '';           // Default empty password for 'root'
+        // Get database credentials from environment variables
+        $this->host = getenv('DB_HOST') ?: 'db';
+        $this->username = getenv('DB_USER') ?: 'root';
+        $this->password = getenv('DB_PASS') ?: '';
+        $this->database = getenv('DB_NAME') ?: 'wmsucms';
     }
 
     public function connect() {
         try {
-            // Use TCP/IP connection for Docker container, set port 3306
-            $dsn = "mysql:host={$this->dbhost};port=3306;dbname={$this->dbname}";
+            // Add error handling and retry logic
+            $retries = 5;
+            $retry_interval = 5; // seconds
             
-            // Create PDO connection
-            $this->db = new PDO($dsn, $this->user, $this->password);
-            
-            // Set PDO error mode to exception to catch any issues
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            // Optional: Output success message to confirm connection
-            // echo "Connected to the database successfully!";
-            
-        } catch(PDOException $e) {
-            // Handle any connection error
-            echo "Connection error: " . $e->getMessage();
-            $this->db = null;
+            for ($i = 0; $i < $retries; $i++) {
+                try {
+                    $this->connection = new PDO(
+                        "mysql:host={$this->host};dbname={$this->database}",
+                        $this->username,
+                        $this->password,
+                        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+                    );
+                    
+                    // If we get here, connection succeeded
+                    return $this->connection;
+                } catch (PDOException $e) {
+                    // If this is the last retry, throw the exception
+                    if ($i === $retries - 1) {
+                        throw $e;
+                    }
+                    
+                    // Otherwise wait and retry
+                    error_log("Database connection failed, retrying in {$retry_interval} seconds...");
+                    sleep($retry_interval);
+                }
+            }
+        } catch (PDOException $e) {
+            error_log("Connection error: " . $e->getMessage());
+            // Return null instead of throwing to prevent fatal errors
+            return null;
         }
-
-        return $this->db;
     }
 }
 ?>

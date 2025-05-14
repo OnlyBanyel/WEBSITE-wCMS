@@ -89,59 +89,87 @@ $contentManage = $accManagementObj->fetchContentManagers();
         <?php endif; ?>
         
         <!-- Add College Department Section -->
-        <div class="mb-12 bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="bg-primary text-white p-4">
-                <h2 class="text-xl font-semibold">Add New College Department</h2>
-            </div>
-            <div class="p-6">
-                <form id="addCollegeForm" method="POST" enctype="multipart/form-data" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Department Information -->
-                        <div class="space-y-4">
-                            <div>
-                                <label for="collegeName" class="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
-                                <input type="text" id="collegeName" name="collegeName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter department name" required>
-                            </div>                                              
-                        </div>
-                        
-                        <!-- Department Logo Upload -->
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Department Logo</label>
-                                <div class="border border-dashed border-gray-300 rounded-lg p-4 text-center">
-                                    <div class="mb-4">
-                                        <img id="logoPreview" src="../../imgs/default-dept-img.png" alt="Logo Preview" class="mx-auto h-32 w-32 object-contain">
-                                    </div>
-                                    
-                                    <div class="custom-file-input">
-                                        <input type="file" name="collegeLogo" id="collegeLogo" accept="image/*" onchange="previewLogo(this)">
-                                        <div class="custom-file-label">
-                                            <span id="fileNameDisplay">Choose logo file...</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    
-                                    <p class="mt-2 text-xs text-gray-500">Recommended: Square image, 512x512px or larger</p>
-                                </div>
-                            </div>                            
-                        </div>
+<div class="mb-12 bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="bg-primary text-white p-4">
+        <h2 class="text-xl font-semibold">Add New College Department</h2>
+    </div>
+    <div class="p-6">
+        <form id="addCollegeForm" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Department Information -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="collegeName" class="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
+                        <input type="text" id="collegeName" name="collegeName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter department name (e.g. College of Computing Studies)" required>
+                        <p class="mt-1 text-xs text-gray-500">An account will be created with email: <span id="emailPreview" class="font-medium">departmentname@wmsu.edu.ph</span></p>
                     </div>
                     
-                    <div class="flex justify-end">
-                        <button type="button" onclick="addCollege()" class="px-6 py-3 bg-primary hover:bg-primaryDark text-white font-medium rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <div>
+                        <label for="defaultPassword" class="block text-sm font-medium text-gray-700 mb-1">Default Password</label>
+                        <div class="relative">
+                            <input type="password" id="defaultPassword" name="defaultPassword" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" value="wmsu123" required>
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                                Add Department
-                            </div>
-                        </button>
+                            </button>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">The content manager will need to change this on first login</p>
                     </div>
-                </form>
+                    
+                    <div>
+                        <label for="establishedYear" class="block text-sm font-medium text-gray-700 mb-1">Established (Academic Year)</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="establishedYear" name="establishedYear" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g. 1995-1996" pattern="\d{4}-\d{4}" title="Format: YYYY-YYYY (e.g. 1995-1996)">
+                            <div class="relative" data-tooltip="Format: YYYY-YYYY">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">When was this department established? (Format: YYYY-YYYY)</p>
+                    </div>
+                </div>
+                
+                <!-- Department Logo Upload -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Department Logo</label>
+                        <div class="border border-dashed border-gray-300 rounded-lg p-4 text-center">
+                            <div class="mb-4">
+                                <img id="logoPreview" src="../../imgs/default-dept-img.png" alt="Logo Preview" class="mx-auto h-32 w-32 object-contain">
+                            </div>
+                            
+                            <div class="custom-file-input">
+                                <input type="file" name="collegeLogo" id="collegeLogo" accept="image/*" onchange="previewLogo(this)">
+                                <div class="custom-file-label">
+                                    <span id="fileNameDisplay">Choose logo file...</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <p class="mt-2 text-xs text-gray-500">Recommended: Square image, 512x512px or larger</p>
+                        </div>
+                    </div>                            
+                </div>
             </div>
-        </div>
+            
+            <div class="flex justify-end">
+                <button type="button" onclick="addCollege()" class="px-6 py-3 bg-primary hover:bg-primaryDark text-white font-medium rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Add Department & Create Account
+                    </div>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
         
         
         <!-- Content Manager Accounts Section -->
@@ -222,6 +250,17 @@ $contentManage = $accManagementObj->fetchContentManagers();
                                     </span>
                                 </div>
                                 <?php endif; ?>
+                                
+                                <?php if(!empty($manager['established_year'])): ?>
+                                <div class="flex items-center mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                    </svg>
+                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-blue-600 rounded-full">
+                                        Established: <?php echo htmlspecialchars($manager['established_year']); ?>
+                                    </span>
+                                </div>
+                                <?php endif; ?>
                             </div>
                             <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 text-center">
                                 <?php if(isset($manager['status']) && $manager['status'] == 0): ?>
@@ -295,17 +334,45 @@ $contentManage = $accManagementObj->fetchContentManagers();
             }
         }
         
+        // Validate academic year format
+        document.getElementById('establishedYear').addEventListener('input', function() {
+            const value = this.value;
+            const yearPattern = /^\d{4}-\d{4}$/;
+            
+            if (value && !yearPattern.test(value)) {
+                this.setCustomValidity('Please use format: YYYY-YYYY (e.g. 1995-1996)');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+        
         // Add College function (to be implemented by the user)
         // Add College function
-        function addCollege() {
+function addCollege() {
     // Get form data
     const form = document.getElementById('addCollegeForm');
     const collegeName = document.getElementById('collegeName').value;
+    const defaultPassword = document.getElementById('defaultPassword').value;
+    const establishedYear = document.getElementById('establishedYear').value;
     
     // Basic validation
     if (!collegeName) {
         alert('Please enter a college department name');
         return;
+    }
+    
+    if (!defaultPassword) {
+        alert('Please enter a default password');
+        return;
+    }
+    
+    // Validate academic year format if provided
+    if (establishedYear) {
+        const yearPattern = /^\d{4}-\d{4}$/;
+        if (!yearPattern.test(establishedYear)) {
+            alert('Academic year must be in format: YYYY-YYYY (e.g. 1995-1996)');
+            return;
+        }
     }
     
     // Show loading state
@@ -320,11 +387,15 @@ $contentManage = $accManagementObj->fetchContentManagers();
     `;
     submitButton.disabled = true;
     
+    // Create FormData and append the password
+    const formData = new FormData(form);
+    formData.append('defaultPassword', defaultPassword);
+    
     // Use jQuery AJAX
     $.ajax({
         url: '../page-functions/addCollegeDept.php',
         type: 'POST',
-        data: new FormData(form),
+        data: formData,
         processData: false,
         contentType: false,
         success: function(data) {
@@ -359,6 +430,7 @@ $contentManage = $accManagementObj->fetchContentManagers();
                 form.reset();
                 $('#logoPreview').attr('src', '../../imgs/profiles/default-profile.png');
                 $('#fileNameDisplay').text('Choose logo file...');
+                $('#emailPreview').text('departmentname@wmsu.edu.ph');
                 
                 // Reload the page after a short delay to show the new department
                 setTimeout(() => {
@@ -380,6 +452,45 @@ $contentManage = $accManagementObj->fetchContentManagers();
         }
     });
 }
+// Generate email preview based on department name
+document.getElementById('collegeName').addEventListener('input', function() {
+    const collegeName = this.value.trim();
+    let emailName = '';
+    
+    // Extract the part after "College of" if it exists
+    if (collegeName.toLowerCase().startsWith('college of ')) {
+        emailName = collegeName.substring(11).trim();
+    } else {
+        emailName = collegeName;
+    }
+    
+    // Remove spaces and special characters
+    emailName = emailName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    // Update the email preview
+    document.getElementById('emailPreview').textContent = emailName + '@wmsu.edu.ph';
+});
+
+// Toggle password visibility
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('defaultPassword');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        this.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+            </svg>
+        `;
+    } else {
+        passwordInput.type = 'password';
+        this.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+        `;
+    }
+});
     </script>
 </body>
 </html>

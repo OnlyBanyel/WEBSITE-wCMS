@@ -10,11 +10,13 @@ services:
     environment:
       DB_HOST: db
       DB_USER: root
-      DB_PASS: ""   # Empty string for root password
+      DB_PASS: ""
       DB_NAME: wmsucms
     depends_on:
       db:
         condition: service_healthy
+    # Add restart policy
+    restart: unless-stopped
 
   db:
     image: mariadb:11.4.5
@@ -23,11 +25,19 @@ services:
       MARIADB_DATABASE: wmsucms
     volumes:
       - db_data:/var/lib/mysql
+      # Add a volume for database initialization
+      - ./database:/docker-entrypoint-initdb.d
+    ports:
+      # Expose MySQL port for external access if needed
+      - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    # Add restart policy
+    restart: unless-stopped
 
 volumes:
   db_data:

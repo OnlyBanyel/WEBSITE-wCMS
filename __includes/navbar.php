@@ -1,10 +1,20 @@
 <head>
   <?php require_once "head.php"; 
   
-require_once $_SERVER['DOCUMENT_ROOT'] . "/CMS-WMSU-Website/classes/pages.class.php";
+if (file_exists(dirname(__DIR__) . "/CMS-WMSU-Website/classes/pages.class.php")) {
+    require_once dirname(__DIR__) . "/CMS-WMSU-Website/classes/pages.class.php";
+}
+// Render or production path
+// else {
+//     require_once "/var/www/html/CMS-WMSU-Website/classes/pages.class.php";
+// }
+
+// Then you can instantiate your class
+$genElements = new Pages;
+
 
       
-  $genElements = new Pages;
+$genElements = new Pages;
 
   /** @region navbar */
   $navBarItemsSQL = "
