@@ -10,10 +10,11 @@ services:
     environment:
       DB_HOST: db
       DB_USER: root
-      DB_PASS:
+      DB_PASS: ""   # Empty string for root password
       DB_NAME: wmsucms
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: mariadb:11.4.5
@@ -22,6 +23,11 @@ services:
       MARIADB_DATABASE: wmsucms
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db_data:
