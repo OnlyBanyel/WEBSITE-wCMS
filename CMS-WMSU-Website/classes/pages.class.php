@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . "/WEBSITE-WCMS/CMS-WMSU-Website/tools/functions.php";
+require_once "../tools/functions.php";
 require_once __DIR__ . "/db_connection.class.php";
 
 class Pages {
