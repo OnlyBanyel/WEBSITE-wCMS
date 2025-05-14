@@ -1,7 +1,8 @@
 <head>
   <?php require_once "head.php"; 
+  
+require_once $_SERVER['DOCUMENT_ROOT'] . "/CMS-WMSU-Website/classes/pages.class.php";
 
-  require_once dirname(__DIR__) . "/CMS-WMSU-Website/classes/pages.class.php";
       
   $genElements = new Pages;
 
