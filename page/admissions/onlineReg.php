@@ -1,6 +1,5 @@
 <?php 
 require_once '../../CMS-WMSU-Website/classes/pages.class.php';
-require_once '../../CMS-WMSU-Website/tools/functions.php';
 
 $onlineRegObj = new Pages;
 
