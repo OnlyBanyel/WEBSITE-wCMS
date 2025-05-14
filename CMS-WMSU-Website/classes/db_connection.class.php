@@ -17,13 +17,14 @@ class Database {
     public function connect() {
         try {
             $this->db = new PDO(
-                "mysql:host={$this->dbhost};dbname={$this->dbname}",
+                "mysql:host={$this->dbhost};port=3306;dbname={$this->dbname}",
                 $this->user,
                 $this->password
             );
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $e) {
             echo "Connection error: " . $e->getMessage();
+            $this->db = null;
         }
 
         return $this->db;
