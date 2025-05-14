@@ -8,21 +8,29 @@ class Database {
     protected $db;
 
     public function __construct() {
-        $this->dbhost = getenv('DB_HOST') ?: 'localhost';   // fallback to 'localhost' if not set
-        $this->dbname = getenv('DB_NAME') ?: 'wmsucms';     // fallback to 'wmsucms'
-        $this->user = getenv('DB_USER') ?: 'root';          // fallback to 'root'
-        $this->password = getenv('DB_PASS') ?: '';          // fallback to empty string
+        // These values are pulled from environment variables for Docker use
+        $this->dbhost = getenv('DB_HOST') ?: '127.0.0.1';   // 127.0.0.1 instead of 'localhost' for Docker container
+        $this->dbname = getenv('DB_NAME') ?: 'wmsucms';      // Default 'wmsucms'
+        $this->user = getenv('DB_USER') ?: 'root';           // Default 'root'
+        $this->password = getenv('DB_PASS') ?: '';           // Default empty password for 'root'
     }
 
     public function connect() {
         try {
-            $this->db = new PDO(
-                "mysql:host={$this->dbhost};port=3306;dbname={$this->dbname}",
-                $this->user,
-                $this->password
-            );
+            // Use TCP/IP connection for Docker container, set port 3306
+            $dsn = "mysql:host={$this->dbhost};port=3306;dbname={$this->dbname}";
+            
+            // Create PDO connection
+            $this->db = new PDO($dsn, $this->user, $this->password);
+            
+            // Set PDO error mode to exception to catch any issues
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Optional: Output success message to confirm connection
+            // echo "Connected to the database successfully!";
+            
         } catch(PDOException $e) {
+            // Handle any connection error
             echo "Connection error: " . $e->getMessage();
             $this->db = null;
         }
