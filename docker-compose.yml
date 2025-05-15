@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   web:
     build: .
@@ -19,7 +21,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      networks:
+    networks:
       - default
       - host
 
