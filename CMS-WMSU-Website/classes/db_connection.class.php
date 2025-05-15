@@ -20,21 +20,25 @@ class Database {
     }
 
     public function connect() {
-        try {
-            // Explicit port to ensure compatibility in Docker and local
-            $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname};charset=utf8mb4";
-            
-            $this->db = new PDO($dsn, $this->user, $this->password);
+    try {
+        $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname};charset=utf8mb4";
 
-            // Error reporting to exception mode
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $ssl_ca = '/etc/ssl/aiven/ca.pem';
 
-        } catch (PDOException $e) {
-            echo "Database connection error: " . $e->getMessage();
-            $this->db = null;
-        }
+        $options = [
+            PDO::MYSQL_ATTR_SSL_CA => $ssl_ca,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ];
 
-        return $this->db;
+        $this->db = new PDO($dsn, $this->user, $this->password, $options);
+
+    } catch (PDOException $e) {
+        echo "Database connection error: " . $e->getMessage();
+        $this->db = null;
     }
+
+    return $this->db;
+}
+
 }
 ?>
