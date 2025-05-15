@@ -9,11 +9,16 @@ class Database {
     protected $db;
 
     public function __construct() {
-        $this->dbhost   = getenv('DB_HOST') ?: '127.0.0.1';
-        $this->dbname   = getenv('DB_NAME') ?: 'wmsucms';
-        $this->user     = getenv('DB_USER') ?: 'root';
-        $this->password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '';
-        $this->port     = getenv('DB_PORT') ?: '3306';
+        $this->dbhost   = getenv('DB_HOST');
+        $this->dbname   = getenv('DB_NAME');
+        $this->user     = getenv('DB_USER');
+        $this->password = getenv('DB_PASS');
+        $this->port     = getenv('DB_PORT');
+        // $this->dbhost   = getenv('DB_HOST') ?: '127.0.0.1';
+        // $this->dbname   = getenv('DB_NAME') ?: 'wmsucms';
+        // $this->user     = getenv('DB_USER') ?: 'root';
+        // $this->password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '';
+        // $this->port     = getenv('DB_PORT') ?: '3306';
     }
 public function connect() {
     try {
