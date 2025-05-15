@@ -1,21 +1,21 @@
 FROM php:7.4-apache
 
-# Add these to your Dockerfile:
+# Install dependencies with proper MySQL 8 support
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     libssl-dev \
-    && pecl install mysql \
-    && docker-php-ext-enable mysql \
-    && docker-php-ext-install pdo_mysql mysqli
-
-# Install PHP extensions with SSL support
-RUN docker-php-ext-install mysqli pdo pdo_mysql && \
-    docker-php-ext-enable opcache
+    libcurl4-openssl-dev \
+    libonig-dev \
+    libxml2-dev \
+    && docker-php-ext-install pdo_mysql mysqli opcache \
+    && docker-php-ext-enable opcache \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache modules
 RUN a2enmod rewrite ssl
 
-# Create SSL directory and set permissions
+# Create SSL directory
 RUN mkdir -p /etc/ssl/aiven && \
     chown -R www-data:www-data /etc/ssl/aiven
 
