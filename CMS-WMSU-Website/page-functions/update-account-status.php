@@ -14,15 +14,15 @@ function debug_log($message) {
 }
 
 debug_log("Update account status script started");
-debug_log("Session data: " . print_r($_SESSION, true));
+debug_log("POST data: " . print_r($_POST, true));
 
 // Check if this is an AJAX request
 $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
           strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 
-// If not an AJAX request, return error
-if (!$isAjax) {
-    debug_log("Not an AJAX request");
+// If not an AJAX request, check if it's a regular form submission
+if (!$isAjax && $_SERVER['REQUEST_METHOD'] != 'POST') {
+    debug_log("Not an AJAX request or POST submission");
     header('Content-Type: application/json');
     echo json_encode([
         'success' => false,
@@ -51,10 +51,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
     (isset($_POST['suspend_account']) || isset($_POST['reactivate_account'])) && 
     isset($_POST['manager_id'])) {
     
-    $managerId = $_POST['manager_id'];
+    $managerId = intval($_POST['manager_id']);
     $newStatus = isset($_POST['suspend_account']) ? 0 : 1;
     
     debug_log("Updating account status: Manager ID = $managerId, New Status = $newStatus");
+    
+    if ($managerId <= 0) {
+        debug_log("Invalid manager ID: $managerId");
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => 'Invalid manager ID'
+        ]);
+        exit;
+    }
     
     try {
         $accManagementObj = new Pages();
@@ -62,22 +72,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
         // Debug database connection
         debug_log("Database connection established");
         
-        // Check if the manager ID exists
-        debug_log("Checking if manager ID exists: $managerId");
-        
+        // Update the account status
         $result = $accManagementObj->updateAccountStatus($managerId, $newStatus);
         
         debug_log("Update result: " . ($result ? "Success" : "Failed"));
         
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => $result,
-            'message' => $result ? 
-                ($newStatus == 0 ? "Account suspended successfully" : "Account reactivated successfully") : 
-                "Failed to update account status",
-            'newStatus' => $newStatus,
-            'managerId' => $managerId
-        ]);
+        // For AJAX requests, return JSON
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => $result,
+                'message' => $result ? 
+                    ($newStatus == 0 ? "Account suspended successfully" : "Account reactivated successfully") : 
+                    "Failed to update account status",
+                'newStatus' => $newStatus,
+                'managerId' => $managerId
+            ]);
+        } else {
+            // For regular form submissions, redirect back with a message
+            if ($result) {
+                $_SESSION['success_msg'] = $newStatus == 0 ? 
+                    "Account suspended successfully" : 
+                    "Account reactivated successfully";
+            } else {
+                $_SESSION['error_msg'] = "Failed to update account status";
+            }
+            
+            // Redirect back to the accounts page
+            header("Location: ../page-views/super-admin/academics-account.php");
+            exit;
+        }
     } catch (Exception $e) {
         debug_log("Exception: " . $e->getMessage());
         header('Content-Type: application/json');

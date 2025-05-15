@@ -1,0 +1,22 @@
+[2025-05-15 17:17:52] Received add course request Data: {
+    "POST": {
+        "courseType": "undergrad"
+    },
+    "RAW": "courseType=undergrad"
+}
+[2025-05-15 17:17:52] Processing add course request Data: {
+    "courseType": "undergrad",
+    "subpage": "40"
+}
+[2025-05-15 17:17:52] Determined new course index Data: {
+    "highestIndex": 1,
+    "newIndex": 2
+}
+[2025-05-15 17:17:52] Successfully added new course header Data: {
+    "newCourseID": "1112",
+    "courseName": "New Undergraduate Program"
+}
+[2025-05-15 17:17:52] Added default outcome Data: {
+    "outcomeID": "1113",
+    "courseIndex": 2
+}

@@ -14,9 +14,9 @@ $acadSubpages = $acadSubpagesObj->fetchCollegeSubpages(3);
 </head>
 <body class="font-sans">
     <!-- Header -->
-    <section class="header">
-        <?php require_once '../../__includes/navbar.php'?>
-    </section>
+      <section class="header sticky top-0 z-50 bg-white" style="isolation: isolate;">
+      <?php require_once '../../__includes/navbar.php'?>
+  </section>
 
     <main class="w-full">
         <!-- Subnav -->

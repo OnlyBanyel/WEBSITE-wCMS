@@ -244,9 +244,88 @@ if (empty($gradCourses)) {
     .outcomes-list li:last-child {
         margin-bottom: 0;
     }
+
+    /* Toast notification styling */
+    .toast-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 9999;
+    }
+
+    .toast {
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.375rem;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 250px;
+        max-width: 350px;
+        animation: slideIn 0.3s ease-out forwards;
+    }
+
+    .toast-success {
+        background-color: #10b981;
+        color: white;
+    }
+
+    .toast-error {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .toast-info {
+        background-color: #3b82f6;
+        color: white;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.25rem;
+        cursor: pointer;
+        margin-left: 0.5rem;
+        opacity: 0.7;
+    }
+
+    .toast-close:hover {
+        opacity: 1;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+
+    .slide-out {
+        animation: slideOut 0.3s ease-in forwards;
+    }
 </style>
 
 <div class="bg-gray-50 min-h-screen p-4 md:p-6">
+    <!-- Toast Container for Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
     <!-- Page Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800">Courses & Programs Management</h1>
@@ -340,12 +419,13 @@ if (empty($gradCourses)) {
                         <tr class="courses-item-container">
                             <td><?php echo $i; ?></td>
                             <td>
-                                <form action="../page-functions/updateCourse.php" method="POST" class="space-y-4 course-form" name="<?php echo $courseName?>-items" id="<?php echo $courseName?>-items">
-                                    <input type="text" name="courseTitle" data-titlesectionid="<?php echo $courseData['sectionID']?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent courseTitle" id="<?php echo $courseName?>" value="<?php echo $courseName ?>">
+                                <div class="space-y-4 course-form" data-course-type="undergrad" data-course-index="<?php echo $courseData['index'] ?>">
+                                    <input type="text" name="courseTitle" data-titlesectionid="<?php echo $courseData['sectionID']?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent courseTitle" value="<?php echo $courseName ?>">
                                     <input type="hidden" name="titleSectionID" value="<?php echo $courseData['sectionID']?>">
                                     <input type="hidden" name="courseIndex" value="<?php echo $courseData['index'] ?>">
                                     <input type="hidden" name="isNew" value="<?php echo strpos($courseData['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
                                     <input type="hidden" name="courseType" value="undergrad">
+                                </div>
                             </td>
                             <td>
                                 <div class="mb-2 flex justify-between items-center">
@@ -367,7 +447,6 @@ if (empty($gradCourses)) {
                                             <input type="text" 
                                                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
                                                 name="outcome_content[]" 
-                                                id="<?php echo $courseName?>-outcomes-<?php echo $j?>" 
                                                 data-sectionid="<?php echo $outcome['sectionID']?>" 
                                                 value="<?php echo $outcome['content']?>">
                                             <input type="hidden" name="outcome_sectionid[]" value="<?php echo $outcome['sectionID']?>">
@@ -386,7 +465,6 @@ if (empty($gradCourses)) {
                                             <input type="text" 
                                                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
                                                 name="outcome_content[]" 
-                                                id="<?php echo $courseName?>-outcomes-1" 
                                                 data-sectionid="temp_outcome_<?php echo $courseData['index']; ?>_1" 
                                                 value="">
                                             <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $courseData['index']; ?>_1">
@@ -400,14 +478,15 @@ if (empty($gradCourses)) {
                             </td>
                             <td>
                                 <div class="flex flex-col space-y-2">
-                                    <input type="submit" value="Save Changes" class="submitCourse bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md cursor-pointer transition-colors text-sm">
-                                    <button type="button" class="deleteCourse bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded-md cursor-pointer transition-colors text-sm"
+                                    <button type="button" class="save-course bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md cursor-pointer transition-colors text-sm">
+                                        Save Changes
+                                    </button>
+                                    <button type="button" class="delete-course bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded-md cursor-pointer transition-colors text-sm"
                                             data-sectionid="<?php echo $courseData['sectionID']; ?>"
                                             data-coursetype="undergrad">
                                         Delete Course
                                     </button>
                                 </div>
-                                </form>
                             </td>
                         </tr>
                     <?php 
@@ -444,12 +523,13 @@ if (empty($gradCourses)) {
                         <tr class="courses-item-container">
                             <td><?php echo $i; ?></td>
                             <td>
-                                <form action="../page-functions/updateCourse.php" method="POST" class="space-y-4 course-form" name="<?php echo $courseName?>-items" id="<?php echo $courseName?>-items">
-                                    <input type="text" name="courseTitle" data-titlesectionid="<?php echo $courseData['sectionID']?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent courseTitle" id="<?php echo $courseName?>" value="<?php echo $courseName ?>">
+                                <div class="space-y-4 course-form" data-course-type="grad" data-course-index="<?php echo $courseData['index'] ?>">
+                                    <input type="text" name="courseTitle" data-titlesectionid="<?php echo $courseData['sectionID']?>" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent courseTitle" value="<?php echo $courseName ?>">
                                     <input type="hidden" name="titleSectionID" value="<?php echo $courseData['sectionID']?>">
                                     <input type="hidden" name="courseIndex" value="<?php echo $courseData['index'] ?>">
                                     <input type="hidden" name="isNew" value="<?php echo strpos($courseData['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
                                     <input type="hidden" name="courseType" value="grad">
+                                </div>
                             </td>
                             <td>
                                 <div class="mb-2 flex justify-between items-center">
@@ -471,7 +551,6 @@ if (empty($gradCourses)) {
                                             <input type="text" 
                                                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
                                                 name="outcome_content[]" 
-                                                id="<?php echo $courseName?>-outcomes-<?php echo $j?>" 
                                                 data-sectionid="<?php echo $outcome['sectionID']?>" 
                                                 value="<?php echo $outcome['content']?>">
                                             <input type="hidden" name="outcome_sectionid[]" value="<?php echo $outcome['sectionID']?>">
@@ -490,7 +569,6 @@ if (empty($gradCourses)) {
                                             <input type="text" 
                                                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
                                                 name="outcome_content[]" 
-                                                id="<?php echo $courseName?>-outcomes-1" 
                                                 data-sectionid="temp_outcome_grad_<?php echo $courseData['index']; ?>_1" 
                                                 value="">
                                             <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_grad_<?php echo $courseData['index']; ?>_1">
@@ -504,14 +582,15 @@ if (empty($gradCourses)) {
                             </td>
                             <td>
                                 <div class="flex flex-col space-y-2">
-                                    <input type="submit" value="Save Changes" class="submitCourse bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md cursor-pointer transition-colors text-sm">
-                                    <button type="button" class="deleteCourse bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded-md cursor-pointer transition-colors text-sm"
+                                    <button type="button" class="save-course bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md cursor-pointer transition-colors text-sm">
+                                        Save Changes
+                                    </button>
+                                    <button type="button" class="delete-course bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded-md cursor-pointer transition-colors text-sm"
                                             data-sectionid="<?php echo $courseData['sectionID']; ?>"
                                             data-coursetype="grad">
                                         Delete Course
                                     </button>
                                 </div>
-                                </form>
                             </td>
                         </tr>
                     <?php 
@@ -524,6 +603,42 @@ if (empty($gradCourses)) {
 </div>
 
 <script>
+    // Toast notification system
+    const toastContainer = document.getElementById('toast-container');
+    
+    function showToast(message, type = 'success', duration = 3000) {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <span>${message}</span>
+            <button class="toast-close">&times;</button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Auto-remove after duration
+        const timeout = setTimeout(() => {
+            removeToast(toast);
+        }, duration);
+        
+        // Close button functionality
+        toast.querySelector('.toast-close').addEventListener('click', () => {
+            clearTimeout(timeout);
+            removeToast(toast);
+        });
+        
+        return toast;
+    }
+    
+    function removeToast(toast) {
+        toast.classList.add('slide-out');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300); // Match the animation duration
+    }
+    
     // Tab functionality
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', () => {
@@ -542,20 +657,73 @@ if (empty($gradCourses)) {
     });
 
     // Remove outcome functionality
-    document.querySelectorAll('.remove-outcome').forEach(button => {
-        button.addEventListener('click', function() {
-            this.closest('li').remove();
-        });
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-outcome')) {
+            const sectionId = e.target.dataset.sectionid;
+            
+            // If it's a temporary outcome (not saved to DB yet), just remove it from DOM
+            if (sectionId.startsWith('temp_')) {
+                e.target.closest('li').remove();
+                return;
+            }
+            
+            // For existing outcomes, confirm before deletion
+            if (confirm('Are you sure you want to remove this outcome?')) {
+                const button = e.target;
+                const listItem = button.closest('li');
+                
+                // Show loading state
+                button.innerHTML = '...';
+                button.disabled = true;
+                
+                // Send AJAX request to delete the outcome
+                fetch('../page-functions/removeItem.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: `sectionID=${sectionId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the item from DOM with animation
+                        listItem.style.opacity = '0';
+                        listItem.style.height = '0';
+                        listItem.style.transition = 'opacity 0.3s, height 0.3s';
+                        
+                        setTimeout(() => {
+                            listItem.remove();
+                            showToast('Outcome removed successfully', 'success');
+                        }, 300);
+                    } else {
+                        showToast(data.message || 'Failed to remove outcome', 'error');
+                        button.innerHTML = '×';
+                        button.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('An error occurred while removing the outcome', 'error');
+                    button.innerHTML = '×';
+                    button.disabled = false;
+                });
+            }
+        }
     });
     
     // Add outcome functionality
-    document.querySelectorAll('.add-outcome').forEach(button => {
-        button.addEventListener('click', function() {
-            const courseType = this.dataset.course;
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('add-outcome')) {
+            const courseType = e.target.dataset.course;
             const outcomesList = document.getElementById(`outcomes-${courseType}`);
             const outcomeCount = outcomesList.querySelectorAll('li').length + 1;
             const courseIndex = courseType.split('-')[1];
             const isGrad = courseType.startsWith('grad');
+            
+            // Generate a unique temporary ID for this new outcome
+            const tempId = `temp_new_outcome_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
             
             const newOutcomeHTML = `
                 <li>
@@ -563,10 +731,10 @@ if (empty($gradCourses)) {
                         class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
                         name="outcome_content[]" 
                         value=""
-                        data-sectionid="temp_new_outcome_${outcomeCount}">
-                    <input type="hidden" name="outcome_sectionid[]" value="temp_new_outcome_${outcomeCount}">
+                        data-sectionid="${tempId}">
+                    <input type="hidden" name="outcome_sectionid[]" value="${tempId}">
                     <input type="hidden" name="outcome_isnew[]" value="1">
-                    <button type="button" class="remove-outcome" data-sectionid="temp_new_outcome_${outcomeCount}">
+                    <button type="button" class="remove-outcome" data-sectionid="${tempId}">
                         ×
                     </button>
                 </li>
@@ -574,27 +742,31 @@ if (empty($gradCourses)) {
             
             outcomesList.insertAdjacentHTML('beforeend', newOutcomeHTML);
             
-            // Attach event listener to the new remove button
-            outcomesList.querySelector(`li:last-child .remove-outcome`).addEventListener('click', function() {
-                this.closest('li').remove();
-            });
-        });
+            // Focus the new input field
+            const newInput = outcomesList.querySelector(`li:last-child input[type="text"]`);
+            if (newInput) {
+                newInput.focus();
+            }
+        }
     });
     
     // Add new course buttons
     document.getElementById('addNewUndergradCourse').addEventListener('click', function() {
-        addCourse('undergrad');
+        addNewCourse('undergrad');
     });
 
     document.getElementById('addNewGradCourse').addEventListener('click', function() {
-        addCourse('grad');
+        addNewCourse('grad');
     });
 
-    function addCourse(courseType) {
-        const button = this;
+    function addNewCourse(courseType) {
+        // Show loading state
+        const button = courseType === 'undergrad' ? 
+            document.getElementById('addNewUndergradCourse') : 
+            document.getElementById('addNewGradCourse');
+        
         const originalHTML = button.innerHTML;
         
-        // Show loading state
         button.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -612,97 +784,132 @@ if (empty($gradCourses)) {
             },
             body: `courseType=${courseType}`
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Reload the page to show the new course
-                location.reload();
+                showToast('New course added successfully!', 'success');
+                
+                // Get the current page and reload it
+                const currentPage = document.querySelector('.dynamic-load.active').dataset.file || 'page-views/courses-offered.php';
+                if (typeof loadPage === 'function') {
+                    loadPage(currentPage);
+                } else {
+                    reloadPageContent();
+                }
             } else {
-                showErrorMessage(data.message || 'Failed to add course');
+                showToast(data.message || 'Failed to add course', 'error');
+                
+                // Restore button state
+                button.innerHTML = originalHTML;
+                button.disabled = false;
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showErrorMessage('An error occurred while adding the course');
-        })
-        .finally(() => {
+            showToast('An error occurred while adding the course', 'error');
+            
             // Restore button state
             button.innerHTML = originalHTML;
             button.disabled = false;
         });
     }
 
-    // Setup form submit handler for all course forms
-    document.querySelectorAll('.course-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+    // Save course changes
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('save-course')) {
+            const row = e.target.closest('tr');
+            const courseForm = row.querySelector('.course-form');
+            const courseType = courseForm.dataset.courseType;
+            const courseIndex = courseForm.dataset.courseIndex;
             
-            // Collect all outcomes data
+            // Get form data
+            const courseTitle = courseForm.querySelector('input[name="courseTitle"]').value;
+            const titleSectionID = courseForm.querySelector('input[name="titleSectionID"]').value;
+            const isNew = courseForm.querySelector('input[name="isNew"]').value;
+            
+            // Collect all outcomes
+            const outcomesList = row.querySelector('.outcomes-list');
             const outcomes = [];
-            this.querySelectorAll('.outcome-input').forEach(input => {
-                const sectionId = input.getAttribute('data-sectionid') || input.closest('li').querySelector('input[name="outcome_sectionid[]"]').value;
-                const isNew = sectionId.startsWith('temp_') || sectionId.startsWith('temp_new_outcome_');
+            
+            outcomesList.querySelectorAll('li').forEach(li => {
+                const content = li.querySelector('input[name="outcome_content[]"]').value;
+                const sectionId = li.querySelector('input[name="outcome_content[]"]').dataset.sectionid;
+                const isNew = sectionId.startsWith('temp_');
+                
                 outcomes.push({
-                    content: input.value,
+                    content: content,
                     sectionID: sectionId,
                     isNew: isNew
                 });
             });
             
-            // Create FormData object
-            const formData = new FormData(this);
+            // Show loading state
+            const button = e.target;
+            const originalText = button.textContent;
+            button.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Saving...
+            `;
+            button.disabled = true;
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('courseTitle', courseTitle);
+            formData.append('titleSectionID', titleSectionID);
+            formData.append('isNew', isNew);
+            formData.append('courseType', courseType);
+            formData.append('courseIndex', courseIndex);
             formData.append('outcomes', JSON.stringify(outcomes));
             
-            // Check if this is a new course
-            const isNewCourse = formData.get('isNew') === '1';
-            
-            // Disable the submit button to prevent double submission
-            const submitButton = this.querySelector('input[type="submit"]');
-            submitButton.disabled = true;
-            submitButton.value = 'Saving...';
-            
             // Send AJAX request
-            fetch(this.action, {
+            fetch('../page-functions/updateCourse.php', {
                 method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
-                return response.json();
             })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showSuccessMessage('Course ' + (isNewCourse ? 'added' : 'updated') + ' successfully!');
+                    showToast('Course updated successfully!', 'success');
                     
-                    // Update the form to mark it as no longer new
-                    if (isNewCourse) {
-                        this.querySelector('input[name="isNew"]').value = '0';
+                    // If this was a new course, update the form
+                    if (isNew === '1') {
+                        courseForm.querySelector('input[name="isNew"]').value = '0';
+                    }
+                    
+                    // Get the current page and reload it
+                    const currentPage = document.querySelector('.dynamic-load.active').dataset.file || 'page-views/courses-offered.php';
+                    if (typeof loadPage === 'function') {
+                        loadPage(currentPage);
+                    } else {
+                        reloadPageContent();
                     }
                 } else {
-                    showErrorMessage(data.message || 'Failed to save course');
+                    showToast(data.message || 'Failed to save course', 'error');
+                    
+                    // Restore button state
+                    button.textContent = originalText;
+                    button.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showErrorMessage('An error occurred while saving the course');
-            })
-            .finally(() => {
-                submitButton.disabled = false;
-                submitButton.value = 'Save Changes';
+                showToast('An error occurred while saving the course', 'error');
+                
+                // Restore button state
+                button.textContent = originalText;
+                button.disabled = false;
             });
-        });
+        }
     });
 
-    // Course deletion functionality
+    // Delete course
     document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('deleteCourse')) {
+        if (e.target.classList.contains('delete-course')) {
             const button = e.target;
             const row = button.closest('tr');
             const sectionID = button.dataset.sectionid;
@@ -711,7 +918,12 @@ if (empty($gradCourses)) {
             if (confirm('Are you sure you want to delete this course and all its outcomes?')) {
                 // Show loading state
                 const originalText = button.textContent;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                button.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                    Deleting...
+                `;
                 button.disabled = true;
                 
                 // Make AJAX request
@@ -723,32 +935,40 @@ if (empty($gradCourses)) {
                     },
                     body: `sectionID=${sectionID}&courseType=${courseType}`
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Remove the row with animation
-                        row.style.opacity = '0';
-                        row.style.transition = 'opacity 0.3s ease';
-                        setTimeout(() => {
-                            row.remove();
+                        // Show success message
+                        showToast('Course deleted successfully!', 'success');
+                        
+                        // Get the current page and reload it
+                        const currentPage = document.querySelector('.dynamic-load.active').dataset.file || 'page-views/courses-offered.php';
+                        if (typeof loadPage === 'function') {
+                            loadPage(currentPage);
+                        } else {
+                            // Fallback animation if we can't reload
+                            row.style.opacity = '0';
+                            row.style.height = '0';
+                            row.style.overflow = 'hidden';
+                            row.style.transition = 'opacity 0.3s, height 0.5s';
                             
-                            // Show success message
-                            showSuccessMessage('Course deleted successfully!');
-                        }, 300);
+                            setTimeout(() => {
+                                row.remove();
+                            }, 500);
+                        }
                     } else {
-                        alert(data.message || 'Failed to delete course');
+                        showToast(data.message || 'Failed to delete course', 'error');
+                        
+                        // Restore button state
                         button.textContent = originalText;
                         button.disabled = false;
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while deleting the course');
+                    showToast('An error occurred while deleting the course', 'error');
+                    
+                    // Restore button state
                     button.textContent = originalText;
                     button.disabled = false;
                 });
@@ -756,26 +976,43 @@ if (empty($gradCourses)) {
         }
     });
     
-    // Helper functions for showing messages
-    function showSuccessMessage(message) {
-        const successMsg = document.createElement('div');
-        successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
-        successMsg.textContent = message;
-        document.body.appendChild(successMsg);
+    // Function to reload the current page content without full page refresh
+    function reloadPageContent() {
+        // Get the current page URL from the active navigation item
+        const currentPage = document.querySelector('.dynamic-load.active').dataset.file || 'page-views/courses-offered.php';
         
-        setTimeout(() => {
-            successMsg.remove();
-        }, 3000);
-    }
-    
-    function showErrorMessage(message) {
-        const errorMsg = document.createElement('div');
-        errorMsg.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
-        errorMsg.textContent = message;
-        document.body.appendChild(errorMsg);
+        // Show loading toast
+        const loadingToast = showToast('Refreshing content...', 'info');
         
-        setTimeout(() => {
-            errorMsg.remove();
-        }, 3000);
+        // Use the existing loadPage function from script.js
+        if (typeof loadPage === 'function') {
+            loadPage(currentPage);
+            
+            // Remove the loading toast after a short delay
+            setTimeout(() => {
+                removeToast(loadingToast);
+                showToast('Content updated successfully', 'success');
+            }, 1000);
+        } else {
+            // Fallback if loadPage function is not available
+            $.ajax({
+                url: currentPage,
+                type: "GET",
+                success: (response) => {
+                    $("#main-content-section").html(response);
+                    removeToast(loadingToast);
+                    showToast('Content updated successfully', 'success');
+                    
+                    // Reinitialize any necessary components
+                    if (typeof initFormHandlers === 'function') {
+                        initFormHandlers();
+                    }
+                },
+                error: () => {
+                    removeToast(loadingToast);
+                    showToast('Failed to refresh content', 'error');
+                }
+            });
+        }
     }
 </script>

@@ -59,6 +59,9 @@ $contentManage = $accManagementObj->fetchContentManagers();
             box-shadow: 0 10px 25px -5px rgba(189, 15, 3, 0.1), 0 8px 10px -6px rgba(189, 15, 3, 0.1);
         }
     </style>
+    <!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
 </head>
 <body class="bg-gray-50">
     <div class="container mx-auto py-10 px-4">
@@ -173,136 +176,133 @@ $contentManage = $accManagementObj->fetchContentManagers();
         
         
         <!-- Content Manager Accounts Section -->
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Content Manager Accounts</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <?php if(!empty($contentManage)): ?>
-                <?php foreach($contentManage as $manager): ?>
-                    <div class="transform transition duration-300 hover:-translate-y-2 hover:shadow-lg">
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
-                            <div class="bg-gray-100 p-6 border-b-2 border-gray-200 text-center">
-                                <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-3 border-white shadow-md">
+<h2 class="text-2xl font-bold text-gray-800 mb-6">Content Manager Accounts</h2>
+
+<div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+    <?php if(!empty($contentManage)): ?>
+        <div class="p-4">
+            <table id="accountsTable" class="w-full stripe hover" style="width:100%">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-3 text-left">Profile</th>
+                        <th class="px-4 py-3 text-left">Name</th>
+                        <th class="px-4 py-3 text-left">Email</th>
+                        <th class="px-4 py-3 text-left">Role</th>
+                        <th class="px-4 py-3 text-left">Department</th>
+                        <th class="px-4 py-3 text-left">Established</th>
+                        <th class="px-4 py-3 text-left">Status</th>
+                        <th class="px-4 py-3 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($contentManage as $manager): ?>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-3">
+                                <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-200">
                                     <?php if(!empty($manager['profileImg'])): ?>
                                         <img src="<?php echo htmlspecialchars($manager['profileImg']); ?>" class="w-full h-full object-cover" alt="Profile Image">
                                     <?php else: ?>
                                         <img src="/WEBSITE-wCMS/imgs/profiles/default-profile.png" class="w-full h-full object-cover" alt="Default Profile">
                                     <?php endif; ?>
                                 </div>
-                                <h5 class="text-xl font-semibold">
-                                    <?php echo htmlspecialchars($manager['firstName'] . ' ' . $manager['lastName']); ?>
-                                </h5>
-                                
+                            </td>
+                            <td class="px-4 py-3 font-medium">
+                                <?php echo htmlspecialchars($manager['firstName'] . ' ' . $manager['lastName']); ?>
+                            </td>
+                            <td class="px-4 py-3">
+                                <?php echo htmlspecialchars($manager['email']); ?>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="px-3 py-1 text-xs font-semibold text-white bg-cyan-600 rounded-full">
+                                    <?php 
+                                    echo isset($manager['roleName']) ? htmlspecialchars($manager['roleName']) : 'Role ID: ' . htmlspecialchars($manager['role_id']); 
+                                    ?>
+                                </span>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="px-3 py-1 text-xs font-semibold text-white bg-green-600 rounded-full">
+                                    <?php 
+                                    echo isset($manager['pageName']) ? htmlspecialchars($manager['pageName']) : 'Page ID: ' . htmlspecialchars($manager['pageID']); 
+                                    ?>
+                                </span>
+                                <?php if(!empty($manager['subpage_assigned']) || !empty($manager['subPageName'])): ?>
+                                    <br>
+                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-amber-500 rounded-full mt-1 inline-block">
+                                        <?php 
+                                        echo isset($manager['subPageName']) ? htmlspecialchars($manager['subPageName']) : htmlspecialchars($manager['subpage_assigned']); 
+                                        ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-4 py-3">
+                                <?php if(!empty($manager['established_year'])): ?>
+                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-blue-600 rounded-full">
+                                        <?php echo htmlspecialchars($manager['established_year']); ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span class="text-gray-400">-</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-4 py-3">
                                 <?php if(isset($manager['status']) && $manager['status'] == 0): ?>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 mt-2 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         Suspended
                                     </span>
                                 <?php else: ?>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 mt-2 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
                                         Active
                                     </span>
                                 <?php endif; ?>
-                            </div>
-                            <div class="p-6 flex-grow">
-                                <div class="flex items-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                    <span class="text-gray-700"><?php echo htmlspecialchars($manager['email']); ?></span>
-                                </div>
-                                
-                                <div class="flex items-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-cyan-600 rounded-full">
-                                        <?php 
-                                        echo isset($manager['roleName']) ? htmlspecialchars($manager['roleName']) : 'Role ID: ' . htmlspecialchars($manager['role_id']); 
-                                        ?>
-                                    </span>
-                                </div>
-                                
-                                <div class="flex items-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-green-600 rounded-full">
-                                        <?php 
-                                        echo isset($manager['pageName']) ? htmlspecialchars($manager['pageName']) : 'Page ID: ' . htmlspecialchars($manager['pageID']); 
-                                        ?>
-                                    </span>
-                                </div>
-                                
-                                <?php if(!empty($manager['subpage_assigned']) || !empty($manager['subPageName'])): ?>
-                                <div class="flex items-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                                    </svg>
-                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-amber-500 rounded-full">
-                                        <?php 
-                                        echo isset($manager['subPageName']) ? htmlspecialchars($manager['subPageName']) : htmlspecialchars($manager['subpage_assigned']); 
-                                        ?>
-                                    </span>
-                                </div>
-                                <?php endif; ?>
-                                
-                                <?php if(!empty($manager['established_year'])): ?>
-                                <div class="flex items-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                                    </svg>
-                                    <span class="px-3 py-1 text-xs font-semibold text-white bg-blue-600 rounded-full">
-                                        Established: <?php echo htmlspecialchars($manager['established_year']); ?>
-                                    </span>
-                                </div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 text-center">
+                            </td>
+                            <td class="px-4 py-3">
                                 <?php if(isset($manager['status']) && $manager['status'] == 0): ?>
-                                    <form method="POST" class="inline status-form">
+                                    <form method="POST" action="../page-functions/update-account-status.php" class="inline status-form">
                                         <input type="hidden" name="manager_id" value="<?php echo $manager['id']; ?>">
                                         <input type="hidden" name="reactivate_account" value="1">
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
+                                        <button type="submit" class="inline-flex items-center px-3 py-1 bg-green-600 text-white text-xs font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            Reactivate Account
+                                            Reactivate
                                         </button>
                                     </form>
                                 <?php else: ?>
-                                    <form method="POST" class="inline status-form">
+                                    <form method="POST" action="../page-functions/update-account-status.php" class="inline status-form">
                                         <input type="hidden" name="manager_id" value="<?php echo $manager['id']; ?>">
                                         <input type="hidden" name="suspend_account" value="1">
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
+                                        <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-600 text-white text-xs font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                             </svg>
-                                            Suspend Account
+                                            Suspend
                                         </button>
                                     </form>
                                 <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="col-span-3">
-                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded" role="alert">
-                        <div class="flex">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>No content manager accounts found.</span>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
+    <?php else: ?>
+        <div class="p-6">
+            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded" role="alert">
+                <div class="flex">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>No content manager accounts found.</span>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
     </div>
 
     <script>
@@ -492,5 +492,80 @@ document.getElementById('togglePassword').addEventListener('click', function() {
     }
 });
     </script>
+<!-- DataTables JS -->
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#accountsTable').DataTable({
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 0 },
+                { responsivePriority: 2, targets: 1 },
+                { responsivePriority: 3, targets: 7 }
+            ],
+            language: {
+                search: "Search accounts:",
+                lengthMenu: "Show _MENU_ accounts per page",
+                info: "Showing _START_ to _END_ of _TOTAL_ accounts",
+                emptyTable: "No content manager accounts found"
+            }
+        });
+    });
+</script>
+<!-- Add this JavaScript at the end of the file, just before the closing </body> tag -->
+<script>
+    // Handle form submissions via AJAX to prevent page reload
+    $(document).ready(function() {
+        $('.status-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            const form = $(this);
+            const managerId = form.find('input[name="manager_id"]').val();
+            const row = form.closest('tr');
+            
+            $.ajax({
+                url: '../page-functions/update-account-status.php',
+                type: 'POST',
+                data: form.serialize(),
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        // Show success message
+                        const successMessage = $(`
+                            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded fixed top-4 right-4 z-50 shadow-lg">
+                                <div class="flex">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>${response.message}</span>
+                                </div>
+                            </div>
+                        `);
+                        
+                        $('body').append(successMessage);
+                        
+                        // Remove success message after 3 seconds
+                        setTimeout(() => {
+                            successMessage.fadeOut(function() {
+                                $(this).remove();
+                            });
+                        }, 3000);
+                        
+                        // Refresh the table row to show updated status
+                        location.reload();
+                    } else {
+                        // Show error message
+                        alert(response.message || 'An error occurred while updating the account status.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

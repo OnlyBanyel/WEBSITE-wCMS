@@ -109,9 +109,9 @@ $pageTitle = "Elementary Department";
 
 <body class="font-inter antialiased text-gray-800 overflow-x-hidden bg-gray-50">
     <!-- Header Section -->
-    <section class="header m-0 p-0">
-        <?php require_once '../../__includes/navbar.php'?>
-    </section>
+      <section class="header sticky top-0 z-50 bg-white" style="isolation: isolate;">
+      <?php require_once '../../__includes/navbar.php'?>
+  </section>
 
     <main class="w-full">
         <!-- Subnav -->

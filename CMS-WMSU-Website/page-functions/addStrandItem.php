@@ -22,6 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $strandDesc = isset($_POST['strandDesc']) ? trim($_POST['strandDesc']) : '';
         $strandEndDesc = isset($_POST['strandEndDesc']) ? trim($_POST['strandEndDesc']) : '';
         
+        // Debug log
+        error_log("Adding strand: " . $strandName . " to subpage: " . $subpage);
+        
         // Validate required fields
         if (empty($strandName)) {
             throw new Exception("Strand name is required");
@@ -35,6 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
+        // Generate a unique identifier for this strand group
+        $strandGroupId = uniqid('strand_');
+        
         // Insert new strand name
         $strandID = $pagesObj->addContent(
             $subpage,
@@ -42,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'text',
             $strandName,
             '',
-            'strand-name'
+            'strand-name',
+            $strandGroupId
         );
         
         if (!$strandID) {
@@ -56,7 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'text',
             $strandDesc,
             '',
-            'strand-desc'
+            'strand-desc',
+            $strandGroupId
         );
         
         if (!$descID) {
@@ -70,7 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'text',
             $strandEndDesc,
             '',
-            'strand-desc-end'
+            'strand-desc-end',
+            $strandGroupId
         );
         
         if (!$endDescID) {
@@ -78,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Handle outcomes if provided
-        if (isset($_POST['outcome_content'])) {
+        if (isset($_POST['outcome_content']) && is_array($_POST['outcome_content'])) {
             foreach ($_POST['outcome_content'] as $index => $content) {
                 if (!empty(trim($content))) {
                     $itemNumber = $index + 1;
@@ -88,7 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'text',
                         trim($content),
                         '',
-                        'strand-item-' . $itemNumber
+                        'strand-item-' . $itemNumber,
+                        $strandGroupId
                     );
                     
                     if (!$outcomeID) {
@@ -103,7 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'message' => 'Strand added successfully',
             'strandID' => $strandID,
             'descID' => $descID,
-            'endDescID' => $endDescID
+            'endDescID' => $endDescID,
+            'strandGroupId' => $strandGroupId
         ]);
         
     } catch (Exception $e) {

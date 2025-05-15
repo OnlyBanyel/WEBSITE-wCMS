@@ -2,6 +2,9 @@
 session_start();
 require_once "../classes/pages.class.php";
 
+// Set content type to JSON
+header('Content-Type: application/json');
+
 // Check if user is logged in
 if (!isset($_SESSION['account'])) {
     echo json_encode(['success' => false, 'message' => 'You must be logged in to perform this action.']);
@@ -13,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pagesObj = new Pages();
     
     // Log received data for debugging
-    file_put_contents('updateStrand.log', print_r($_POST, true), FILE_APPEND);
+    error_log("Updating strand with data: " . print_r($_POST, true));
 
     // Get form data
     $subpage = isset($_POST['subpage']) ? intval($_POST['subpage']) : 31; // Default to SHS subpage
@@ -27,47 +30,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $strandEndDesc = $_POST['strandEndDesc'];
     
     try {
-
         // Handle strand name (main strand entry)
         if ($isNew) {
             // Create new strand
-            $strandID = $pagesObj->addPageSection([
-                'subpage' => $subpage,
-                'indicator' => 'Strand',
-                'description' => 'strand-name',
-                'content' => $strandName
-            ]);
+            $strandID = $pagesObj->addContent(
+                $subpage,
+                'Strand',
+                'text',
+                $strandName,
+                '',
+                'strand-name'
+            );
+            
+            if (!$strandID) {
+                throw new Exception("Failed to add strand name");
+            }
             
             // Create description
-            $descID = $pagesObj->addPageSection([
-                'subpage' => $subpage,
-                'indicator' => 'Strand',
-                'description' => 'strand-desc',
-                'content' => $strandDesc
-            ]);
+            $descID = $pagesObj->addContent(
+                $subpage,
+                'Strand',
+                'text',
+                $strandDesc,
+                '',
+                'strand-desc'
+            );
+            
+            if (!$descID) {
+                throw new Exception("Failed to add strand description");
+            }
             
             // Create end description
-            $endDescID = $pagesObj->addPageSection([
-                'subpage' => $subpage,
-                'indicator' => 'Strand',
-                'description' => 'strand-desc-end',
-                'content' => $strandEndDesc
-            ]);
+            $endDescID = $pagesObj->addContent(
+                $subpage,
+                'Strand',
+                'text',
+                $strandEndDesc,
+                '',
+                'strand-desc-end'
+            );
+            
+            if (!$endDescID) {
+                throw new Exception("Failed to add strand end description");
+            }
         } else {
             // Update existing strand
-            $pagesObj->updatePageSection($strandID, [
-                'content' => $strandName
-            ]);
+            $pagesObj->changeContent($strandID, $subpage, $strandName);
             
             // Update description
-            $pagesObj->updatePageSection($descID, [
-                'content' => $strandDesc
-            ]);
+            $pagesObj->changeContent($descID, $subpage, $strandDesc);
             
             // Update end description
-            $pagesObj->updatePageSection($endDescID, [
-                'content' => $strandEndDesc
-            ]);
+            $pagesObj->changeContent($endDescID, $subpage, $strandEndDesc);
         }
         
         // Handle outcomes/subjects
@@ -78,22 +92,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             for ($i = 0; $i < count($outcomeContents); $i++) {
                 $content = $outcomeContents[$i];
-                $sectionID = isset($outcomeSectionIDs[$i]) ? $outcomeSectionIDs[$i] : null;
+                $sectionID = isset($outcomeSectionIDs[$i]) && !empty($outcomeSectionIDs[$i]) ? $outcomeSectionIDs[$i] : null;
                 $isNewOutcome = isset($outcomeIsNew[$i]) && $outcomeIsNew[$i] === '1';
+                
+                if (empty(trim($content))) {
+                    continue; // Skip empty outcomes
+                }
                 
                 if ($isNewOutcome || is_null($sectionID)) {
                     // Create new outcome
-                    $pagesObj->addPageSection([
-                        'subpage' => $subpage,
-                        'indicator' => 'Strand',
-                        'description' => 'strand-item-' . ($i + 1),
-                        'content' => $content
-                    ]);
+                    $itemNumber = $i + 1;
+                    $outcomeID = $pagesObj->addContent(
+                        $subpage,
+                        'Strand',
+                        'text',
+                        trim($content),
+                        '',
+                        'strand-item-' . $itemNumber
+                    );
+                    
+                    if (!$outcomeID) {
+                        throw new Exception("Failed to add strand outcome");
+                    }
                 } else {
                     // Update existing outcome
-                    $pagesObj->updatePageSection($sectionID, [
-                        'content' => $content
-                    ]);
+                    $pagesObj->changeContent($sectionID, $subpage, trim($content));
                 }
             }
         }

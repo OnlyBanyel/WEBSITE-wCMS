@@ -1,52 +1,52 @@
 <?php
 session_start();
-require_once '../classes/login.class.php';
-require_once '../classes/pages.class.php';
+require_once "../classes/pages.class.php";
+require_once "../classes/login.class.php";
 
-$loginObj = new Login;
-$pagesObj = new Pages;
+// Initialize response array
+$response = ['success' => false, 'message' => ''];
 
+// Check if user is logged in
+if (!isset($_SESSION['account'])) {
+    $response['message'] = 'Unauthorized access';
+    echo json_encode($response);
+    exit;
+}
+
+// Initialize classes
+$pagesObj = new Pages();
+$loginObj = new Login();
+
+// Get subpage from session
+$subpage = $_SESSION['account']['subpage_assigned'];
+
+// Handle adding new carousel image slot
 if (isset($_POST['addNewCarouselImage'])) {
-    $subpage = $_SESSION['account']['subpage_assigned'];
-    
-    // Add a new empty carousel image entry
+    // Add new carousel image slot to database
     $result = $pagesObj->addContent(
         $subpage,
         'College Profile',
         'image',
-        null,
-        '', // Empty path for new image
+        '',
+        '',
         'carousel-img'
     );
     
-    if ($result['success']) {
+    if ($result) {
+        $response['success'] = true;
+        $response['message'] = 'New carousel image slot added successfully';
+        $response['sectionID'] = $result;
+        
         // Refresh session data
-        unset($_SESSION['collegeData']);
         $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
-        
-        // Count how many carousel images we have now
-        $carouselCount = 0;
-        foreach ($_SESSION['collegeData'] as $data) {
-            if ($data['indicator'] == 'College Profile' && $data['description'] == 'carousel-img') {
-                $carouselCount++;
-            }
-        }
-        
-        echo json_encode([
-            "success" => true,
-            "message" => "New carousel image slot added successfully",
-            "newIndex" => $carouselCount,
-            "sectionID" => $result['sectionID'] // Return the new section ID
-        ]);
     } else {
-        echo json_encode([
-            "success" => false,
-            "message" => "Failed to add new carousel image slot"
-        ]);
+        $response['message'] = 'Failed to add new carousel image slot to database';
     }
 } else {
-    echo json_encode([
-        "success" => false,
-        "message" => "Invalid request"
-    ]);
+    $response['message'] = 'Invalid request';
 }
+
+// Return JSON response
+header('Content-Type: application/json');
+echo json_encode($response);
+?>

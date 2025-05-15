@@ -634,3 +634,34 @@ Array
         )
 
 )
+Array
+(
+    [subpage] => 31
+    [strandID] => 1032
+    [descID] => 1061
+    [endDescID] => 1062
+    [isNew] => 0
+    [strandName] => GAS
+    [strandDesc] => HEY
+    [strandEndDesc] => HWEY
+    [outcomeContent] => Array
+        (
+            [0] => bababaaba
+        )
+
+    [outcome_content] => Array
+        (
+            [0] => bababaaba
+        )
+
+    [outcome_sectionid] => Array
+        (
+            [0] => 
+        )
+
+    [outcome_isnew] => Array
+        (
+            [0] => 1
+        )
+
+)

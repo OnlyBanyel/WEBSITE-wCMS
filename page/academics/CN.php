@@ -264,15 +264,42 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
           scroll-behavior: smooth;
       }
   
-      
-      /* Carousel fade animation */
-      .carousel-item.active {
-          animation: fadeIn 1.5s ease-in-out;
+      /* Smooth carousel sliding without white space */
+      .carousel-inner {
+          position: relative;
+          width: 100%;
+          overflow: hidden;
       }
       
-      @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+      .carousel-item {
+          position: relative;
+          display: none;
+          float: left;
+          width: 100%;
+          margin-right: -100%;
+          backface-visibility: hidden;
+          transition: transform 0.6s ease-in-out;
+      }
+      
+      .carousel-item.active,
+      .carousel-item-next,
+      .carousel-item-prev {
+          display: block;
+      }
+      
+      .carousel-item-next:not(.carousel-item-start),
+      .active.carousel-item-end {
+          transform: translateX(100%);
+      }
+      
+      .carousel-item-prev:not(.carousel-item-end),
+      .active.carousel-item-start {
+          transform: translateX(-100%);
+      }
+      
+      .carousel-item-next.carousel-item-start,
+      .carousel-item-prev.carousel-item-end {
+          transform: translateX(0);
       }
       
       /* Department card hover effect */
@@ -480,9 +507,9 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
       
       /* Add proper spacing for department cards */
       .dept-card-container {
-          padding: 2rem !important;
+          padding: 1rem !important;
           margin: 0 auto !important;
-          max-width: 1200px !important;
+          max-width: 1600px !important;
           margin: 0 auto !important;
       }
       
@@ -492,9 +519,9 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
       
       /* Fix container padding for all sections */
       .section-container {
-          padding-left: 2rem !important;
-          padding-right: 2rem !important;
-          max-width: 1400px !important;
+          padding-left: 1rem !important;
+          padding-right: 1rem !important;
+          max-width: 1600px !important;
           margin: 0 auto !important;
       }
       
@@ -507,8 +534,8 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
       
       /* Fix accordion spacing */
       .accordion-container {
-          padding: 0 2rem !important;
-          max-width: 1200px !important;
+          padding: 0 1rem !important;
+          max-width: 1600px !important;
           margin: 0 auto !important;
       }
       
@@ -557,26 +584,84 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
           }
       }
 
-      /* Add additional styling for better content spacing */
+      /* Improved syllabus section styling */
       .syllabus-section {
-          padding: 1rem;
-          background-color: rgba(255, 255, 255, 0.7);
+          border-radius: 0.75rem;
+          background-color: white;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          overflow: hidden;
+      }
+      
+      .syllabus-header {
+          background-color: rgba(189, 15, 3, 0.1);
+          padding: 1rem 1.5rem;
+          border-bottom: 2px solid rgba(189, 15, 3, 0.2);
+      }
+      
+      .syllabus-content {
+          padding: 1.5rem;
+      }
+      
+      .syllabus-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1.5rem;
+      }
+      
+      .syllabus-item {
+          background-color: rgba(255, 255, 255, 0.8);
           border-radius: 0.5rem;
-          margin-top: 1rem;
-          margin-bottom: 1rem;
+          padding: 1rem;
+          border-left: 3px solid #BD0F03;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      }
+      
+      .syllabus-item h5 {
+          color: #BD0F03;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          font-size: 1rem;
+      }
+      
+      .syllabus-item ul {
+          padding-left: 1.5rem;
+      }
+      
+      .syllabus-item ul li {
+          margin-bottom: 0.25rem;
+          position: relative;
+      }
+      
+      .syllabus-item ul li::before {
+          content: '';
+          position: absolute;
+          left: -1rem;
+          top: 0.5rem;
+          width: 6px;
+          height: 6px;
+          background-color: #BD0F03;
+          border-radius: 50%;
+      }
+      
+      .tag {
+          display: inline-block;
+          padding: 0.25rem 0.75rem;
+          border-radius: 9999px;
+          font-size: 0.875rem;
+          font-weight: 500;
+          margin-right: 0.5rem;
+          margin-bottom: 0.5rem;
+          background-color: rgba(189, 15, 3, 0.1);
+          color: #BD0F03;
       }
 
-      /* Improve responsive layout for smaller screens */
-      @media (max-width: 768px) {
-          .accordion-content .px-4 {
-              padding-left: 0.75rem !important;
-              padding-right: 0.75rem !important;
-          }
-          
-          .accordion-content .py-4 {
-              padding-top: 0.75rem !important;
-              padding-bottom: 0.75rem !important;
-          }
+      /* Ensure consistent border radius */
+      .rounded-2xl, .rounded-xl, .rounded-t-2xl, .rounded-b-2xl {
+          border-radius: 1rem !important;
+      }
+      
+      .rounded-full {
+          border-radius: 9999px !important;
       }
   </style>
   <!-- Google Fonts -->
@@ -587,9 +672,9 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body class="font-inter antialiased text-gray-800 overflow-x-hidden bg-gray-50">
+<body class="font-inter antialiased overflow-x-hidden bg-gray-50">
   <!-- Header Section -->
-  <section class="header">
+  <section class="header sticky top-0 z-50 bg-white" style="isolation: isolate;">
       <?php require_once '../../__includes/navbar.php'?>
   </section>
 
@@ -605,15 +690,25 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
           <div class="relative h-[650px] md:h-[700px] w-full overflow-hidden">
               <!-- Carousel Images -->
               <div class="absolute inset-0 w-full h-full">
-                  <div id="carouselHero" class="carousel slide relative h-full" data-bs-ride="carousel">
+                  <div id="carouselHero" class="carousel slide relative h-full" data-bs-ride="carousel" data-bs-interval="4000">
                       <div class="carousel-inner h-full">
                           <?php foreach ($carouselItem as $index => $img) { ?>
-                              <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?> h-full" data-bs-interval="4000">
+                              <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?> h-full">
                                   <div class="absolute inset-0 bg-gradient-to-b from-black/70 to-primary/60"></div>
                                   <img src="<?php echo $img['imagePath'] ?>" class="h-full w-full object-cover" alt="CCS Carousel Image">
                               </div>
                           <?php } ?>
                       </div>          
+                      
+                      <!-- Carousel Controls -->
+                      <button class="carousel-control-prev" type="button" data-bs-target="#carouselHero" data-bs-slide="prev">
+                          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                          <span class="visually-hidden">Previous</span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#carouselHero" data-bs-slide="next">
+                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                          <span class="visually-hidden">Next</span>
+                      </button>
                       
                       <!-- Carousel Indicators -->
                       <div class="carousel-indicators absolute bottom-4">
@@ -625,7 +720,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
               </div>
               
               <!-- College Logo & Title Overlay -->
-              <div class="absolute inset-0 flex flex-col items-center justify-center z-10 px-4 md:px-8">
+              <div class="absolute inset-0 flex flex-col items-center justify-center z-0 px-4 md:px-8">
                   <div class="bg-primary/10 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl animate-fade">
                       <img src="<?php echo $carouselLogoImage ?>" class="h-32 w-32 sm:h-48 sm:w-48 md:h-80 md:w-80 drop-shadow-lg animate-pulse-slow" alt="CCS Logo">
                   </div>
@@ -737,14 +832,14 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
               </div>
               
               <!-- Undergraduate Programs -->
-              <div class="accordion-container mb-12 md:mb-20">
+              <div class="accordion-container mb-8 md:mb-10">
                   <div class="bg-primary py-4 md:py-6 px-4 md:px-8 rounded-t-2xl">
                       <h2 class="text-xl sm:text-2xl md:text-4xl font-bold text-white text-center font-montserrat">
                           Undergraduate Programs
                       </h2>
                   </div>
                   
-                  <div class="max-w-4xl mx-auto bg-white rounded-b-2xl shadow-custom overflow-hidden">
+                  <div class="w-full mx-auto bg-white rounded-b-2xl shadow-custom overflow-hidden">
                       <?php foreach ($undergradCourses as $courseName => $courseData) { ?>
                           <div class="border-b border-gray-200 last:border-b-0">
                               <!-- Accordion Header -->
@@ -775,60 +870,68 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
                                           <?php } ?>
                                       </ul>
                                       
-                                      <!-- Course Syllabus Section -->
-                                      <div class="mt-6 pt-6 border-t border-gray-200">
-   <h4 class="font-bold text-base md:text-lg text-primary mb-3 md:mb-4 red-underline inline-block">Course Syllabus:</h4>
-   
-   <div class="space-y-4 syllabus-section">
-       <div>
-           <h5 class="text-sm font-semibold text-gray-800">Course Description:</h5>
-           <p class="text-sm text-gray-700 mt-1">This course provides a comprehensive introduction to the fundamental concepts and practices of <?php echo $courseName; ?>. Students will develop both theoretical knowledge and practical skills necessary for success in the computing industry.</p>
-       </div>
-       
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-           <div>
-               <h5 class="text-sm font-semibold text-gray-800">Units/Credits:</h5>
-               <p class="text-sm text-gray-700 mt-1">3 Units</p>
-           </div>
-           
-           <div>
-               <h5 class="text-sm font-semibold text-gray-800">Prerequisites:</h5>
-               <p class="text-sm text-gray-700 mt-1">Introduction to Computing, Basic Programming</p>
-           </div>
-       </div>
-       
-       <div>
-           <h5 class="text-sm font-semibold text-gray-800">Main Topics:</h5>
-           <ul class="mt-1 space-y-1 pl-4 list-disc text-sm text-gray-700">
-               <li>Fundamental principles and theories</li>
-               <li>Current industry practices and standards</li>
-               <li>Problem-solving methodologies</li>
-               <li>Practical application development</li>
-               <li>Ethical considerations in computing</li>
-           </ul>
-       </div>
-       
-       <div>
-           <h5 class="text-sm font-semibold text-gray-800">Learning Outcomes:</h5>
-           <ul class="mt-1 space-y-1 pl-4 list-disc text-sm text-gray-700">
-               <li>Demonstrate proficiency in core concepts</li>
-               <li>Apply theoretical knowledge to practical scenarios</li>
-               <li>Develop critical thinking and analytical skills</li>
-               <li>Create solutions to complex computing problems</li>
-           </ul>
-       </div>
-       
-       <div>
-           <h5 class="text-sm font-semibold text-gray-800">Assessment Methods:</h5>
-           <ul class="mt-1 space-y-1 pl-4 list-disc text-sm text-gray-700">
-               <li>Written examinations (40%)</li>
-               <li>Practical projects (30%)</li>
-               <li>Assignments and quizzes (20%)</li>
-               <li>Class participation (10%)</li>
-           </ul>
-       </div>
-   </div>
-</div>
+                                      <!-- Course Syllabus Section - Improved UI -->
+                                      <div class="mt-6 pt-4 border-t border-gray-200">
+                                          <div class="syllabus-section">
+                                              <div class="syllabus-header">
+                                                  <h4 class="font-bold text-primary">Course Syllabus</h4>
+                                              </div>
+                                              <div class="syllabus-content">
+                                                  <div class="mb-4">
+                                                      <div class="flex flex-wrap gap-2 mb-4">
+                                                          <span class="tag"><i class="fas fa-graduation-cap mr-1"></i> 3 Units</span>
+                                                          <span class="tag"><i class="fas fa-clock mr-1"></i> 54 Hours</span>
+                                                          <span class="tag"><i class="fas fa-book mr-1"></i> Undergraduate</span>
+                                                      </div>
+                                                      
+                                                      <h5 class="text-lg font-semibold text-gray-800 mb-2">Course Description</h5>
+                                                      <p class="text-gray-700 mb-4">This course provides a comprehensive introduction to the fundamental concepts and practices of <?php echo $courseName; ?>. Students will develop both theoretical knowledge and practical skills necessary for success in the computing industry.</p>
+                                                  </div>
+                                                  
+                                                  <div class="syllabus-grid">
+                                                      <div class="syllabus-item">
+                                                          <h5><i class="fas fa-list-check mr-1"></i> Main Topics</h5>
+                                                          <ul class="text-sm text-gray-700">
+                                                              <li>Fundamental principles and theories</li>
+                                                              <li>Current industry practices and standards</li>
+                                                              <li>Problem-solving methodologies</li>
+                                                              <li>Practical application development</li>
+                                                              <li>Ethical considerations in computing</li>
+                                                          </ul>
+                                                      </div>
+                                                      
+                                                      <div class="syllabus-item">
+                                                          <h5><i class="fas fa-bullseye mr-1"></i> Learning Outcomes</h5>
+                                                          <ul class="text-sm text-gray-700">
+                                                              <li>Demonstrate proficiency in core concepts</li>
+                                                              <li>Apply theoretical knowledge to practical scenarios</li>
+                                                              <li>Develop critical thinking and analytical skills</li>
+                                                              <li>Create solutions to complex computing problems</li>
+                                                          </ul>
+                                                      </div>
+                                                      
+                                                      <div class="syllabus-item">
+                                                          <h5><i class="fas fa-tasks mr-1"></i> Assessment Methods</h5>
+                                                          <ul class="text-sm text-gray-700">
+                                                              <li>Written examinations (40%)</li>
+                                                              <li>Practical projects (30%)</li>
+                                                              <li>Assignments and quizzes (20%)</li>
+                                                              <li>Class participation (10%)</li>
+                                                          </ul>
+                                                      </div>
+                                                      
+                                                      <div class="syllabus-item">
+                                                          <h5><i class="fas fa-book-open mr-1"></i> Prerequisites</h5>
+                                                          <ul class="text-sm text-gray-700">
+                                                              <li>Introduction to Computing</li>
+                                                              <li>Basic Programming</li>
+                                                              <li>Mathematics for Computing</li>
+                                                          </ul>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
                                        
                                        <div class="mt-4 md:mt-6 flex justify-end">
                                            <a href="#" class="inline-flex items-center text-primary font-medium hover:text-primaryDark transition-colors duration-300 group">
@@ -853,7 +956,7 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
                        </h2>
                    </div>
                    
-                   <div class="max-w-4xl mx-auto bg-white rounded-b-2xl shadow-custom overflow-hidden">
+                   <div class="w-full mx-auto bg-white rounded-b-2xl shadow-custom overflow-hidden">
                        <?php foreach ($gradCourses as $courseName => $courseData) { ?>
                            <div class="border-b border-gray-200 last:border-b-0">
                                <!-- Accordion Header -->
@@ -882,73 +985,69 @@ if (isset($currentGrad) && preg_match('/grad-course-list-items-\d+$/', $item["de
                                            <?php } ?>
                                        </ul>
                                        
-                                       <!-- Course Syllabus Section -->
-                                       <div class="mt-6 pt-6 border-t border-gray-200">
-   <h4 class="font-bold text-base md:text-lg text-primary mb-3 md:mb-4 red-underline inline-block">Course Syllabus:</h4>
-   
-   <div class="space-y-4 syllabus-section">
-       <div>
-           <h5 class="text-sm font-semibold text-gray-800">Course Description:</h5>
-           <p class="text-sm text-gray-700 mt-1">This advanced graduate course explores cutting-edge concepts and methodologies in <?php echo $courseName; ?>. Students will engage with current research, develop specialized knowledge, and contribute to the field through original research projects.</p>
-       </div>
-       
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-           <div>
-               <h5 class="text-sm font-semibold text-gray-800">Units/Credits:</h5>
-               <p class="text-sm text-gray-700 mt-1">4 Units</p>
-           </div>
-           
-           <div>
-               <h5 class="text-sm font-semibold text-gray-800">Prerequisites:</h5>
-               <p class="text-sm text-gray-700 mt-1">Bachelor's degree in Computing or related field, Advanced Programming</p>
-           </div>
-       </div>
-       
-       <div>
-           <h5 class="text-sm font-semibold text-gray-800">Main Topics:</h5>
-           <ul class="mt-1 space-y-1 pl-4 list-disc text-sm text-gray-700">
-               <li>Advanced theoretical frameworks</li>
-               <li>Current research trends and innovations</li>
-               <li>Specialized methodologies and techniques</li>
-               <li>Industry applications and case studies</li>
-               <li>Ethical and societal implications</li>
-           </ul>
-       </div>
-       
-       <div>
-           <h5 class="text-sm font-semibold text-gray-800">Research Component:</h5>
-           <p class="text-sm text-gray-700 mt-1">Students are required to complete a substantial research project that contributes to the field. This includes:</p>
-           <ul class="mt-1 space-y-1 pl-4 list-disc text-sm text-gray-700">
-               <li>Literature review of current research</li>
-               <li>Development of research proposal</li>
-               <li>Implementation of research methodology</li>
-               <li>Analysis and interpretation of results</li>
-               <li>Presentation and defense of findings</li>
-           </ul>
-       </div>
-       
-       <div>
-           <h5 class="text-sm font-semibold text-gray-800">Learning Outcomes:</h5>
-           <ul class="mt-1 space-y-1 pl-4 list-disc text-sm text-gray-700">
-               <li>Demonstrate expertise in advanced concepts</li>
-               <li>Critically evaluate current research and methodologies</li>
-               <li>Design and conduct original research</li>
-               <li>Develop innovative solutions to complex problems</li>
-               <li>Communicate research findings effectively</li>
-           </ul>
-       </div>
-       
-       <div>
-           <h5 class="text-sm font-semibold text-gray-800">Assessment Methods:</h5>
-           <ul class="mt-1 space-y-1 pl-4 list-disc text-sm text-gray-700">
-               <li>Research project (50%)</li>
-               <li>Written examinations (25%)</li>
-               <li>Seminar presentations (15%)</li>
-               <li>Class participation and discussion (10%)</li>
-           </ul>
-       </div>
-   </div>
-</div>
+                                       <!-- Course Syllabus Section - Improved UI -->
+                                       <div class="mt-6 pt-4 border-t border-gray-200">
+                                          <div class="syllabus-section">
+                                              <div class="syllabus-header">
+                                                  <h4 class="font-bold text-primary">Course Syllabus</h4>
+                                              </div>
+                                              <div class="syllabus-content">
+                                                  <div class="mb-4">
+                                                      <div class="flex flex-wrap gap-2 mb-4">
+                                                          <span class="tag"><i class="fas fa-graduation-cap mr-1"></i> 4 Units</span>
+                                                          <span class="tag"><i class="fas fa-clock mr-1"></i> 72 Hours</span>
+                                                          <span class="tag"><i class="fas fa-book mr-1"></i> Graduate</span>
+                                                      </div>
+                                                      
+                                                      <h5 class="text-lg font-semibold text-gray-800 mb-2">Course Description</h5>
+                                                      <p class="text-gray-700 mb-4">This advanced graduate course explores cutting-edge concepts and methodologies in <?php echo $courseName; ?>. Students will engage with current research, develop specialized knowledge, and contribute to the field through original research projects.</p>
+                                                  </div>
+                                                  
+                                                  <div class="syllabus-grid">
+                                                      <div class="syllabus-item">
+                                                          <h5><i class="fas fa-list-check mr-1"></i> Main Topics</h5>
+                                                          <ul class="text-sm text-gray-700">
+                                                              <li>Advanced theoretical frameworks</li>
+                                                              <li>Current research trends and innovations</li>
+                                                              <li>Specialized methodologies and techniques</li>
+                                                              <li>Industry applications and case studies</li>
+                                                              <li>Ethical and societal implications</li>
+                                                          </ul>
+                                                      </div>
+                                                      
+                                                      <div class="syllabus-item">
+                                                          <h5><i class="fas fa-flask mr-1"></i> Research Component</h5>
+                                                          <ul class="text-sm text-gray-700">
+                                                              <li>Literature review of current research</li>
+                                                              <li>Development of research proposal</li>
+                                                              <li>Implementation of research methodology</li>
+                                                              <li>Analysis and interpretation of results</li>
+                                                              <li>Presentation and defense of findings</li>
+                                                          </ul>
+                                                      </div>
+                                                      
+                                                      <div class="syllabus-item">
+                                                          <h5><i class="fas fa-tasks mr-1"></i> Assessment Methods</h5>
+                                                          <ul class="text-sm text-gray-700">
+                                                              <li>Research project (50%)</li>
+                                                              <li>Written examinations (25%)</li>
+                                                              <li>Seminar presentations (15%)</li>
+                                                              <li>Class participation (10%)</li>
+                                                          </ul>
+                                                      </div>
+                                                      
+                                                      <div class="syllabus-item">
+                                                          <h5><i class="fas fa-book-open mr-1"></i> Prerequisites</h5>
+                                                          <ul class="text-sm text-gray-700">
+                                                              <li>Bachelor's degree in Computing or related field</li>
+                                                              <li>Advanced Programming</li>
+                                                              <li>Research Methods</li>
+                                                          </ul>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
                                        
                                        <div class="mt-4 md:mt-6 flex justify-end">
                                            <a href="#" class="inline-flex items-center text-primary font-medium hover:text-primaryDark transition-colors duration-300 group">

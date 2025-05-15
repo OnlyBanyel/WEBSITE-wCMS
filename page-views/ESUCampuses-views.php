@@ -343,7 +343,7 @@
 </head>
 <body>
      <div class="relative z-10 subnav-container">
-            <?php require_once '../__includes/subnav_academics.php' ?>
+            <?php require_once '../../__includes/subnav_academics.php' ?>
         </div>
     <div class="container">
         <header>

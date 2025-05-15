@@ -76,6 +76,9 @@ if (empty($genInfoImgs)) {
     ];
 }
 
+// Debug image data
+// echo "<pre>Image Data: " . print_r($genInfoImgs, true) . "</pre>";
+
 // Set the current page for the preview component
 $previewPage = 'college-overview';
 ?>
@@ -285,6 +288,68 @@ $previewPage = 'college-overview';
         max-height: 100%;
         object-fit: contain;
     }
+    
+    /* Toast notification */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+    
+    .toast {
+        padding: 12px 20px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 300px;
+        max-width: 450px;
+        animation: slideIn 0.3s ease-out forwards;
+    }
+    
+    .toast-success {
+        background-color: #10b981;
+        color: white;
+    }
+    
+    .toast-error {
+        background-color: #ef4444;
+        color: white;
+    }
+    
+    .toast-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
 </style>
 
 <div class="bg-gray-50 min-h-screen p-4 md:p-6">
@@ -293,13 +358,15 @@ $previewPage = 'college-overview';
         <h1 class="text-3xl font-bold text-gray-800">College Overview Management</h1>
         <p class="text-gray-600 mt-2">Edit and manage the college overview section of your website</p>
         <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-            <p class="text-sm text-blue-700"><strong>Note:</strong> The preview below shows how your content will appear on the actual website. Changes you make will be reflected in real-time.</p>
+            <p class="text-sm text-blue-700"><strong>Note:</strong> Changes you make will be saved when you click the "Save Changes" button.</p>
         </div>
     </div>
 
     <!-- Universal Preview Section -->
-    <?php include_once "../components/universal-preview.php"; ?>
-
+    
+    <!-- Toast Container for Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+    
     <!-- Tabbed Interface -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
         <!-- Tab Navigation -->
@@ -329,7 +396,7 @@ $previewPage = 'college-overview';
                 $listType = 'CG-list-item';
                 ?>
                 
-                <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-preview="true">
+                <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-section-type="goals" data-section-index="<?php echo $q; ?>">
                     <table class="overview-table">
                         <thead>
                             <tr>
@@ -349,7 +416,7 @@ $previewPage = 'college-overview';
                             <tr>
                                 <td class="font-medium">Section Content</td>
                                 <td>
-                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input">
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input" data-section-type="goals">
                                     <input type="hidden" name="topContentSectionID" value="<?php echo $headSectionID; ?>">
                                     <input type="hidden" name="topContentIsNew" value="<?php echo strpos($headSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
                                 </td>
@@ -357,7 +424,7 @@ $previewPage = 'college-overview';
                             <tr>
                                 <td class="font-medium align-top pt-4">Outcomes</td>
                                 <td>
-                                    <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>">
+                                    <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>" data-section-type="goals">
                                         <?php 
                                         $i = 1; 
                                         if (!empty($listItems)) {
@@ -371,9 +438,12 @@ $previewPage = 'college-overview';
                                                     data-sectionid="<?php echo $item['sectionID']; ?>" 
                                                     value="<?php echo $item['content']; ?>"
                                                     data-section-id="<?php echo $item['sectionID']; ?>" 
-                                                    data-element-name="Outcome Input">
+                                                    data-element-name="Outcome Input"
+                                                    data-section-type="goals"
+                                                    data-outcome-type="<?php echo $listType; ?>">
                                                 <input type="hidden" name="outcome_sectionid[]" value="<?php echo $item['sectionID']; ?>">
                                                 <input type="hidden" name="outcome_isnew[]" value="0">
+                                                <input type="hidden" name="outcome_type[]" value="<?php echo $listType; ?>">
                                                 <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']; ?>">
                                                     ×
                                                 </button>
@@ -392,7 +462,9 @@ $previewPage = 'college-overview';
                                                     data-sectionid="temp_outcome_<?php echo $q; ?>_1" 
                                                     value=""
                                                     data-section-id="temp_outcome_<?php echo $q; ?>_1" 
-                                                    data-element-name="Outcome Input">
+                                                    data-element-name="Outcome Input"
+                                                    data-section-type="goals"
+                                                    data-outcome-type="<?php echo $listType; ?>">
                                                 <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $q; ?>_1">
                                                 <input type="hidden" name="outcome_isnew[]" value="1">
                                                 <input type="hidden" name="outcome_type[]" value="<?php echo $listType; ?>">
@@ -403,7 +475,7 @@ $previewPage = 'college-overview';
                                         <?php } ?>
                                     </ul>
                                     <div class="mt-3">
-                                        <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listType; ?>">Add Outcome</button>
+                                        <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listType; ?>" data-section-type="goals">Add Outcome</button>
                                     </div>
                                 </td>
                             </tr>
@@ -434,7 +506,7 @@ $previewPage = 'college-overview';
                 $listType = 'CM-list-item';
                 ?>
                 
-                <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-preview="true">
+                <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-section-type="mission" data-section-index="<?php echo $q; ?>">
                     <table class="overview-table">
                         <thead>
                             <tr>
@@ -454,7 +526,7 @@ $previewPage = 'college-overview';
                             <tr>
                                 <td class="font-medium">Section Content</td>
                                 <td>
-                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input">
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input" data-section-type="mission">
                                     <input type="hidden" name="topContentSectionID" value="<?php echo $headSectionID; ?>">
                                     <input type="hidden" name="topContentIsNew" value="<?php echo strpos($headSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
                                 </td>
@@ -462,7 +534,7 @@ $previewPage = 'college-overview';
                             <tr>
                                 <td class="font-medium align-top pt-4">Outcomes</td>
                                 <td>
-                                    <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>">
+                                    <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>" data-section-type="mission">
                                         <?php 
                                         $i = 1; 
                                         if (!empty($listItems)) {
@@ -476,9 +548,12 @@ $previewPage = 'college-overview';
                                                     data-sectionid="<?php echo $item['sectionID']; ?>" 
                                                     value="<?php echo $item['content']; ?>"
                                                     data-section-id="<?php echo $item['sectionID']; ?>" 
-                                                    data-element-name="Outcome Input">
+                                                    data-element-name="Outcome Input"
+                                                    data-section-type="mission"
+                                                    data-outcome-type="<?php echo $listType; ?>">
                                                 <input type="hidden" name="outcome_sectionid[]" value="<?php echo $item['sectionID']; ?>">
                                                 <input type="hidden" name="outcome_isnew[]" value="0">
+                                                <input type="hidden" name="outcome_type[]" value="<?php echo $listType; ?>">
                                                 <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']; ?>">
                                                     ×
                                                 </button>
@@ -497,7 +572,9 @@ $previewPage = 'college-overview';
                                                     data-sectionid="temp_outcome_<?php echo $q; ?>_1" 
                                                     value=""
                                                     data-section-id="temp_outcome_<?php echo $q; ?>_1" 
-                                                    data-element-name="Outcome Input">
+                                                    data-element-name="Outcome Input"
+                                                    data-section-type="mission"
+                                                    data-outcome-type="<?php echo $listType; ?>">
                                                 <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $q; ?>_1">
                                                 <input type="hidden" name="outcome_isnew[]" value="1">
                                                 <input type="hidden" name="outcome_type[]" value="<?php echo $listType; ?>">
@@ -508,7 +585,7 @@ $previewPage = 'college-overview';
                                         <?php } ?>
                                     </ul>
                                     <div class="mt-3">
-                                        <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listType; ?>">Add Outcome</button>
+                                        <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listType; ?>" data-section-type="mission">Add Outcome</button>
                                     </div>
                                 </td>
                             </tr>
@@ -539,7 +616,7 @@ $previewPage = 'college-overview';
                 $listType = 'CV-list-item';
                 ?>
                 
-                <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-preview="true">
+                <form action="#" method="POST" class="space-y-4 overview-form" name="<?php echo $titleContent; ?>-overviewItems" id="<?php echo $titleContent; ?>-overviewItems" data-section-type="vision" data-section-index="<?php echo $q; ?>">
                     <table class="overview-table">
                         <thead>
                             <tr>
@@ -559,7 +636,7 @@ $previewPage = 'college-overview';
                             <tr>
                                 <td class="font-medium">Section Content</td>
                                 <td>
-                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input">
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent overview-top-content styleable <?php echo $styler->getElementClassString($headSectionID); ?>" name="overviewTopContent" id="overview-top-content-<?php echo $q; ?>" data-sectionid="<?php echo $headSectionID; ?>" value="<?php echo $headContent; ?>" data-section-id="<?php echo $headSectionID; ?>" data-element-name="Section Content Input" data-section-type="vision">
                                     <input type="hidden" name="topContentSectionID" value="<?php echo $headSectionID; ?>">
                                     <input type="hidden" name="topContentIsNew" value="<?php echo strpos($headSectionID, 'temp_') === 0 ? '1' : '0'; ?>">
                                 </td>
@@ -567,7 +644,7 @@ $previewPage = 'college-overview';
                             <tr>
                                 <td class="font-medium align-top pt-4">Outcomes</td>
                                 <td>
-                                    <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>">
+                                    <ul class="outcomes-list space-y-3" id="outcomes-list-<?php echo $q; ?>" data-section-type="vision">
                                         <?php 
                                         $i = 1; 
                                         if (!empty($listItems)) {
@@ -581,9 +658,12 @@ $previewPage = 'college-overview';
                                                     data-sectionid="<?php echo $item['sectionID']; ?>" 
                                                     value="<?php echo $item['content']; ?>"
                                                     data-section-id="<?php echo $item['sectionID']; ?>" 
-                                                    data-element-name="Outcome Input">
+                                                    data-element-name="Outcome Input"
+                                                    data-section-type="vision"
+                                                    data-outcome-type="<?php echo $listType; ?>">
                                                 <input type="hidden" name="outcome_sectionid[]" value="<?php echo $item['sectionID']; ?>">
                                                 <input type="hidden" name="outcome_isnew[]" value="0">
+                                                <input type="hidden" name="outcome_type[]" value="<?php echo $listType; ?>">
                                                 <button type="button" class="remove-outcome btn btn-danger" data-sectionid="<?php echo $item['sectionID']; ?>">
                                                     ×
                                                 </button>
@@ -602,7 +682,9 @@ $previewPage = 'college-overview';
                                                     data-sectionid="temp_outcome_<?php echo $q; ?>_1" 
                                                     value=""
                                                     data-section-id="temp_outcome_<?php echo $q; ?>_1" 
-                                                    data-element-name="Outcome Input">
+                                                    data-element-name="Outcome Input"
+                                                    data-section-type="vision"
+                                                    data-outcome-type="<?php echo $listType; ?>">
                                                 <input type="hidden" name="outcome_sectionid[]" value="temp_outcome_<?php echo $q; ?>_1">
                                                 <input type="hidden" name="outcome_isnew[]" value="1">
                                                 <input type="hidden" name="outcome_type[]" value="<?php echo $listType; ?>">
@@ -613,7 +695,7 @@ $previewPage = 'college-overview';
                                         <?php } ?>
                                     </ul>
                                     <div class="mt-3">
-                                        <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listType; ?>">Add Outcome</button>
+                                        <button type="button" class="add-outcome bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-md transition-colors styleable" data-section="<?php echo $q; ?>" data-type="<?php echo $listType; ?>" data-section-type="vision">Add Outcome</button>
                                     </div>
                                 </td>
                             </tr>
@@ -688,6 +770,37 @@ $previewPage = 'college-overview';
 <?php include_once "../components/save-all-button.php"; ?>
 
 <script>
+    // Toast notification system
+    function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div>${message}</div>
+            <button class="toast-close">&times;</button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Auto-remove after 5 seconds
+        const timeout = setTimeout(() => {
+            removeToast(toast);
+        }, 5000);
+        
+        // Close button
+        toast.querySelector('.toast-close').addEventListener('click', () => {
+            clearTimeout(timeout);
+            removeToast(toast);
+        });
+    }
+    
+    function removeToast(toast) {
+        toast.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }
+    
     // File input display
     document.querySelectorAll('input[type="file"]').forEach(input => {
         input.addEventListener('change', function() {
@@ -716,48 +829,99 @@ $previewPage = 'college-overview';
     
     // Add outcome functionality
     document.querySelectorAll('.add-outcome').forEach(button => {
-        button.addEventListener('click', function() {
-            const form = this.closest('.overview-form');
-            const outcomesList = form.querySelector('.outcomes-list');
-            const formName = form.getAttribute('name');
-            const nextIndex = outcomesList.querySelectorAll('li').length + 1;
-            
-            // Generate a temporary ID for new items (negative number)
-            const tempSectionID = 'temp_outcome_' + Math.floor(Math.random() * 1000000);
-            
-            const newOutcome = document.createElement('li');
-            newOutcome.className = 'flex items-center gap-2';
-            newOutcome.innerHTML = `
-                <input type="text" 
-                       name="outcome_content[]" 
-                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
-                       id="${formName}-${nextIndex}-outcomes" 
-                       data-sectionid="${tempSectionID}" 
-                       data-is-new="true" 
-                       value="">
-                <input type="hidden" name="outcome_sectionid[]" value="${tempSectionID}">
-                <input type="hidden" name="outcome_isnew[]" value="1">
-                <button type="button" class="remove-outcome btn btn-danger" data-sectionid="${tempSectionID}">×</button>
-            `;
-            
-            outcomesList.appendChild(newOutcome);
-            
-            // Add event listener to the new remove button
-            newOutcome.querySelector('.remove-outcome').addEventListener('click', function() {
-                this.closest('li').remove();
-                updatePreview();
-            });
-            
-            // Update preview
-            updatePreview();
-        });
+        // Remove any existing event listeners to prevent duplicates
+        button.removeEventListener('click', addOutcomeHandler);
+        // Add the event listener
+        button.addEventListener('click', addOutcomeHandler);
     });
+
+    // Define the handler function separately to avoid duplicates
+    function addOutcomeHandler(event) {
+        // Prevent default behavior and stop propagation
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const form = this.closest('.overview-form');
+        const outcomesList = form.querySelector('.outcomes-list');
+        const formName = form.getAttribute('name');
+        const nextIndex = outcomesList.querySelectorAll('li').length + 1;
+        const sectionType = this.getAttribute('data-type');
+        const sectionCategory = this.getAttribute('data-section-type');
+        
+        // Generate a temporary ID for new items
+        const tempSectionID = 'temp_outcome_' + Math.floor(Math.random() * 1000000);
+        
+        const newOutcome = document.createElement('li');
+        newOutcome.className = 'flex items-center gap-2';
+        newOutcome.innerHTML = `
+            <input type="text" 
+                   name="outcome_content[]" 
+                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent outcome-input"
+                   id="${formName}-${nextIndex}-outcomes" 
+                   data-sectionid="${tempSectionID}" 
+                   data-is-new="true" 
+                   data-section-type="${sectionCategory}"
+                   data-outcome-type="${sectionType}"
+                   value="">
+            <input type="hidden" name="outcome_sectionid[]" value="${tempSectionID}">
+            <input type="hidden" name="outcome_isnew[]" value="1">
+            <input type="hidden" name="outcome_type[]" value="${sectionType}">
+            <button type="button" class="remove-outcome btn btn-danger" data-sectionid="${tempSectionID}">×</button>
+        `;
+        
+        outcomesList.appendChild(newOutcome);
+        
+        // Add event listener to the new remove button
+        newOutcome.querySelector('.remove-outcome').addEventListener('click', function() {
+            this.closest('li').remove();
+        });
+        
+        // Log to confirm only one item was added
+        console.log('Added new outcome item');
+    }
     
     // Remove outcome functionality
     document.querySelectorAll('.remove-outcome').forEach(button => {
         button.addEventListener('click', function() {
-            this.closest('li').remove();
-            updatePreview();
+            const sectionID = this.getAttribute('data-sectionid');
+            const listItem = this.closest('li');
+            
+            // If this is a temporary item (not yet saved to database), just remove it
+            if (sectionID.startsWith('temp_')) {
+                listItem.remove();
+                return;
+            }
+            
+            // Otherwise, send AJAX request to delete from database
+            if (confirm('Are you sure you want to delete this item?')) {
+                fetch('../page-functions/removeItem.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        sectionID: sectionID
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the item from the DOM
+                        listItem.remove();
+                        
+                        // Show success message
+                        showToast('Item deleted successfully', 'success');
+                    } else {
+                        // Show error message
+                        showToast('Error: ' + (data.message || 'Failed to delete item'), 'error');
+                        console.error('Delete error:', data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('An error occurred while deleting the item. Please try again.', 'error');
+                });
+            }
         });
     });
     
@@ -766,31 +930,144 @@ $previewPage = 'college-overview';
         button.addEventListener('click', function() {
             const form = this.closest('form');
             const formData = new FormData(form);
+            const sectionType = form.getAttribute('data-section-type');
             
-            // Update the preview first
-            updatePreview();
+            // Add section type to form data
+            formData.append('section_type', sectionType);
             
             // Show saving indicator
             const originalText = this.textContent;
             this.textContent = 'Saving...';
             this.disabled = true;
             
-            // Simulate saving (just update preview in this case)
-            setTimeout(() => {
-                this.textContent = 'Saved!';
+            // Send AJAX request to save the data
+            fetch('../page-functions/updateOverviewItem.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.textContent = 'Saved!';
+                    
+                    // Update any temporary IDs with new permanent IDs
+                    if (data.newItems) {
+                        data.newItems.forEach(item => {
+                            const input = form.querySelector(`input[data-sectionid="${item.tempId}"]`);
+                            if (input) {
+                                input.setAttribute('data-sectionid', item.newId);
+                                const hiddenInput = input.nextElementSibling;
+                                if (hiddenInput) {
+                                    hiddenInput.value = item.newId;
+                                }
+                            }
+                        });
+                    }
+                    
+                    showToast('Changes saved successfully', 'success');
+                    
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.disabled = false;
+                    }, 1000);
+                } else {
+                    this.textContent = 'Error!';
+                    console.error('Save error:', data);
+                    showToast('Error: ' + (data.message || 'Failed to save changes'), 'error');
+                    
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.disabled = false;
+                    }, 1000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.textContent = 'Error!';
+                showToast('An error occurred while saving. Please try again.', 'error');
                 
                 setTimeout(() => {
                     this.textContent = originalText;
                     this.disabled = false;
                 }, 1000);
-            }, 500);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.textContent = 'Error!';
+                showToast('An error occurred while saving. Please try again.', 'error');
+                
+                setTimeout(() => {
+                    this.textContent = originalText;
+                    this.disabled = false;
+                }, 1000);
+            });
         });
     });
     
     // Initialize input change listeners
     document.querySelectorAll('input, textarea, select').forEach(input => {
         input.addEventListener('input', function() {
-            markUnsavedChanges();
+            // Mark form as having unsaved changes
+            const form = this.closest('form');
+            if (form) {
+                form.classList.add('has-changes');
+            }
+        });
+    });
+    
+    // Handle form submission for image uploads
+    document.querySelector('form[enctype="multipart/form-data"]')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fileInput = this.querySelector('input[type="file"]');
+        if (fileInput && fileInput.files.length === 0) {
+            showToast('Please select a file to upload', 'error');
+            return;
+        }
+        
+        const formData = new FormData(this);
+        
+        // Show loading indicator
+        const submitButton = this.querySelector('input[type="submit"]');
+        const originalText = submitButton.value;
+        submitButton.value = 'Uploading...';
+        submitButton.disabled = true;
+        
+        fetch('../page-functions/uploadOverviewImg.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Image uploaded successfully', 'success');
+                
+                // Update the image preview
+                const imagePreview = this.querySelector('.image-preview');
+                if (imagePreview) {
+                    imagePreview.innerHTML = `<img src="${data.newPath}" alt="Overview Image" class="max-w-full max-h-full object-contain">`;
+                }
+                
+                // Reset the file input
+                fileInput.value = '';
+                this.querySelector('.file-name').textContent = 'Choose a file...';
+                
+                // Reload the page to reflect changes
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                showToast('Error: ' + (data.message || 'Failed to upload image'), 'error');
+            }
+            
+            submitButton.value = originalText;
+            submitButton.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('An error occurred while uploading. Please try again.', 'error');
+            
+            submitButton.value = originalText;
+            submitButton.disabled = false;
         });
     });
 </script>

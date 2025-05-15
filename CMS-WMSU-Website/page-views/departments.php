@@ -227,53 +227,79 @@ while (count($genInfoImgs) < count($departments)) {
                 </thead>
                 <tbody>
                     <?php 
-                    $i = 0;
-                    foreach ($departments as $items) { ?>
-                        <tr>
-                            <td><?php echo $i + 1; ?></td>
-                            <td>
-                                <form action="../page-functions/uploadDeptImgs.php" method="POST" class="departmentForm" id="departmentForm-<?php echo isset($genInfoImgs[$i]) ? $genInfoImgs[$i]['sectionID'] : 'temp_'.$i; ?>" enctype="multipart/form-data">
-                                    <input type="text" name="deptName" class="deptName w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="deptName" data-textid="<?php echo $items['sectionID']?>" value="<?php echo $items['content']?>">
-                                    <input type="hidden" name="textID" value="<?php echo $items['sectionID']?>">
-                                    <input type="hidden" name="isNew" value="<?php echo strpos($items['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
-                                    <input type="hidden" name="sectionID" value="<?php echo isset($genInfoImgs[$i]) ? $genInfoImgs[$i]['sectionID'] : 'temp_img_'.$i; ?>">
-                                    <input type="hidden" name="imgIsNew" value="<?php echo (!isset($genInfoImgs[$i]) || empty($genInfoImgs[$i]['imagePath'])) ? '1' : '0'; ?>">
-                            </td>
-                            <td>
-                                <?php if (!empty($genInfoImgs[$i]['imagePath'])) { ?>
-                                    <img src="<?php echo $genInfoImgs[$i]['imagePath'] ?>" alt="Department Image" class="img-preview">
-                                <?php } else { ?>
-                                    <div class="img-placeholder">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                <?php } ?>
-                            </td>
-                            <td>
-                                <div class="relative">
-                                    <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="deptImg" id="deptImg-<?php echo isset($genInfoImgs[$i]) ? $genInfoImgs[$i]['sectionID'] : 'temp_'.$i; ?>" accept="image/*">
-                                    <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
-                                        <span class="file-name">Choose a new image...</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="flex space-x-2">
-                                    <button type="submit" class="changeDeptImg bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm">Save</button>
-                                    <button type="button" class="deleteDeptBtn bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm" 
-                                            data-textid="<?php echo $items['sectionID']?>"
-                                            data-isnew="<?php echo strpos($items['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
-                                        Delete
-                                    </button>
-                                </div>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php $i++; } ?>
+$i = 0;
+foreach ($departments as $items) { ?>
+    <tr>
+        <td><?php echo $i + 1; ?></td>
+        <td>
+            <!-- Department Name Form -->
+            <form action="../page-functions/uploadDeptImgs.php" method="POST" class="departmentNameForm" id="departmentNameForm-<?php echo $items['sectionID']; ?>" enctype="multipart/form-data">
+                <input type="text" name="deptName" class="deptName w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="deptName" data-textid="<?php echo $items['sectionID']?>" value="<?php echo $items['content']?>">
+                <input type="hidden" name="textID" value="<?php echo $items['sectionID']?>">
+                <input type="hidden" name="isNew" value="<?php echo strpos($items['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
+                <input type="hidden" name="updateType" value="name">
+                
+                <div class="mt-2">
+                    <button type="submit" class="saveDeptName bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Save Name
+                    </button>
+                </div>
+            </form>
+        </td>
+        <td>
+            <?php if (!empty($genInfoImgs[$i]['imagePath'])) { ?>
+                <img src="<?php echo $genInfoImgs[$i]['imagePath'] ?>" alt="Department Image" class="img-preview">
+            <?php } else { ?>
+                <div class="img-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+            <?php } ?>
+        </td>
+        <td>
+            <!-- Department Image Form -->
+            <form action="../page-functions/uploadDeptImgs.php" method="POST" class="departmentImageForm" id="departmentImageForm-<?php echo isset($genInfoImgs[$i]) ? $genInfoImgs[$i]['sectionID'] : 'temp_'.$i; ?>" enctype="multipart/form-data">
+                <input type="hidden" name="textID" value="<?php echo $items['sectionID']?>">
+                <input type="hidden" name="sectionID" value="<?php echo isset($genInfoImgs[$i]) ? $genInfoImgs[$i]['sectionID'] : 'temp_img_'.$i; ?>">
+                <input type="hidden" name="imgIsNew" value="<?php echo (!isset($genInfoImgs[$i]) || empty($genInfoImgs[$i]['imagePath'])) ? '1' : '0'; ?>">
+                <input type="hidden" name="updateType" value="image">
+                
+                <div class="relative">
+                    <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="deptImg" id="deptImg-<?php echo isset($genInfoImgs[$i]) ? $genInfoImgs[$i]['sectionID'] : 'temp_'.$i; ?>" accept="image/*">
+                    <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
+                        <span class="file-name">Choose a new image...</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="mt-2">
+                    <button type="submit" class="saveDeptImg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Save Image
+                    </button>
+                </div>
+            </form>
+        </td>
+        <td>
+            <button type="button" class="deleteDeptBtn bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm" 
+                    data-textid="<?php echo $items['sectionID']?>"
+                    data-isnew="<?php echo strpos($items['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete
+            </button>
+        </td>
+    </tr>
+<?php $i++; } ?>
                 </tbody>
             </table>
         </div>

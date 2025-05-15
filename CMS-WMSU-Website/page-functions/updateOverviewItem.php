@@ -1,136 +1,203 @@
 <?php
 session_start();
-require_once '../classes/login.class.php';
-require_once '../classes/pages.class.php';
+require_once "../classes/pages.class.php";
+require_once "../classes/login.class.php";
 
-$loginObj = new Login();
+// Check if user is logged in
+if (!isset($_SESSION['account'])) {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+    exit;
+}
+
+// Initialize classes
 $pagesObj = new Pages();
+$loginObj = new Login();
 
-header('Content-Type: application/json'); // Ensure JSON response
+// Get the subpage from the session
+$subpage = $_SESSION['account']['subpage_assigned'];
 
-// Collect errors for debugging
-$errors = [];
+// Debug information
+$debug = [];
+$debug['post_data'] = $_POST;
+$debug['section_type'] = isset($_POST['section_type']) ? $_POST['section_type'] : 'unknown';
 
-// Check if required fields are set
-if (isset($_POST['overviewTitle']) && isset($_POST['overviewSectionID'])) {
-    $overviewTitle = $_POST['overviewTitle'];
-    $overviewSectionID = $_POST['overviewSectionID'];
-    $subpage = $_SESSION['account']['subpage_assigned'];
-
-    // Check if this is a completely new item
-    $isNewItem = isset($_POST['isNewItem']) && $_POST['isNewItem'] === '1';
-
-    // Try updating overview title
-    if ($isNewItem || strpos($overviewSectionID, 'temp_') === 0) {
-        // Add new title
-        $newSectionID = $pagesObj->addContent(
-            $subpage,
-            'College Overview',
-            'text',
-            $overviewTitle,
-            null,
-            $overviewSectionID === 'temp_title_0' ? 'geninfo-front-title' : 
-            ($overviewSectionID === 'temp_title_1' ? 'geninfo-front-title' : 'geninfo-front-title')
-        );
+// Process the form data
+try {
+    // Process section title
+    if (isset($_POST['overviewTitle']) && isset($_POST['overviewSectionID'])) {
+        $isNew = isset($_POST['isNew']) && $_POST['isNew'] === '1';
+        $sectionID = $_POST['overviewSectionID'];
+        $sectionType = isset($_POST['sectionType']) ? (int)$_POST['sectionType'] : 0;
         
-        if (!$newSectionID) {
-            $errors[] = "Failed to create new overview title.";
-        }
-    } else {
-        // Update existing title
-        $updateTitle = $pagesObj->changeContent($overviewSectionID, $subpage, $overviewTitle);
-        if (!$updateTitle) {
-            $errors[] = "Failed to update overview title (SectionID: $overviewSectionID).";
-        }
-    }
-
-    // Try updating overview top content (if provided)
-    $updateTopContent = true;
-    if (isset($_POST['overviewTopContent']) && isset($_POST['topContentSectionID'])) {
-        $overviewTopContent = $_POST['overviewTopContent'];
-        $topContentSectionID = $_POST['topContentSectionID'];
+        // Determine the correct description based on section type
+        $description = 'geninfo-front-title';
         
-        if ($isNewItem || strpos($topContentSectionID, 'temp_') === 0) {
-            // Add new content
-            $newTopContentID = $pagesObj->addContent(
+        if ($isNew || strpos($sectionID, 'temp_') === 0) {
+            // Add new title
+            $result = $pagesObj->addContent(
                 $subpage,
                 'College Overview',
                 'text',
-                $overviewTopContent,
+                $_POST['overviewTitle'],
                 null,
-                'geninfo-back-head'
+                $description
             );
             
-            if (!$newTopContentID) {
-                $errors[] = "Failed to create new overview content.";
-                $updateTopContent = false;
+            if (!$result) {
+                throw new Exception("Failed to add overview title");
             }
+            
+            $debug['title_added'] = true;
+            $debug['title_id'] = $result;
+        } else {
+            // Update existing title
+            $result = $pagesObj->changeContent($sectionID, $subpage, $_POST['overviewTitle']);
+            
+            if (!$result) {
+                throw new Exception("Failed to update overview title");
+            }
+            
+            $debug['title_updated'] = true;
+        }
+    }
+    
+    // Process section content
+    if (isset($_POST['overviewTopContent']) && isset($_POST['topContentSectionID'])) {
+        $isNew = isset($_POST['topContentIsNew']) && $_POST['topContentIsNew'] === '1';
+        $sectionID = $_POST['topContentSectionID'];
+        $sectionType = isset($_POST['section_type']) ? $_POST['section_type'] : '';
+        
+        // Determine the correct description based on section type
+        $description = 'geninfo-back-head';
+        
+        // Debug
+        $debug['content_section_type'] = $sectionType;
+        $debug['content_section_id'] = $sectionID;
+        $debug['content_is_new'] = $isNew;
+        
+        if ($isNew || strpos($sectionID, 'temp_') === 0) {
+            // Add new content
+            $result = $pagesObj->addContent(
+                $subpage,
+                'College Overview',
+                'text',
+                $_POST['overviewTopContent'],
+                null,
+                $description
+            );
+            
+            if (!$result) {
+                throw new Exception("Failed to add overview content");
+            }
+            
+            $debug['content_added'] = true;
+            $debug['content_id'] = $result;
         } else {
             // Update existing content
-            $updateTopContent = $pagesObj->changeContent($topContentSectionID, $subpage, $overviewTopContent);
-            if (!$updateTopContent) {
-                $errors[] = "Failed to update overview top content (SectionID: $topContentSectionID).";
+            $result = $pagesObj->changeContent($sectionID, $subpage, $_POST['overviewTopContent']);
+            
+            if (!$result) {
+                throw new Exception("Failed to update overview content");
             }
+            
+            $debug['content_updated'] = true;
         }
     }
-
-    // Decode outcomes JSON
-    $outcomes = [];
-    if (isset($_POST['outcomes'])) {
-        $outcomes = json_decode($_POST['outcomes'], true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $errors[] = "Invalid outcomes format.";
-        }
-    }
-
-    // Try updating outcomes
-    $updateOutcomes = true;
-    foreach ($outcomes as $outcome) {
-        if (isset($outcome['content']) && isset($outcome['sectionID'])) {
-            // Handle new items (negative sectionID)
-            if (isset($outcome['isNew']) && $outcome['isNew']) {
-                // Add new content - you'll need to implement addContent() in your Pages class
-                $newSectionID = $pagesObj->addContent(
+    
+    // Process outcomes
+    $newItems = [];
+    if (isset($_POST['outcome_content']) && is_array($_POST['outcome_content'])) {
+        $outcomes = $_POST['outcome_content'];
+        $sectionIDs = $_POST['outcome_sectionid'] ?? [];
+        $isNew = $_POST['outcome_isnew'] ?? [];
+        $outcomeTypes = $_POST['outcome_type'] ?? [];
+        $sectionType = isset($_POST['section_type']) ? $_POST['section_type'] : '';
+        
+        // Debug
+        $debug['outcomes_section_type'] = $sectionType;
+        $debug['outcomes_count'] = count($outcomes);
+        
+        // Map section types to outcome types
+        $outcomeTypeMap = [
+            'goals' => 'CG-list-item',
+            'mission' => 'CM-list-item',
+            'vision' => 'CV-list-item'
+        ];
+        
+        // Default outcome type
+        $defaultOutcomeType = $outcomeTypeMap[$sectionType] ?? 'CG-list-item';
+        
+        foreach ($outcomes as $index => $content) {
+            if (empty($content)) continue;
+            
+            $itemSectionID = $sectionIDs[$index] ?? '';
+            $itemIsNew = isset($isNew[$index]) && ($isNew[$index] === '1' || $isNew[$index] === true);
+            $outcomeType = $outcomeTypes[$index] ?? $defaultOutcomeType;
+            
+            // Debug
+            $debug['outcome_' . $index] = [
+                'content' => $content,
+                'section_id' => $itemSectionID,
+                'is_new' => $itemIsNew,
+                'outcome_type' => $outcomeType
+            ];
+            
+            if ($itemIsNew || strpos($itemSectionID, 'temp_') === 0) {
+                // Add new outcome
+                $result = $pagesObj->addContent(
                     $subpage,
-                    'College Overview', // Adjust indicator as needed
+                    'College Overview',
                     'text',
-                    $outcome['content'],
+                    $content,
                     null,
-                    'CG-list-item' // Adjust description as needed
+                    $outcomeType
                 );
                 
-                if (!$newSectionID) {
-                    $errors[] = "Failed to create new outcome.";
-                    $updateOutcomes = false;
+                if (!$result) {
+                    throw new Exception("Failed to add outcome: $content");
                 }
+                
+                // Track new items for UI update
+                $newItems[] = [
+                    'tempId' => $itemSectionID,
+                    'newId' => $result
+                ];
+                
+                $debug['outcome_' . $index]['added'] = true;
+                $debug['outcome_' . $index]['new_id'] = $result;
             } else {
-                // Update existing content
-                $outcomeUpdate = $pagesObj->changeContent($outcome['sectionID'], $subpage, $outcome['content']);
-                if (!$outcomeUpdate) {
-                    $errors[] = "Failed to update outcome (SectionID: {$outcome['sectionID']}).";
-                    $updateOutcomes = false;
+                // Update existing outcome
+                $result = $pagesObj->changeContent($itemSectionID, $subpage, $content);
+                
+                if (!$result) {
+                    throw new Exception("Failed to update outcome (ID: $itemSectionID)");
                 }
+                
+                $debug['outcome_' . $index]['updated'] = true;
             }
-        } else {
-            $errors[] = "Outcome missing required fields.";
-            $updateOutcomes = false;
-            break;
         }
     }
-
-    // If all updates succeed
-    if ($updateTitle && $updateTopContent && $updateOutcomes) {
-        $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
-        echo json_encode(["success" => true]);
-        exit;
-    } else {
-        error_log(json_encode($errors)); // Log errors
-        echo json_encode(["success" => false, "message" => "Update failed.", "errors" => $errors]);
-        exit;
-    }
-} else {
-    error_log("Missing required POST fields.");
-    echo json_encode(["success" => false, "message" => "Missing required fields."]);
-    exit;
+    
+    // Refresh session data
+    $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
+    
+    // Return success response
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => true,
+        'message' => 'Changes saved successfully',
+        'newItems' => $newItems,
+        'debug' => $debug
+    ]);
+    
+} catch (Exception $e) {
+    // Return error response
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage(),
+        'debug' => $debug
+    ]);
 }
 ?>

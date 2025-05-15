@@ -294,7 +294,7 @@ if (empty($collegeName)) {
         <div class="p-5">
             <!-- College Title Tab -->
             <div class="tab-content active" id="college-title-tab">
-                <form action="../page-functions/updateCollegeName.php" method="POST" id="collegeNameForm" class="space-y-4">
+                <form method="POST" id="collegeNameForm" class="space-y-4" data-preview="true">
                     <table class="profile-table">
                         <thead>
                             <tr>
@@ -310,7 +310,7 @@ if (empty($collegeName)) {
                                     <input type="hidden" name="isNew" value="<?php echo strpos($collegeName[0]['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
                                 </td>
                                 <td>
-                                    <input type="submit" value="Save Changes" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable w-full">
+                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors styleable w-full">Save Changes</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -358,7 +358,7 @@ if (empty($collegeName)) {
                                     </div>
                                 </td>
                                 <td>
-                                    <input type="submit" name="submitLogo" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors w-full" value="Upload">
+                                    <button type="submit" name="submitLogo" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer transition-colors w-full">Upload</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -393,23 +393,22 @@ if (empty($collegeName)) {
                                     </div>
                                 </td>
                                 <td>
-                                    <form action="../page-functions/uploadProfileImgs.php" method="POST" id="carouselForm-<?php echo $img['sectionID']; ?>" enctype="multipart/form-data" class="space-y-4">
+                                    <form action="../page-functions/uploadProfileImgs.php" method="POST" enctype="multipart/form-data" class="carousel-image-form">
                                         <input type="hidden" name="imageIndex" value="<?php echo $img['sectionID']; ?>">
                                         <input type="hidden" name="isNew" value="<?php echo empty($img['imagePath']) || strpos($img['sectionID'], 'temp_') === 0 ? '1' : '0'; ?>">
                                         <div class="relative">
-                                            <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="logoImage" id="carouselImage-<?php echo $index; ?>" accept="image/*">
+                                            <input type="file" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" name="carouselImage" accept="image/*">
                                             <div class="bg-gray-100 border border-gray-300 rounded-md px-4 py-2 text-gray-700 flex items-center justify-between">
                                                 <span class="file-name">Choose a file...</span>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
+                                            </svg>
                                         </div>
                                     </form>
                                 </td>
                                 <td>
                                     <div class="flex space-x-2">
-                                        <button type="submit" form="carouselForm-<?php echo $img['sectionID']; ?>" name="submitImg" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md cursor-pointer transition-colors flex-1 text-sm">
+                                        <button type="button" class="upload-carousel-image bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md cursor-pointer transition-colors flex-1 text-sm">
                                             Upload
                                         </button>
                                         <button type="button" class="deleteCarouselImage bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md cursor-pointer transition-colors flex-1 text-sm"
@@ -471,44 +470,122 @@ if (empty($collegeName)) {
         });
     });
 
-    // Form submission with AJAX
+    // Form submission with AJAX for College Name
     document.getElementById('collegeNameForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    e.preventDefault();
+    
+    // Get form values directly
+    const collegeName = document.getElementById('collegeName').value;
+    const textID = this.querySelector('input[name="textID"]').value;
+    const isNew = this.querySelector('input[name="isNew"]').value;
+    
+    // Disable the submit button to prevent double submission
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Saving...';
+    
+    // Create status message element
+    const statusMessage = document.createElement('div');
+    statusMessage.className = 'fixed top-4 right-4 px-4 py-2 rounded-md shadow-lg z-50';
+    statusMessage.textContent = 'Saving changes...';
+    statusMessage.style.backgroundColor = '#4B5563'; // Gray background
+    statusMessage.style.color = 'white';
+    document.body.appendChild(statusMessage);
+    
+    // Log what we're sending
+    console.log('Sending data:', {
+        collegeName: collegeName,
+        textID: textID,
+        isNew: isNew
+    });
+    
+    // Create form data manually
+    const formData = new FormData();
+    formData.append('collegeName', collegeName);
+    formData.append('textID', textID);
+    formData.append('isNew', isNew);
+    
+    // Send AJAX request
+    fetch('../page-functions/updateCollegeName.php', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        cache: 'no-store'
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
         
-        const formData = new FormData(this);
-        const isNew = formData.get('isNew') === '1';
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
         
-        // Disable the submit button to prevent double submission
-        const submitButton = this.querySelector('input[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.value = 'Saving...';
-        
-        fetch(this.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('College name ' + (isNew ? 'added' : 'updated') + ' successfully!');
-                // Reload the page to show updated content
-                window.location.reload();
-            } else {
-                alert('Error: ' + (data.message || 'Failed to update college name.'));
-                console.error(data);
-                // Re-enable the button if there was an error
-                submitButton.disabled = false;
-                submitButton.value = 'Save Changes';
+        return response.text().then(text => {
+            // Try to parse as JSON, but handle if it's not valid JSON
+            console.log('Raw response:', text);
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('Failed to parse JSON:', e);
+                throw new Error('Invalid JSON response: ' + text);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+        });
+    })
+    .then(data => {
+        console.log('Parsed response data:', data);
+        
+        // Update status message
+        if (data.success) {
+            statusMessage.textContent = 'College name updated successfully!';
+            statusMessage.style.backgroundColor = '#10B981'; // Green background
+            
+            // Get current page and reload it using the parent window's loadPage function
+            const currentPage = window.parent.$('.dynamic-load.active').data('file');
+            if (currentPage && typeof window.parent.loadPage === 'function') {
+                setTimeout(() => {
+                    window.parent.loadPage(currentPage);
+                }, 1500);
+            } else {
+                // Fallback to simple reload if loadPage isn't available
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
+        } else {
+            statusMessage.textContent = 'Error: ' + (data.message || 'Failed to update college name.');
+            statusMessage.style.backgroundColor = '#EF4444'; // Red background
+            console.error(data);
+            
             // Re-enable the button if there was an error
             submitButton.disabled = false;
-            submitButton.value = 'Save Changes';
-        });
+            submitButton.textContent = originalButtonText;
+            
+            // Remove status message after a delay
+            setTimeout(() => {
+                statusMessage.remove();
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        
+        // Update status message
+        statusMessage.textContent = 'An error occurred: ' + error.message;
+        statusMessage.style.backgroundColor = '#EF4444'; // Red background
+        
+        // Re-enable the button if there was an error
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
+        
+        // Remove status message after a delay
+        setTimeout(() => {
+            statusMessage.remove();
+        }, 3000);
     });
+});
 
     // Logo form submission
     document.getElementById('logoForm').addEventListener('submit', function(e) {
@@ -516,16 +593,29 @@ if (empty($collegeName)) {
         
         const formData = new FormData(this);
         
+        // Check if a file has been selected
+        const fileInput = this.querySelector('input[type="file"]');
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please select an image file to upload.');
+            return;
+        }
+        
         // Disable the submit button to prevent double submission
-        const submitButton = this.querySelector('input[type="submit"]');
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
         submitButton.disabled = true;
-        submitButton.value = 'Uploading...';
+        submitButton.textContent = 'Uploading...';
         
         fetch(this.action, {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 alert('Logo updated successfully!');
@@ -536,7 +626,7 @@ if (empty($collegeName)) {
                 console.error(data);
                 // Re-enable the button if there was an error
                 submitButton.disabled = false;
-                submitButton.value = 'Upload';
+                submitButton.textContent = originalButtonText;
             }
         })
         .catch(error => {
@@ -544,28 +634,49 @@ if (empty($collegeName)) {
             alert('An error occurred. Please try again.');
             // Re-enable the button if there was an error
             submitButton.disabled = false;
-            submitButton.value = 'Upload';
+            submitButton.textContent = originalButtonText;
         });
     });
 
-    // Carousel image forms submission
-    document.querySelectorAll('form[id^="carouselForm-"]').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+    // Carousel image upload buttons
+    document.querySelectorAll('.upload-carousel-image').forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const form = row.querySelector('.carousel-image-form');
+            const fileInput = form.querySelector('input[type="file"]');
             
-            const formData = new FormData(this);
+            // Check if a file has been selected
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please select an image file to upload.');
+                return;
+            }
             
-            // Disable the submit button to prevent double submission
-            const submitButton = this.querySelector('button[type="submit"]');
-            submitButton.disabled = true;
-            submitButton.innerHTML = 'Uploading...';
+            // Disable the button to prevent double submission
+            const originalButtonText = this.textContent;
+            this.disabled = true;
+            this.textContent = 'Uploading...';
             
-            fetch(this.action, {
+            const formData = new FormData(form);
+            
+            // Log the form data for debugging
+            console.log('Submitting carousel image form with data:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+            
+            fetch(form.action, {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Response data:', data);
                 if (data.success) {
                     alert('Image updated successfully!');
                     // Reload the page to show updated content
@@ -574,16 +685,16 @@ if (empty($collegeName)) {
                     alert('Error: ' + (data.message || 'Failed to update image.'));
                     console.error(data);
                     // Re-enable the button if there was an error
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = 'Upload';
+                    this.disabled = false;
+                    this.textContent = originalButtonText;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('An error occurred. Please try again.');
                 // Re-enable the button if there was an error
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Upload';
+                this.disabled = false;
+                this.textContent = originalButtonText;
             });
         });
     });
@@ -612,12 +723,14 @@ if (empty($collegeName)) {
             body: 'addNewCarouselImage=1'
         })
         .then(response => {
+            console.log('Add carousel response status:', response.status);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             return response.json();
         })
         .then(data => {
+            console.log('Add carousel response data:', data);
             if (data.success) {
                 // Reload the page to show the new carousel image slot
                 window.location.reload();
@@ -632,6 +745,10 @@ if (empty($collegeName)) {
                 setTimeout(() => {
                     errorMsg.remove();
                 }, 3000);
+                
+                // Restore button state
+                button.innerHTML = originalHTML;
+                button.disabled = false;
             }
         })
         .catch(error => {
@@ -645,8 +762,7 @@ if (empty($collegeName)) {
             setTimeout(() => {
                 errorMsg.remove();
             }, 3000);
-        })
-        .finally(() => {
+            
             // Restore button state
             button.innerHTML = originalHTML;
             button.disabled = false;
@@ -664,17 +780,17 @@ if (empty($collegeName)) {
             if (confirm('Are you sure you want to delete this carousel image?')) {
                 // Show loading state
                 const originalText = button.textContent;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                button.innerHTML = 'Deleting...';
                 button.disabled = true;
                 
                 // Make AJAX request
-                fetch('../page-functions/uploadProfileImgs.php', {
+                fetch('../page-functions/removeItem.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: `deleteCarouselImage=1&sectionID=${sectionID}&isNew=${isNew}`
+                    body: `sectionID=${sectionID}`
                 })
                 .then(response => {
                     if (!response.ok) {
@@ -683,6 +799,7 @@ if (empty($collegeName)) {
                     return response.json();
                 })
                 .then(data => {
+                    console.log('Delete response:', data);
                     if (data.success) {
                         // Remove the row with animation
                         row.style.opacity = '0';

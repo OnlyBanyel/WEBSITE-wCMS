@@ -197,7 +197,9 @@
   <Title>Admission Guide - WMSU</Title>
 </head>
 
-<section class="header"><?php require_once '../../__includes/navbar.php'?></section>
+  <section class="header sticky top-0 z-50 bg-white" style="isolation: isolate;">
+      <?php require_once '../../__includes/navbar.php'?>
+  </section>
 
 <!-- Subnav & Hero Section -->
 <section class="relative w-full">

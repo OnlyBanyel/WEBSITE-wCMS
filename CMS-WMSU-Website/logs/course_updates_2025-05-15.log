@@ -1,0 +1,84 @@
+[2025-05-15 17:17:40] Received course update request Data: {
+    "POST": {
+        "courseTitle": "Yra",
+        "titleSectionID": "temp_undergrad_1",
+        "isNew": "1",
+        "courseType": "undergrad",
+        "courseIndex": "1",
+        "outcomes": "[{\"content\":\"\",\"sectionID\":\"temp_outcome_1_1\",\"isNew\":true}]"
+    },
+    "RAW": ""
+}
+[2025-05-15 17:17:40] Processing course update Data: {
+    "courseTitle": "Yra",
+    "titleSectionID": "temp_undergrad_1",
+    "isNew": true,
+    "subpage": "40"
+}
+[2025-05-15 17:17:40] Adding new course Data: {
+    "courseType": "undergrad"
+}
+[2025-05-15 17:17:40] Successfully created new course Data: {
+    "titleSectionID": "1111"
+}
+[2025-05-15 17:17:40] Determined course number Data: {
+    "courseNumber": 1
+}
+[2025-05-15 17:17:40] Processing outcomes for new course Data: {
+    "outcomesData": [
+        {
+            "content": "",
+            "sectionID": "temp_outcome_1_1",
+            "isNew": true
+        }
+    ]
+}
+[2025-05-15 17:24:27] Received course update request Data: {
+    "POST": {
+        "courseTitle": "New Yra",
+        "titleSectionID": "1112",
+        "isNew": "0",
+        "courseType": "undergrad",
+        "courseIndex": "2",
+        "outcomes": "[{\"content\":\"Program outcome description\",\"sectionID\":\"1113\",\"isNew\":false}]"
+    },
+    "RAW": ""
+}
+[2025-05-15 17:24:27] Processing course update Data: {
+    "courseTitle": "New Yra",
+    "titleSectionID": "1112",
+    "isNew": false,
+    "subpage": "40"
+}
+[2025-05-15 17:24:27] Updating existing course Data: {
+    "courseType": "undergrad",
+    "originalTitle": "New Undergraduate Program",
+    "newTitle": "New Yra"
+}
+[2025-05-15 17:24:27] Successfully updated course title Data: {
+    "titleSectionID": "1112",
+    "courseTitle": "New Yra"
+}
+[2025-05-15 17:24:27] Determined course number for existing course Data: {
+    "courseNumber": 2
+}
+[2025-05-15 17:24:27] Parsed outcomes from JSON Data: [
+    {
+        "content": "Program outcome description",
+        "sectionID": "1113",
+        "isNew": false
+    }
+]
+[2025-05-15 17:24:27] Processing outcome Data: {
+    "content": "Program outcome description",
+    "isNew": false,
+    "sectionID": "1113"
+}
+[2025-05-15 17:24:27] Updated outcome Data: {
+    "sectionID": "1113",
+    "content": "Program outcome description"
+}
+[2025-05-15 17:24:27] Successfully updated course and outcomes Data: {
+    "courseNumber": 2,
+    "courseType": "undergrad"
+}

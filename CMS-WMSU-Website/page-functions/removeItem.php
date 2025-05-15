@@ -1,40 +1,50 @@
 <?php
 session_start();
-require_once '../classes/login.class.php';
 require_once '../classes/pages.class.php';
+require_once '../classes/login.class.php';
 
-$loginObj = new Login();
+// Initialize classes
 $pagesObj = new Pages();
+$loginObj = new Login();
 
+// Set content type to JSON
 header('Content-Type: application/json');
 
-$response = ['success' => false, 'message' => ''];
-
-try {
-    // Validate required fields
-    if (!isset($_POST['sectionID']) || !is_numeric($_POST['sectionID'])) {
-        throw new Exception('Invalid section ID');
-    }
-
-    $sectionID = (int)$_POST['sectionID'];
-    $subpage = $_SESSION['account']['subpage_assigned'];
-
-    // Delete the item
-    $deleteSuccess = $pagesObj->deleteContent($sectionID);
-    
-
-    if ($deleteSuccess) {
-        $response['success'] = true;
-        $response['message'] = 'Item deleted successfully';
-        $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
-    } else {
-        throw new Exception('Failed to delete item from database');
-    }
-
-} catch (Exception $e) {
-    $response['message'] = $e->getMessage();
-    error_log("Delete Error: " . $e->getMessage());
+// Check if user is logged in
+if (!isset($_SESSION['account'])) {
+    echo json_encode(['success' => false, 'message' => 'User not logged in']);
+    exit;
 }
 
-echo json_encode($response);
+// Get subpage from session
+$subpage = $_SESSION['account']['subpage_assigned'];
+
+// Check if sectionID is provided
+if (!isset($_POST['sectionID']) || empty($_POST['sectionID'])) {
+    echo json_encode(['success' => false, 'message' => 'Missing section ID']);
+    exit;
+}
+
+$sectionID = $_POST['sectionID'];
+
+// Log the deletion attempt
+error_log("Attempting to delete item with sectionID: $sectionID for subpage: $subpage");
+
+// Delete the item
+$result = $pagesObj->deleteItem($sectionID, $subpage);
+
+if ($result) {
+    // Refresh session data
+    $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
+    
+    echo json_encode([
+        'success' => true,
+        'message' => 'Item deleted successfully'
+    ]);
+} else {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Failed to delete item'
+    ]);
+}
 ?>

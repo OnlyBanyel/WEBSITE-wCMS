@@ -264,19 +264,46 @@ class Pages {
         return $qry->execute();
     }
 
-    function uploadProfileImgs($destPath, $sectionID, $subpage) {
+    // Find the uploadProfileImgs method and replace it with this improved version:
+
+function uploadProfileImgs($destPath, $sectionID, $subpage) {
+    try {
+        // First check if the section exists
+        $checkSql = "SELECT COUNT(*) FROM page_sections WHERE sectionID = :sectionID AND subpage = :subpage";
+        $checkQry = $this->db->connect()->prepare($checkSql);
+        $checkQry->bindParam(':sectionID', $sectionID);
+        $checkQry->bindParam(':subpage', $subpage);
+        $checkQry->execute();
+        
+        $exists = $checkQry->fetchColumn();
+        
+        if (!$exists) {
+            error_log("Section ID $sectionID does not exist for subpage $subpage");
+            return false;
+        }
+        
         $sql = "UPDATE page_sections 
-        SET imagePath = :destPath 
-        WHERE subpage = :subpage 
-          AND sectionID = :sectionID 
-          AND description = 'carousel-img'";
+                SET imagePath = :destPath 
+                WHERE sectionID = :sectionID 
+                AND subpage = :subpage";
+        
         $qry = $this->db->connect()->prepare($sql);
         $qry->bindParam(':destPath', $destPath);
         $qry->bindParam(':sectionID', $sectionID);
         $qry->bindParam(':subpage', $subpage);
-
-        return $qry->execute();
+        
+        $result = $qry->execute();
+        
+        if (!$result) {
+            error_log("Failed to update image path for section ID $sectionID: " . print_r($qry->errorInfo(), true));
+        }
+        
+        return $result;
+    } catch (PDOException $e) {
+        error_log("Database error in uploadProfileImgs: " . $e->getMessage());
+        return false;
     }
+}
     
     function uploadImgs($destPath, $sectionID, $subpage) {
         $sql = "UPDATE page_sections 
@@ -292,9 +319,25 @@ class Pages {
         return $qry->execute();
     }
 
-    public function changeContent($sectionID, $subpage, $value, $indicator = null, $description = null) {
-        $sql = "UPDATE page_sections SET content = :value 
-                WHERE sectionID = :sectionID AND subpage = :subpage";
+    // Find the changeContent method and replace it with this improved version:
+
+public function changeContent($sectionID, $subpage, $value, $indicator = null, $description = null) {
+    try {
+        // First check if the section exists
+        $checkSql = "SELECT COUNT(*) FROM page_sections WHERE sectionID = :sectionID AND subpage = :subpage";
+        $checkQry = $this->db->connect()->prepare($checkSql);
+        $checkQry->bindParam(':sectionID', $sectionID);
+        $checkQry->bindParam(':subpage', $subpage);
+        $checkQry->execute();
+        
+        $exists = $checkQry->fetchColumn();
+        if (!$exists) {
+            error_log("Section ID $sectionID does not exist for subpage $subpage");
+            return false;
+        }
+        
+        // Build the SQL query
+        $sql = "UPDATE page_sections SET content = :value WHERE sectionID = :sectionID AND subpage = :subpage";
         
         if ($indicator !== null) {
             $sql .= " AND indicator = :indicator";
@@ -315,8 +358,18 @@ class Pages {
             $qry->bindParam(':description', $description);
         }
         
-        return $qry->execute();
+        $result = $qry->execute();
+        
+        if (!$result) {
+            error_log("Failed to update content for section ID $sectionID: " . print_r($qry->errorInfo(), true));
+        }
+        
+        return $result;
+    } catch (PDOException $e) {
+        error_log("Database error in changeContent: " . $e->getMessage());
+        return false;
     }
+}
 
     function deleteItem($sectionID, $subpage) {
         $sql = "DELETE FROM page_sections WHERE sectionID = :sectionID AND subpage = :subpage";
@@ -326,12 +379,25 @@ class Pages {
         return $qry->execute();
     }
 
-    public function addContent($subpage, $indicator, $elemType, $content, $imagePath, $description) {
+    public function addContent($subpage, $indicator, $elemType, $content, $imagePath, $description, $groupId = null) {
         try {
+            // Check if the page_sections table has a group_id column
+            $checkColumnSql = "SHOW COLUMNS FROM page_sections LIKE 'group_id'";
+            $checkColumnStmt = $this->db->connect()->prepare($checkColumnSql);
+            $checkColumnStmt->execute();
+            
+            // If the column doesn't exist, add it
+            if ($checkColumnStmt->rowCount() == 0) {
+                $addColumnSql = "ALTER TABLE page_sections ADD COLUMN group_id VARCHAR(50) NULL";
+                $addColumnStmt = $this->db->connect()->prepare($addColumnSql);
+                $addColumnStmt->execute();
+                error_log("Added group_id column to page_sections table");
+            }
+            
             $sql = "INSERT INTO page_sections 
-                    (pageID, subpage, indicator, elemType, content, imagePath, description, createdAt, updatedAt) 
+                    (pageID, subpage, indicator, elemType, content, imagePath, description, group_id, createdAt, updatedAt) 
                     VALUES 
-                    (3, :subpage, :indicator, :elemType, :content, :imagePath, :description, NOW(), NOW())";
+                    (3, :subpage, :indicator, :elemType, :content, :imagePath, :description, :groupId, NOW(), NOW())";
             
             $db = $this->db->connect();
             $qry = $db->prepare($sql);
@@ -342,6 +408,7 @@ class Pages {
             $qry->bindParam(':content', $content);
             $qry->bindParam(':imagePath', $imagePath);
             $qry->bindParam(':description', $description);
+            $qry->bindParam(':groupId', $groupId);
             
             $success = $qry->execute();
             
@@ -393,49 +460,49 @@ class Pages {
     }
 
     public function updateAccountStatus($managerId, $status) {
-        try {
-            // First, check if the manager ID exists
-            $checkSql = "SELECT COUNT(*) FROM accounts WHERE id = :id";
-            $checkQry = $this->db->connect()->prepare($checkSql);
-            $checkQry->bindParam(':id', $managerId, PDO::PARAM_INT);
-            $checkQry->execute();
-            
-            $managerExists = $checkQry->fetchColumn();
-            
-            if (!$managerExists) {
-                error_log("Manager ID does not exist: $managerId");
-                return false;
-            }
-            
-            // Now update the status
-            $sql = "UPDATE accounts SET status = :status WHERE id = :id";
-            $qry = $this->db->connect()->prepare($sql);
-            $qry->bindParam(':status', $status, PDO::PARAM_INT);
-            $qry->bindParam(':id', $managerId, PDO::PARAM_INT);
-            
-            $result = $qry->execute();
-            
-            if (!$result) {
-                $errorInfo = $qry->errorInfo();
-                error_log("SQL Error: " . print_r($errorInfo, true));
-                return false;
-            }
-            
-            // Check if any rows were affected
-            $rowCount = $qry->rowCount();
-            if ($rowCount === 0) {
-                error_log("No rows affected when updating account status for manager ID: $managerId");
-                // Still return true if the query executed successfully but no rows were affected
-                // This can happen if the status is already set to the requested value
-                return true;
-            }
-            
-            return true;
-        } catch (PDOException $e) {
-            error_log("PDO Exception in updateAccountStatus: " . $e->getMessage());
+    try {
+        // First, check if the manager ID exists
+        $checkSql = "SELECT COUNT(*) FROM accounts WHERE id = :id";
+        $checkQry = $this->db->connect()->prepare($checkSql);
+        $checkQry->bindParam(':id', $managerId, PDO::PARAM_INT);
+        $checkQry->execute();
+        
+        $managerExists = $checkQry->fetchColumn();
+        
+        if (!$managerExists) {
+            error_log("Manager ID does not exist: $managerId");
             return false;
         }
+        
+        // Now update the status with a specific WHERE clause for the ID
+        $sql = "UPDATE accounts SET status = :status WHERE id = :id";
+        $qry = $this->db->connect()->prepare($sql);
+        $qry->bindParam(':status', $status, PDO::PARAM_INT);
+        $qry->bindParam(':id', $managerId, PDO::PARAM_INT);
+        
+        $result = $qry->execute();
+        
+        if (!$result) {
+            $errorInfo = $qry->errorInfo();
+            error_log("SQL Error: " . print_r($errorInfo, true));
+            return false;
+        }
+        
+        // Check if any rows were affected
+        $rowCount = $qry->rowCount();
+        if ($rowCount === 0) {
+            error_log("No rows affected when updating account status for manager ID: $managerId");
+            // Still return true if the query executed successfully but no rows were affected
+            // This can happen if the status is already set to the requested value
+            return true;
+        }
+        
+        return true;
+    } catch (PDOException $e) {
+        error_log("PDO Exception in updateAccountStatus: " . $e->getMessage());
+        return false;
     }
+}
 
     public function fetchAllUsers() {
         try {
@@ -547,17 +614,38 @@ class Pages {
     // Get strand-related items
     public function getStrandRelatedItems($strandID) {
         try {
-            $sql = "SELECT * FROM page_sections 
-                    WHERE subpage = 31 
-                    AND indicator = 'Strand' 
-                    AND (description = 'strand-desc' 
-                         OR description = 'strand-desc-end' 
-                         OR description LIKE 'strand-item-%')";
+            // First get the group_id for this strand
+            $groupSql = "SELECT group_id FROM page_sections WHERE sectionID = :sectionID";
+            $groupStmt = $this->db->connect()->prepare($groupSql);
+            $groupStmt->bindParam(':sectionID', $strandID);
+            $groupStmt->execute();
+            $groupId = $groupStmt->fetchColumn();
             
-            $stmt = $this->db->connect()->prepare($sql);
-            $stmt->execute();
-            
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // If we have a group_id, use it to fetch related items
+            if ($groupId) {
+                $sql = "SELECT * FROM page_sections 
+                        WHERE group_id = :groupId
+                        AND indicator = 'Strand'";
+                
+                $stmt = $this->db->connect()->prepare($sql);
+                $stmt->bindParam(':groupId', $groupId);
+                $stmt->execute();
+                
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                // Fallback to the old method if no group_id
+                $sql = "SELECT * FROM page_sections 
+                        WHERE subpage = 31 
+                        AND indicator = 'Strand' 
+                        AND (description = 'strand-desc' 
+                             OR description = 'strand-desc-end' 
+                             OR description LIKE 'strand-item-%')";
+                
+                $stmt = $this->db->connect()->prepare($sql);
+                $stmt->execute();
+                
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
         } catch (PDOException $e) {
             error_log("Database error: " . $e->getMessage());
             return [];

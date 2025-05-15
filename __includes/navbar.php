@@ -96,10 +96,34 @@ $genElements = new Pages;
     .mobile-dropdown.active {
       display: block;
     }
+
+    /* Sticky navbar styles */
+    nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Ensure content doesn't get hidden behind navbar */
+    body {
+      padding-top: 0;
+    }
+
+    /* Adjust mobile menu to work with sticky navbar */
+    .mobile-menu {
+      position: absolute;
+      width: 100%;
+      background-color: white;
+      z-index: 999;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 
-<nav>
+<nav class="sticky-top">
   <section class="nav-cont">
       <div class="WMSU-Logo-cont">
           <img src="<?php echo $navbarLogo?>" alt="" class="WMSU-Logo">

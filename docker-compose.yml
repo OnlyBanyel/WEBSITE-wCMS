@@ -4,8 +4,17 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: wmsucms_web
+
     env_file:
-      - dbvar.env
+      - ./dbvar.env   # Ensure this file is in the same dir as docker-compose.yml
+
+    environment:      # Optional override to be extra sure (can remove if env_file works)
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+
     volumes:
       - ./your-web-code:/var/www/html
       - ./aiven-certs/ca.pem:/etc/ssl/aiven/ca.pem

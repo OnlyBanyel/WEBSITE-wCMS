@@ -1,0 +1,157 @@
+[2025-05-15 17:05:40] Raw POST data Data: 
+[2025-05-15 17:05:40] POST array Data: Array
+(
+    [deptName] => Department of Computer 
+    [textID] => temp_dept_1
+    [isNew] => 1
+    [updateType] => name
+)
+
+[2025-05-15 17:05:40] FILES array Data: Array
+(
+)
+
+[2025-05-15 17:05:40] Update type Data: name
+[2025-05-15 17:05:40] Processing department name update
+[2025-05-15 17:05:40] Department name update details Data: Array
+(
+    [value] => Department of Computer 
+    [textID] => temp_dept_1
+    [isNew] => 1
+    [subpage] => 40
+)
+
+[2025-05-15 17:05:40] New department added Data: Array
+(
+    [new textID] => 1110
+)
+
+[2025-05-15 17:05:47] Raw POST data Data: 
+[2025-05-15 17:05:47] POST array Data: Array
+(
+    [deptName] => Department of Yra
+    [textID] => 1110
+    [isNew] => 0
+    [updateType] => name
+)
+
+[2025-05-15 17:05:47] FILES array Data: Array
+(
+)
+
+[2025-05-15 17:05:47] Update type Data: name
+[2025-05-15 17:05:47] Processing department name update
+[2025-05-15 17:05:47] Department name update details Data: Array
+(
+    [value] => Department of Yra
+    [textID] => 1110
+    [isNew] => 
+    [subpage] => 40
+)
+
+[2025-05-15 17:05:47] Department name updated successfully Data: Array
+(
+    [textID] => 1110
+)
+
+[2025-05-15 17:05:53] Raw POST data Data: 
+[2025-05-15 17:05:53] POST array Data: Array
+(
+    [textID] => 1110
+    [sectionID] => 1093
+    [imgIsNew] => 0
+    [updateType] => image
+)
+
+[2025-05-15 17:05:53] FILES array Data: Array
+(
+    [deptImg] => Array
+        (
+            [name] => download (1).jfif
+            [type] => image/jpeg
+            [tmp_name] => Q:\XAMPP\tmp\phpAD4D.tmp
+            [error] => 0
+            [size] => 72415
+        )
+
+)
+
+[2025-05-15 17:05:53] Update type Data: image
+[2025-05-15 17:05:53] Processing department image update
+[2025-05-15 17:05:53] Department image update details Data: Array
+(
+    [textID] => 1110
+    [sectionID] => 1093
+    [imgIsNew] => 
+    [subpage] => 40
+)
+
+[2025-05-15 17:05:53] Image uploaded successfully Data: Array
+(
+    [path] => /WEBSITE-wCMS/imgs/department_682602d14ed7b1.55152878.jfif
+)
+
+[2025-05-15 17:05:53] Updating existing image Data: Array
+(
+    [result] => 1
+    [sectionID] => 1093
+)
+
+[2025-05-15 17:52:27] Raw POST data Data: 
+[2025-05-15 17:52:27] POST array Data: Array
+(
+    [deptName] => Computer Science 
+    [textID] => 218
+    [isNew] => 0
+    [updateType] => name
+    [_t] => 1747324347236
+)
+
+[2025-05-15 17:52:27] FILES array Data: Array
+(
+)
+
+[2025-05-15 17:52:27] Update type Data: name
+[2025-05-15 17:52:27] Processing department name update
+[2025-05-15 17:52:27] Department name update details Data: Array
+(
+    [value] => Computer Science 
+    [textID] => 218
+    [isNew] => 
+    [subpage] => 1
+)
+
+[2025-05-15 17:52:27] Department name updated successfully Data: Array
+(
+    [textID] => 218
+)
+
+[2025-05-15 17:52:30] Raw POST data Data: 
+[2025-05-15 17:52:30] POST array Data: Array
+(
+    [deptName] => Computer Science Department
+    [textID] => 218
+    [isNew] => 0
+    [updateType] => name
+    [_t] => 1747324350220
+)
+
+[2025-05-15 17:52:30] FILES array Data: Array
+(
+)
+
+[2025-05-15 17:52:30] Update type Data: name
+[2025-05-15 17:52:30] Processing department name update
+[2025-05-15 17:52:30] Department name update details Data: Array
+(
+    [value] => Computer Science Department
+    [textID] => 218
+    [isNew] => 
+    [subpage] => 1
+)
+
+[2025-05-15 17:52:30] Department name updated successfully Data: Array
+(
+    [textID] => 218
+)
+

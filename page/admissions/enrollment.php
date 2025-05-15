@@ -171,7 +171,9 @@
   <Title>Enrollment Procedure - WMSU</Title>
 </head>
 
-<section class="header"><?php require_once '../../__includes/navbar.php'?></section>
+  <section class="header sticky top-0 z-50 bg-white" style="isolation: isolate;">
+      <?php require_once '../../__includes/navbar.php'?>
+  </section>
 
 <div class="breadcrumb-container">
   <div class="relative z-10">
@@ -182,11 +184,6 @@
 <main>
   <div class="enrollment-container">
     <div class="banner">Enrollment Procedure</div>
-    
-    <p class="intro-text">
-      The Enrollment Procedures outline all the essential steps, requirements, and guidelines to ensure a seamless registration process. 
-      Carefully review each section to complete your enrollment smoothly and meet all necessary deadlines.
-    </p>
     
     <h2 class="enrollment-header">New Students</h2>
     

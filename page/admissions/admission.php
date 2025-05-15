@@ -26,9 +26,9 @@
     </style>
 </head>
 
-<section class="header">
-  <?php require_once '../../__includes/navbar.php'?>
-</section>
+  <section class="header sticky top-0 z-50 bg-white" style="isolation: isolate;">
+      <?php require_once '../../__includes/navbar.php'?>
+  </section>
 
 <body class="bg-gray-50">
     <nav class="container-breadcrumb">

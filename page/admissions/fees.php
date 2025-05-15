@@ -240,7 +240,9 @@
   <Title>Online Registration - WMSU</Title>
 </head>
 
-<section class="header"><?php require_once '../../__includes/navbar.php'?></section>
+  <section class="header sticky top-0 z-50 bg-white" style="isolation: isolate;">
+      <?php require_once '../../__includes/navbar.php'?>
+  </section>
 <div class="breadcrumb-container">
   <div class="relative z-10">
     <?php require_once '../../__includes/subnav_academics.php' ?>
@@ -249,12 +251,7 @@
 
 <main>
   <div class="registration-container">
-    <div class="banner">Online Registration</div>
-    
-    <p class="intro-text">
-      The Online Registration process provides a convenient and efficient way to enroll in your desired program. 
-      Follow the outlined steps carefully to complete your registration smoothly and meet all necessary requirements and deadlines.
-    </p>
+    <div class="banner">Fees</div>
     
     <div class="registration-steps">
       <!-- Step 1 -->
