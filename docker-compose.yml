@@ -8,7 +8,7 @@ services:
     environment:
       DB_HOST: db
       DB_USER: root
-      DB_PASS: ""
+      DB_PASS: yourpassword    # <-- match the root password below
       DB_NAME: wmsucms
     depends_on:
       db:
@@ -17,15 +17,14 @@ services:
   db:
     image: mariadb
     environment:
-      MYSQL_ROOT_PASSWORD: yourpassword
+      MARIADB_ROOT_PASSWORD: admin123   # <-- required for initialization
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 3
-
-
-
+    volumes:
+      - db_data:/var/lib/mysql   # <-- persist database data
 
 volumes:
   db_data:
