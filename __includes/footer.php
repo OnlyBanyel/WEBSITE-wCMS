@@ -37,7 +37,7 @@
                 <p class="footer-contacts-text inter-light">991-1771</p>
             </div>
             <div class="footer-email">
-                <img src="imgs/ic_outline-email.png" alt="">
+                <img src="/imgs/ic_outline-email.png" alt="">
                 <p class="footer-contacts-text inter-light">wmsu@wmsu.edu.ph</p>
             </div>
             <div class="footer-iso">

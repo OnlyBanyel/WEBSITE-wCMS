@@ -178,7 +178,7 @@ $genElements = new Pages;
                   </div>
               </div>
           </div>
-          <a class="inter-extralight inline-align" id="Admissions" href="">ADMISSIONS <img src="/WEBSITE-wCMS/imgs/Expand Arrow.png" alt=""></a>
+          <a class="inter-extralight inline-align" id="Admissions" href="">ADMISSIONS <img src="/imgs/Expand Arrow.png" alt=""></a>
           <div id="Admissions-dropdown" class="nav-dropdown">
               <div class="dropdown-cont">
                   <div class="dropdown-title">
@@ -201,7 +201,7 @@ $genElements = new Pages;
                   </div>
               </div>
           </div>
-          <a class="inter-extralight inline-align" id="Academic" href="">ACADEMICS <img src="/WEBSITE-wCMS/imgs/Expand Arrow.png" alt=""></a>
+          <a class="inter-extralight inline-align" id="Academic" href="">ACADEMICS <img src="/imgs/Expand Arrow.png" alt=""></a>
           <div id="Academic-dropdown" class="nav-dropdown">
               <div class="dropdown-cont">
               <div class="dropdown-title">
@@ -322,17 +322,17 @@ $genElements = new Pages;
                   </div>
               </div>
           </div>
-          <a class="inter-extralight inline-align" id="Administration" href="">ADMINISTRATION <img src="/WEBSITE-wCMS/imgs/Expand Arrow.png" alt=""></a>
+          <a class="inter-extralight inline-align" id="Administration" href="">ADMINISTRATION <img src="/imgs/Expand Arrow.png" alt=""></a>
           <div id="Administration-dropdown" class="nav-dropdown">
               <div class="dropdown-cont">
                   <h1>Administration</h1>
               </div>
           </div>
-          <a class="inter-extralight inline-align" id="Research" href="">RESEARCH <img src="/WEBSITE-wCMS/imgs/Expand Arrow.png" alt=""></a>
+          <a class="inter-extralight inline-align" id="Research" href="">RESEARCH <img src="/imgs/Expand Arrow.png" alt=""></a>
           <div id="Research-dropdown" class="nav-dropdown">
               <h6 class="dropdown-title">RESEARCH</h6>
           </div>
-          <a class="inter-extralight inline-align" id="Other-Links" href="">OTHER LINKS <img src="/WEBSITE-wCMS/imgs/Expand Arrow.png" alt=""></a>
+          <a class="inter-extralight inline-align" id="Other-Links" href="">OTHER LINKS <img src="/imgs/Expand Arrow.png" alt=""></a>
           <div id="Other-dropdown" class="nav-dropdown">
                   <div class="dropdown-title">
                       <div class="dropdown-content">
@@ -420,7 +420,7 @@ $genElements = new Pages;
       <a href="" class="mobile-link">OTHER LINKS</a>
       
       <div class="mobile-mywmsu">
-        <a class="MyWmsu-link inter-regular" href="/WEBSITE-WCMS/CMS-WMSU-Website/pages/login-form.php">MyWMSU</a>
+        <a class="MyWmsu-link inter-regular" href="/CMS-WMSU-Website/pages/login-form.php">MyWMSU</a>
       </div>
     </div>
   </div>
