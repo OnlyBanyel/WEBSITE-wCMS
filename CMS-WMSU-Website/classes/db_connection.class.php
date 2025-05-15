@@ -16,22 +16,23 @@ class Database {
         $this->port     = getenv('DB_PORT') ?: '3306';
     }
 
-  public function connect() {
-    try {
-        $options = [
+    public function connect() {
+        try {
+           $options = [
             PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/aiven/ca.pem',
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false, // Add this line to ignore verification error
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-        ];
+];
 
-        $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname};charset=utf8mb4";
 
-        $this->db = new PDO($dsn, $this->user, $this->password, $options);
-        return $this->db;
+            $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname};charset=utf8mb4";
 
-    } catch (PDOException $e) {
-        throw new Exception("Database connection failed: " . $e->getMessage());
+            $this->db = new PDO($dsn, $this->user, $this->password, $options);
+            return $this->db;
+
+        } catch (PDOException $e) {
+            throw new Exception("Database connection failed: " . $e->getMessage());
+        }
     }
-}
-
 }
 ?>
