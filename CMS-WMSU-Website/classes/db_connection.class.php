@@ -5,6 +5,8 @@ class Database {
     private $dbname;
     private $user;
     private $password;
+
+    private $port;
     protected $db;
 
     public function __construct() {
@@ -14,12 +16,13 @@ class Database {
         $this->dbname   = getenv('DB_NAME') ?: 'wmsucms';
         $this->user     = getenv('DB_USER') ?: 'root';
         $this->password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : ''; // Handles empty string env var
+        $this->port     = getenv('DB_PORT') ?: '3306'; // Default MySQL port
     }
 
     public function connect() {
         try {
             // Explicit port to ensure compatibility in Docker and local
-            $dsn = "mysql:host={$this->dbhost};port=3306;dbname={$this->dbname};charset=utf8mb4";
+            $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname};charset=utf8mb4";
             
             $this->db = new PDO($dsn, $this->user, $this->password);
 
