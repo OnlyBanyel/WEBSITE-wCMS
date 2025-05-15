@@ -4,11 +4,15 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: wmsucms_web
-
     env_file:
-      - ./dbvar.env   # Ensure this file is in the same dir as docker-compose.yml
+      - ./dbvar.env
+    environment:
+      - DB_HOST=wmsucms-wmsu-act.h.aivencloud.com
+      - DB_PORT=20747
+      - DB_NAME=wmsucms
+      - DB_USER=avnadmin
+      - DB_PASS=AVNS_suifDF-uCj0_ikObk7C
     volumes:
       - ./your-web-code:/var/www/html
       - ./aiven-certs/ca.pem:/etc/ssl/aiven/ca.pem
-
     restart: unless-stopped

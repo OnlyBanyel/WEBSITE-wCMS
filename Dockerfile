@@ -19,3 +19,4 @@ EXPOSE 80
 # Copy CA cert into container
 COPY ./aiven-certs/ca.pem /etc/ssl/aiven/ca.pem
 RUN chmod 600 /etc/ssl/aiven/ca.pem
+
