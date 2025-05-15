@@ -1,30 +1,31 @@
+version: '3.8'
+
 services:
   web:
-    build: .
-    ports:
-      - "80:80"
-    volumes:
-      - .:/var/www/html
+    image: php:8.1-apache
+    container_name: wmsucms_web
     environment:
       DB_HOST: db
-      DB_USER: root
-      DB_PASS: yourpassword    # <-- match the root password below
       DB_NAME: wmsucms
+      DB_USER: yourusername
+      DB_PASS: ""  # blank password
     depends_on:
-      db:
-        condition: service_healthy
+      - db
+    volumes:
+      - ./your-web-code:/var/www/html
+    restart: unless-stopped
 
   db:
-    image: mariadb
+    image: mysql:8.0
+    container_name: wmsucms_db
     environment:
-      MARIADB_ROOT_PASSWORD: admin123   # <-- required for initialization
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      MYSQL_ROOT_PASSWORD: rootpassword123
+      MYSQL_DATABASE: wmsucms
+      MYSQL_USER: yourusername
+      MYSQL_PASSWORD: ""  # blank password
     volumes:
-      - db_data:/var/lib/mysql   # <-- persist database data
+      - db_data:/var/lib/mysql
+    restart: unless-stopped
 
 volumes:
   db_data:
