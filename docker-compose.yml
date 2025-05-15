@@ -15,18 +15,17 @@ services:
         condition: service_healthy
 
   db:
-    image: mariadb:11.4.5
-    container_name: website-wcms-db-1
+    image: mariadb
     environment:
-      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
-      MARIADB_DATABASE: wmsucms
-    volumes:
-      - db_data:/var/lib/mysql
+      MYSQL_ROOT_PASSWORD: yourpassword
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
+
+
+
 
 volumes:
   db_data:
