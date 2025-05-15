@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   web:
     image: php:8.1-apache
@@ -10,8 +12,6 @@ services:
       DB_NAME: wmsucms
       DB_USER: avnadmin
       DB_PASS: ${DB_PASSWORD}
-    depends_on:
-      - db
     volumes:
       - ./your-web-code:/var/www/html
     restart: unless-stopped
