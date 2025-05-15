@@ -16,6 +16,7 @@ services:
 
   db:
     image: mariadb:11.4.5
+    container_name: website-wcms-db-1
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
       MARIADB_DATABASE: wmsucms
