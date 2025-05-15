@@ -11,7 +11,8 @@ services:
       DB_PORT: 20747
       DB_NAME: wmsucms
       DB_USER: avnadmin
-      # DB_PASS: ${DB_PASSWORD}
+      DB_PASS: ${DB_PASSWORD}       # <-- uncommented here
     volumes:
       - ./your-web-code:/var/www/html
+      - ./aiven-certs:/etc/ssl/aiven   # <-- mount cert folder inside container
     restart: unless-stopped
