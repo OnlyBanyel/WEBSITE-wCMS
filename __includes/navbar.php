@@ -341,7 +341,7 @@ $genElements = new Pages;
                   </div>
           </div>
           <div class="MyWmsu-btn">
-              <a class="MyWmsu-link inter-regular" href="/WEBSITE-WCMS/CMS-WMSU-Website/pages/login-form.php">MyWMSU</a>
+              <a class="MyWmsu-link inter-regular" href="/CMS-WMSU-Website/pages/login-form.php">MyWMSU</a>
           </div>
       </div>
   </section>

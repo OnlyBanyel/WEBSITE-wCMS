@@ -30,18 +30,18 @@
             <p class="footer-rights inter-light">Copyright © 2025 Western Mindanao State University.</p>
             <p class="footer-rights inter-light">All rights reserved.</p>
         </div>
-        <img class="footer-logo" src="/WEBSITE-wCMS/imgs/WMSU-Logo.png" alt="">
+        <img class="footer-logo" src="/imgs/WMSU-Logo.png" alt="">
         <div class="footer-contacts">
             <div class="footer-number">
-                <img src="/WEBSITE-wCMS/imgs/famicons_call.png" alt="">
+                <img src="/imgs/famicons_call.png" alt="">
                 <p class="footer-contacts-text inter-light">991-1771</p>
             </div>
             <div class="footer-email">
-                <img src="/WEBSITE-wCMS/imgs/ic_outline-email.png" alt="">
+                <img src="imgs/ic_outline-email.png" alt="">
                 <p class="footer-contacts-text inter-light">wmsu@wmsu.edu.ph</p>
             </div>
             <div class="footer-iso">
-                <img src="/WEBSITE-wCMS/imgs/tabler_world.png" alt="">
+                <img src="/imgs/tabler_world.png" alt="">
                 <p class="footer-contacts-text inter-light">ISO 9001-2015</p>
             </div>
         </div>

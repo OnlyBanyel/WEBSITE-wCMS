@@ -289,7 +289,7 @@ if ((isset($_POST['submit'])) && ($_SERVER['REQUEST_METHOD'] === 'POST')){
             <button type="submit" name="submit" class="btn btn-primary">Login</button>
             
             <div class="form-footer">
-            <a href="http://localhost/WEBSITE-WCMS">< Go back to Homepage</a>
+            <a href="../../page/homepage.php">< Go back to Homepage</a>
 
             </div>
         </form>
