@@ -8,5 +8,6 @@ services:
       - dbvar.env
     volumes:
       - ./your-web-code:/var/www/html
-      - ./aiven-certs:/etc/ssl/aiven   # <-- mount your certs folder
+      - ./aiven-certs/ca.pem:/etc/ssl/aiven/ca.pem
+
     restart: unless-stopped
