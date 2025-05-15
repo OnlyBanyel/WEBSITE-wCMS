@@ -21,11 +21,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    networks:
-      - default
-      - host
+    network_mode: host  # Use either this OR networks: not both
 
-networks:
-  host:
-    external: true
-    name: host
+# Remove all networks: configuration when using network_mode: host
