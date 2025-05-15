@@ -1,18 +1,18 @@
 <?php 
-$baseUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/WEBSITE-WCMS';
+$baseUrl = 'https://' . $_SERVER['HTTP_HOST'];
 ;
 ?>
 <head>
-<link rel="stylesheet" href="../vendors/bootstrap-5.3.3-dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="../vendors/datatable-2.1.8/datatables.min.css">
-<link rel="stylesheet" href="../css/navbar.css">
-<link rel="stylesheet" href="../css/homepage.css">
-<link rel="stylesheet" href="../css/fonts.css">
-<link rel="stylesheet" href="../css/linkages.css">
-<link rel="stylesheet" href="../css/footer.css">
-<link rel="stylesheet" href="../css/ESUCampuses.css">
-<link rel="stylesheet" href="../css/output.css">
-<link rel="stylesheet" href="../css/responsive.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/vendors/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/vendors/datatable-2.1.8/datatables.min.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/navbar.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/homepage.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/fonts.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/linkages.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/footer.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/ESUCampuses.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/output.css">
+<link rel="stylesheet" href="<?php echo $baseUrl; ?>/css/responsive.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <script src="<?php echo $baseUrl; ?>/vendors/jquery-3.7.1/jquery-3.7.1.min.js"></script>
