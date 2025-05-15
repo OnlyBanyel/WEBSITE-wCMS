@@ -31,11 +31,9 @@
   </section>
 
 <body class="bg-gray-50">
-    <nav class="container-breadcrumb">
         <div class="relative z-10">
             <?php require_once '../../__includes/subnav_academics.php' ?>
         </div>
-    </nav>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 class="text-3xl md:text-4xl font-bold text-center text-[#BD0F03] mb-8">Admission Information</h1>
