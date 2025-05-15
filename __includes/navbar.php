@@ -150,7 +150,7 @@ $genElements = new Pages;
       <!-- Desktop Navigation Links -->
       <div class="nav-links">
           <a class="inter-extralight" id="Home" href="">HOME</a>
-          <a class="inter-extralight inline-align" id="About" href="">ABOUT US <img src="/WEBSITE-wCMS/imgs/Expand Arrow.png" alt=""></a>
+          <a class="inter-extralight inline-align" id="About" href="">ABOUT US <img src="/imgs/Expand Arrow.png" alt=""></a>
           <div id="About-dropdown" class="nav-dropdown">
               <div class="dropdown-cont">
                   <div class="dropdown-title">
