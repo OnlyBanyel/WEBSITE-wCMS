@@ -16,26 +16,22 @@ class Database {
         $this->port     = getenv('DB_PORT') ?: '3306';
     }
 
-    public function connect() {
-        try {
-            $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname};charset=utf8mb4";
+  public function connect() {
+    try {
+        $options = [
+            PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/aiven/ca.pem',
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ];
 
-            // Optional: only include SSL if ca.pem is mounted
-            $ssl_ca = '/etc/ssl/aiven/ca.pem';
-            $options = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ];
+        $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname};charset=utf8mb4";
 
-            if (file_exists($ssl_ca)) {
-                $options[PDO::MYSQL_ATTR_SSL_CA] = $ssl_ca;
-            }
-
-            $this->db = new PDO($dsn, $this->user, $this->password, $options);
-        } catch (PDOException $e) {
-            throw new Exception("Database connection failed: " . $e->getMessage());
-        }
-
+        $this->db = new PDO($dsn, $this->user, $this->password, $options);
         return $this->db;
+
+    } catch (PDOException $e) {
+        throw new Exception("Database connection failed: " . $e->getMessage());
     }
+}
+
 }
 ?>

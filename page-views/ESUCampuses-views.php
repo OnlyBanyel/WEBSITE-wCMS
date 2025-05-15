@@ -15,103 +15,110 @@
         body {
             background-color: #f8f9fa;
             color: #333;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
         }
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         h1 {
             color: #c00000;
             font-size: 2.5rem;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         h2 {
             color: #c00000;
             font-size: 1.8rem;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         h3 {
             color: #c00000;
             font-size: 1.5rem;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .header-underline {
             width: 100px;
             height: 4px;
             background-color: #c00000;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
 
         .description {
             max-width: 900px;
-            margin: 0 auto 30px;
+            margin: 0 auto 25px;
             text-align: center;
             font-size: 1.1rem;
         }
 
-        /* Updated mission-vision styles without icons */
+        /* Enhanced mission-vision styles */
         .mission-vision-container {
             max-width: 900px;
-            margin: 0 auto 60px;
+            margin: 0 auto 40px;
             display: flex;
             flex-direction: column;
-            gap: 40px;
-            position: relative;
+            gap: 25px;
         }
 
         .mission-box, .vision-box {
             position: relative;
+            transition: transform 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .mission-box:hover, .vision-box:hover {
+            transform: translateY(-5px);
         }
 
         .mission-vision-label {
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             z-index: 2;
-            margin-bottom: -20px;
-            margin-left: 20px;
         }
 
         .label-text {
-            background-color: #c00000;
+            background: linear-gradient(135deg, #c00000, #ff3333);
             color: white;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            padding: 10px 10px;
-            border-radius: 30px;
+            padding: 10px 20px;
+            border-radius: 0 0 15px 0;
             text-transform: uppercase;
             display: inline-block;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
         }
 
         .mission-vision-content {
-            background-color:rgb(231, 219, 219);
+            background: linear-gradient(to right, #f8f8f8, #e7dbdb);
             border-radius: 15px;
-            padding: 30px 25px 20px 25px;
-            margin-left: 40px;
+            padding: 50px 25px 25px 25px;
+            border-left: 5px solid #c00000;
         }
 
         .mission-vision-content p {
             color: #333;
-            font-size: 1rem;
+            font-size: 1.05rem;
             line-height: 1.5;
+            text-align: justify;
         }
-
-        /* End of updated mission-vision styles */
 
         .columns {
             display: flex;
             flex-wrap: wrap;
-            gap: 30px;
+            gap: 20px;
         }
 
         .column {
@@ -121,16 +128,16 @@
 
         .column-title {
             text-align: center;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             border-bottom: 2px solid #c00000;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .campus-card {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             overflow: hidden;
             transition: box-shadow 0.3s ease;
         }
@@ -148,13 +155,13 @@
         }
 
         .campus-header {
-            background-color: #f8e6e6;
+            background-color: rgb(230, 220, 220);
             padding: 15px;
         }
 
         .campus-title {
             color: #c00000;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .campus-description {
@@ -186,8 +193,8 @@
 
         .programs-content {
             display: none;
-            margin-top: 15px;
-            padding-left: 20px;
+            margin-top: 10px;
+            padding-left: 15px;
             border-left: 2px solid #e0c0c0;
         }
 
@@ -202,7 +209,7 @@
         }
 
         .programs-list li {
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             color: #444;
         }
 
@@ -223,26 +230,26 @@
             }
             
             .mission-vision-label {
-                margin-left: 10px;
+                position: absolute;
+                top: 0;
+                left: 0;
             }
             
             .label-text {
-                padding: 8px 20px;
-                font-size: 1.3rem;
+                padding: 8px 15px;
+                font-size: 1.1rem;
             }
             
             .mission-vision-content {
-                margin-left: 20px;
-                padding: 25px 20px 15px 20px;
+                padding: 45px 20px 20px 20px;
             }
         }
 
-        /* REGION CARD STYLES (like screenshot) */
         .region-cards {
             display: flex;
-            gap: 30px;
+            gap: 20px;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         }
         .region-card {
@@ -252,9 +259,9 @@
             border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
             border: 2px solid transparent;
-            transition: box-shadow 0.2s, border-color 0.2s;
+            transition: all 0.3s ease;
             background: #eee;
             display: flex;
             flex-direction: column;
@@ -262,7 +269,12 @@
         }
         .region-card.active {
             border-color: #c00000;
-            box-shadow: 0 4px 16px rgba(192,0,0,0.10);
+            box-shadow: 0 5px 15px rgba(192,0,0,0.15);
+            transform: translateY(-3px);
+        }
+        .region-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         }
         .region-card .region-bg {
             position: absolute;
@@ -271,13 +283,18 @@
             background-position: center;
             filter: brightness(0.92);
             z-index: 1;
+            transition: all 0.3s ease;
+        }
+        .region-card:hover .region-bg {
+            filter: brightness(1);
+            transform: scale(1.05);
         }
         .region-card .region-label {
             position: relative;
             z-index: 2;
-            background: #f8e6e6;
-            padding: 18px 0 12px 20px;
-            font-size: 2rem;
+            background: linear-gradient(to right, rgba(248,230,230,0.95), rgba(248,230,230,0.85));
+            padding: 15px 0 10px 20px;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #c00000;
             letter-spacing: 1px;
@@ -288,28 +305,33 @@
             .region-card { width: 98vw; max-width: 420px; }
         }
         /* Hide/show campus sections */
-        .campus-sections { margin-bottom: 30px; }
+        .campus-sections { margin-bottom: 25px; }
         .campus-section { display: none; }
-        .campus-section.active { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
+        .campus-section.active { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
         /* CAMPUS CARD STYLES */
         .campus-card {
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 0 0 10px 0;
+            padding: 0 0 5px 0;
             margin: 0;
             display: flex;
             flex-direction: column;
             min-height: 160px;
+            transition: all 0.3s ease;
+        }
+        .campus-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .campus-header {
-            padding: 18px 20px 8px 20px;
+            padding: 15px 20px 8px 20px;
         }
         .campus-title {
             color: #c00000;
             font-size: 1.2rem;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .campus-description {
             color: #555;
@@ -317,7 +339,7 @@
         }
         .programs-button {
             width: 100%;
-            padding: 10px 20px;
+            padding: 8px 20px;
             background: #f8e6e6;
             border: none;
             border-top: 1px solid #e0c0c0;
@@ -329,21 +351,33 @@
             justify-content: space-between;
             align-items: center;
             font-size: 1rem;
+            transition: all 0.2s ease;
         }
-        .programs-button span { font-size: 1.3em; transition: transform 0.2s; }
-        .programs-button.active span { transform: rotate(180deg); }
-        .programs-content {
-            display: none;
-            padding: 10px 30px 0 30px;
+        .programs-button:hover {
+            background: #f0d0d0;
+        }
+        .programs-button span {
+            font-size: 1.3em;
+            transition: transform 0.2s;
+            display: inline-block;
+            transform: scaleX(1.8);
         }
         .programs-content.active { display: block; }
+        .programs-content {
+            padding: 10px 15px;
+            margin-top: 5px;
+        }
         .programs-list { margin: 0; padding-left: 18px; }
-        .programs-list li { margin-bottom: 6px; color: #444; }
+        .programs-list li { margin-bottom: 4px; color: #444; }
     </style>
 </head>
 <body>
+      <section class="header sticky top-0 z-50 bg-white" style="isolation: isolate;">
+      <?php require_once '../../__includes/navbar.php'?>
+  </section>
+
      <div class="relative z-10 subnav-container">
-            <?php require_once '../../__includes/subnav_academics.php' ?>
+            <?php require_once '../../__includes/subnav_academics.php'?>
         </div>
     <div class="container">
         <header>
@@ -357,7 +391,7 @@
             </p>
         </header>
 
-        <!-- Updated mission-vision layout without icons -->
+        <!-- Enhanced mission-vision layout -->
         <div class="mission-vision-container">
             <div class="vision-box">
                 <div class="mission-vision-label">
@@ -406,7 +440,7 @@
                         <div class="campus-title">WMSU Alicia Campus</div>
                         <div class="campus-description">Extending WMSU's reach in Alicia, Zamboanga Sibugay.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Science in Agriculture (Crop Science)</li>
@@ -421,7 +455,7 @@
                         <div class="campus-title">WMSU Diplahan Campus</div>
                         <div class="campus-description">Serving Diplahan, Zamboanga Sibugay with quality education.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Elementary Education</li>
@@ -434,7 +468,7 @@
                         <div class="campus-title">WMSU Ipil Campus</div>
                         <div class="campus-description">Located in Ipil, Zamboanga Sibugay, offering diverse programs.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Elementary Education</li>
@@ -449,7 +483,7 @@
                         <div class="campus-title">WMSU Naga Campus</div>
                         <div class="campus-description">Naga, Zamboanga Sibugay campus for local community needs.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Secondary Education major in Filipino</li>
@@ -462,7 +496,7 @@
                         <div class="campus-title">WMSU Pagadian Campus</div>
                         <div class="campus-description">Pagadian, Zamboanga Sibugay campus for higher learning.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>BA Political Science</li>
@@ -480,7 +514,7 @@
                         <div class="campus-title">WMSU Tungawan Campus</div>
                         <div class="campus-description">Tungawan, Zamboanga Sibugay campus for accessible education.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Elementary Education</li>
@@ -496,7 +530,7 @@
                         <div class="campus-title">WMSU Curuan Campus</div>
                         <div class="campus-description">Curuan, Zamboanga del Sur campus for regional development.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Elementary Education</li>
@@ -510,7 +544,7 @@
                         <div class="campus-title">WMSU Imelda Campus</div>
                         <div class="campus-description">Imelda, Zamboanga del Sur campus for higher education.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>BA Political Science</li>
@@ -523,7 +557,7 @@
                         <div class="campus-title">WMSU Mabuhay Campus</div>
                         <div class="campus-description">Mabuhay, Zamboanga del Sur campus for academic excellence.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Elementary Education</li>
@@ -537,7 +571,7 @@
                         <div class="campus-title">WMSU Malangas Campus</div>
                         <div class="campus-description">Malangas, Zamboanga del Sur campus for community growth.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Elementary Education</li>
@@ -551,7 +585,7 @@
                         <div class="campus-title">WMSU Molave Campus</div>
                         <div class="campus-description">Molave, Zamboanga del Sur campus for future leaders.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Elementary Education</li>
@@ -564,7 +598,7 @@
                         <div class="campus-title">WMSU Qintanga Campus</div>
                         <div class="campus-description">Qintanga, Zamboanga del Sur campus for accessible learning.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>Bachelor of Elementary Education</li>
@@ -577,7 +611,7 @@
                         <div class="campus-title">WMSU Siay Campus</div>
                         <div class="campus-description">Siay, Zamboanga del Sur campus for diverse programs.</div>
                     </div>
-                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>▼</span></button>
+                    <button class="programs-button" onclick="togglePrograms(this)">Programs Available <span>⌄</span></button>
                     <div class="programs-content">
                         <ul class="programs-list">
                             <li>BA in Political Science</li>
@@ -619,7 +653,7 @@
             // Toggle current
             btn.classList.toggle('active');
             content.classList.toggle('active');
-            arrow.textContent = content.classList.contains('active') ? '▲' : '▼';
+            arrow.textContent = content.classList.contains('active') ? '⌃' : '⌄';
         }
     </script>
 </body>
