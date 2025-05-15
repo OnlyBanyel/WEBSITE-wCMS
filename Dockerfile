@@ -22,4 +22,9 @@ WORKDIR /var/www/html
 # Copy application files (excluding certs, handled in compose)
 COPY . .
 
+RUN echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/error.ini && \
+    echo "display_errors = On" >> /usr/local/etc/php/conf.d/error.ini && \
+    echo "pdo_mysql.debug=1" >> /usr/local/etc/php/conf.d/pdo_mysql.ini
+
 EXPOSE 80
+
