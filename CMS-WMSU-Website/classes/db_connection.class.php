@@ -17,22 +17,28 @@ class Database {
     }
 
     public function connect() {
-        try {
-           $options = [
+    try {
+        $options = [
             PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/aiven/ca.pem',
-            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false, // Add this line to ignore verification error
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-];
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 5,
+            // Add this for MySQL 8+ authentication
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
+        ];
 
-
-            $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname};charset=utf8mb4";
-
-            $this->db = new PDO($dsn, $this->user, $this->password, $options);
-            return $this->db;
-
-        } catch (PDOException $e) {
-            throw new Exception("Database connection failed: " . $e->getMessage());
-        }
+        $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname}";
+        
+        $this->db = new PDO($dsn, $this->user, $this->password, $options);
+        
+        // Test the connection
+        $this->db->query("SELECT 1");
+        
+        return $this->db;
+    } catch (PDOException $e) {
+        error_log("Full connection error: " . print_r($e, true));
+        throw new Exception("Database connection failed: " . $e->getMessage());
     }
+}
 }
 ?>
