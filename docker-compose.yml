@@ -10,9 +10,9 @@ services:
       DB_NAME: "wmsucms"
       DB_USER: "avnadmin"
       DB_PASS: "AVNS_suifDF-uCj0_ikObk7C"
-      volumes:
-      - ./your-web-code:/var/www/html
-      - ./aiven-certs/ca.pem:/etc/ssl/aiven/ca.pem:ro
+    volumes:
+    - ./your-web-code:/var/www/html
+    - ./aiven-certs/ca.pem:/etc/ssl/aiven/ca.pem:ro
     ports:
       - "8080:80"
     restart: unless-stopped
