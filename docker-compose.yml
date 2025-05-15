@@ -7,8 +7,8 @@ services:
     environment:
       DB_HOST: db
       DB_NAME: wmsucms
-      DB_USER: yourusername
-      DB_PASS: ""  # blank password
+      DB_USER: root
+      DB_PASS: rootpassword123   # same as MYSQL_ROOT_PASSWORD
     depends_on:
       - db
     volumes:
@@ -21,8 +21,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword123
       MYSQL_DATABASE: wmsucms
-      MYSQL_USER: yourusername
-      MYSQL_PASSWORD: ""  # blank password
     volumes:
       - db_data:/var/lib/mysql
     restart: unless-stopped
