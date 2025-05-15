@@ -6,13 +6,7 @@ services:
     container_name: wmsucms_web
     env_file:
       - dbvar.env
-    environment:
-      DB_HOST: wmsucms-wmsu-act.h.aivencloud.com
-      DB_PORT: 20747
-      DB_NAME: wmsucms
-      DB_USER: avnadmin
-      DB_PASS: ${DB_PASSWORD}       # <-- uncommented here
     volumes:
       - ./your-web-code:/var/www/html
-      - ./aiven-certs:/etc/ssl/aiven   # <-- mount cert folder inside container
+      - ./aiven-certs:/etc/ssl/aiven   # <-- mount your certs folder
     restart: unless-stopped
