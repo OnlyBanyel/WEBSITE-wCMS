@@ -8,30 +8,26 @@ class Database {
     protected $db;
 
     public function __construct() {
-        // These values are pulled from environment variables for Docker use
-        $this->dbhost = getenv('DB_HOST') ?: '127.0.0.1';   // 127.0.0.1 instead of 'localhost' for Docker container
-        $this->dbname = getenv('DB_NAME') ?: 'wmsucms';      // Default 'wmsucms'
-        $this->user = getenv('DB_USER') ?: 'root';           // Default 'root'
-        $this->password = getenv('DB_PASS') ?: '';           // Default empty password for 'root'
+        // For Docker, values will be from .env or docker-compose
+        // For local (XAMPP), fallback defaults will be used
+        $this->dbhost   = getenv('DB_HOST') ?: '127.0.0.1';  // Avoid 'localhost' due to socket issues in some setups
+        $this->dbname   = getenv('DB_NAME') ?: 'wmsucms';
+        $this->user     = getenv('DB_USER') ?: 'root';
+        $this->password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : ''; // Handles empty string env var
     }
 
     public function connect() {
         try {
-            // Use TCP/IP connection for Docker container, set port 3306
-            $dsn = "mysql:host={$this->dbhost};port=3306;dbname={$this->dbname}";
+            // Explicit port to ensure compatibility in Docker and local
+            $dsn = "mysql:host={$this->dbhost};port=3306;dbname={$this->dbname};charset=utf8mb4";
             
-            // Create PDO connection
             $this->db = new PDO($dsn, $this->user, $this->password);
-            
-            // Set PDO error mode to exception to catch any issues
+
+            // Error reporting to exception mode
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Optional: Output success message to confirm connection
-            // echo "Connected to the database successfully!";
-            
-        } catch(PDOException $e) {
-            // Handle any connection error
-            echo "Connection error: " . $e->getMessage();
+        } catch (PDOException $e) {
+            echo "Database connection error: " . $e->getMessage();
             $this->db = null;
         }
 
