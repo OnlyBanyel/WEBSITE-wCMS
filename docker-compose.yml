@@ -8,7 +8,7 @@ services:
       DB_HOST: db
       DB_NAME: wmsucms
       DB_USER: root
-      DB_PASS: rootpassword123   # same as MYSQL_ROOT_PASSWORD
+      DB_PASS: ""           # empty password
     depends_on:
       - db
     volumes:
@@ -16,11 +16,11 @@ services:
     restart: unless-stopped
 
   db:
-    image: mysql:8.0
+    image: mariadb:11.0
     container_name: wmsucms_db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword123
-      MYSQL_DATABASE: wmsucms
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: wmsucms
     volumes:
       - db_data:/var/lib/mysql
     restart: unless-stopped
