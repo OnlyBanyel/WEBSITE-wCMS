@@ -16,11 +16,5 @@ services:
     ports:
       - "8080:80"
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    network_mode: host  # Use either this OR networks: not both
-
-# Remove all networks: configuration when using network_mode: host
+    # Use host network mode to bypass Docker's network isolation
+    network_mode: "host"

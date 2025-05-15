@@ -17,18 +17,21 @@ class Database {
     }
 public function connect() {
     try {
-        // Verify environment variables
-        error_log("DB Connection Attempt:");
-        error_log("Host: " . $this->dbhost);
-        error_log("Port: " . $this->port);
-        error_log("User: " . $this->user);
+        // Debug output
+        error_log("Attempting connection to: {$this->dbhost}:{$this->port}");
         
-        // Verify certificate exists
-        $certPath = '/etc/ssl/aiven/ca.pem';
-        error_log("Certificate exists: " . (file_exists($certPath) ? 'Yes' : 'No'));
+        // Test raw TCP connection first
+        $timeout = 5;
+        $socket = @fsockopen($this->dbhost, $this->port, $errno, $errstr, $timeout);
         
+        if (!$socket) {
+            throw new Exception("Raw TCP connection failed: $errstr ($errno)");
+        }
+        fclose($socket);
+        
+        // SSL options
         $options = [
-            PDO::MYSQL_ATTR_SSL_CA => $certPath,
+            PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/aiven/ca.pem',
             PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_TIMEOUT => 5,
@@ -36,19 +39,12 @@ public function connect() {
         ];
 
         $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname}";
-        
-        // Test raw socket connection first
-        $socket = @fsockopen($this->dbhost, $this->port, $errno, $errstr, 5);
-        if (!$socket) {
-            throw new Exception("Raw TCP connection failed: $errstr ($errno)");
-        }
-        fclose($socket);
-        
         $this->db = new PDO($dsn, $this->user, $this->password, $options);
+        
         return $this->db;
     } catch (Exception $e) {
-        error_log("FULL CONNECTION ERROR: " . $e->getMessage());
-        throw new Exception("Database connection failed: " . $e->getMessage());
+        error_log("Database connection error: " . $e->getMessage());
+        throw $e;
     }
 }
 }
