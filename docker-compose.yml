@@ -1,29 +1,17 @@
-version: '3.8'
-
 services:
   web:
     image: php:8.1-apache
     container_name: wmsucms_web
+    env_file:
+      - dbvar.env
     environment:
-      DB_HOST: db
+      DB_HOST: wmsucms-wmsu-act.h.aivencloud.com
+      DB_PORT: 20747
       DB_NAME: wmsucms
-      DB_USER: root
-      DB_PASS: ""           # empty password
+      DB_USER: avnadmin
+      DB_PASS: ${DB_PASSWORD}
     depends_on:
       - db
     volumes:
       - ./your-web-code:/var/www/html
     restart: unless-stopped
-
-  db:
-    image: mariadb:11.0
-    container_name: wmsucms_db
-    environment:
-      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
-      MARIADB_DATABASE: wmsucms
-    volumes:
-      - db_data:/var/lib/mysql
-    restart: unless-stopped
-
-volumes:
-  db_data:
