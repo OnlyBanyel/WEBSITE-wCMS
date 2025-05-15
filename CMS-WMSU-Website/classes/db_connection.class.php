@@ -17,24 +17,32 @@ class Database {
         $this->user     = getenv('DB_USER') ?: 'root';
         $this->password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : ''; // Handles empty string env var
         $this->port     = getenv('DB_PORT') ?: '3306'; // Default MySQL port
-    }
+   // Temporary debug
+    error_log("DB Connection Details:");
+    error_log("Host: " . $this->dbhost);
+    error_log("Port: " . $this->port);
+    error_log("User: " . $this->user);
+    error_log("DB Name: " . $this->dbname);
+}
 
     public function connect() {
     try {
         $dsn = "mysql:host={$this->dbhost};port={$this->port};dbname={$this->dbname};charset=utf8mb4";
 
-        $ssl_ca = '/etc/ssl/aiven/ca.pem';
-
-        $options = [
-            PDO::MYSQL_ATTR_SSL_CA => $ssl_ca,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        // SSL Configuration for Aiven
+        $ssl_options = [
+            PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/aiven/ca.pem',
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false, // Important for Aiven
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false // Better for containerized environments
         ];
 
-        $this->db = new PDO($dsn, $this->user, $this->password, $options);
+        $this->db = new PDO($dsn, $this->user, $this->password, $ssl_options);
 
     } catch (PDOException $e) {
-        echo "Database connection error: " . $e->getMessage();
-        $this->db = null;
+        // More detailed error reporting for debugging
+        error_log("Database connection failed: " . $e->getMessage());
+        throw new Exception("Database connection failed. Check logs for details.");
     }
 
     return $this->db;
