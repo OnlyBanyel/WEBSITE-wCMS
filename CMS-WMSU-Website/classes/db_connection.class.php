@@ -36,7 +36,7 @@ class Database {
         // $this->user     = getenv('DB_USER') ?: 'root';
         // $this->password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '';
         // $this->port     = getenv('DB_PORT') ?: '3306';
-    }
+    
 public function connect() {
     try {
         // Debug output
