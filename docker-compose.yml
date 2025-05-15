@@ -4,17 +4,12 @@ services:
   web:
     build: .
     container_name: wmsucms_web
-    environment:
-      DB_HOST: "wmsucms-wmsu-act.h.aivencloud.com"
-      DB_PORT: "20747"
-      DB_NAME: "wmsucms"
-      DB_USER: "avnadmin"
-      DB_PASS: "AVNS_suifDF-uCj0_ikObk7C"
+    env_file: 
+      - dbvar.env  # Create this file in same directory
     volumes:
-    - ./your-web-code:/var/www/html
-    - ./aiven-certs/ca.pem:/etc/ssl/aiven/ca.pem:ro
+      - ./your-web-code:/var/www/html
+      - ./aiven-certs/ca.pem:/etc/ssl/aiven/ca.pem:ro
     ports:
       - "8080:80"
     restart: unless-stopped
-    # Use host network mode to bypass Docker's network isolation
     network_mode: "host"

@@ -9,11 +9,25 @@ class Database {
     protected $db;
 
     public function __construct() {
-        $this->dbhost   = getenv('DB_HOST');
-        $this->dbname   = getenv('DB_NAME');
-        $this->user     = getenv('DB_USER');
-        $this->password = getenv('DB_PASS');
-        $this->port     = getenv('DB_PORT');
+    $requiredVars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS'];
+    foreach ($requiredVars as $var) {
+        if (empty(getenv($var))) {
+            throw new Exception("Missing required environment variable: $var");
+        }
+    }
+
+    $this->dbhost = getenv('DB_HOST');
+    $this->port = getenv('DB_PORT');
+    $this->dbname = getenv('DB_NAME');
+    $this->user = getenv('DB_USER');
+    $this->password = getenv('DB_PASS');
+
+    error_log("DB Connection Config:");
+    error_log("Host: {$this->dbhost}");
+    error_log("Port: {$this->port}");
+    error_log("User: {$this->user}");
+    error_log("DB Name: {$this->dbname}");
+
         // $this->dbhost   = getenv('DB_HOST') ?: '127.0.0.1';
         // $this->dbname   = getenv('DB_NAME') ?: 'wmsucms';
         // $this->user     = getenv('DB_USER') ?: 'root';
