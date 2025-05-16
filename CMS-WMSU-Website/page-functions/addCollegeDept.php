@@ -12,12 +12,13 @@ $accountObj = new Accounts();
 
 header('Content-Type: application/json');
 
-// 1. FIXED: Set default timezone to avoid warnings
+// Set default timezone
 date_default_timezone_set('Asia/Manila');
 
-// 2. FIXED: Improved error handling
+// Improved error handling
 function handleError($message, $errors = []) {
     error_log("ERROR: " . $message . " - " . json_encode($errors));
+    http_response_code(400);
     echo json_encode([
         "success" => false,
         "message" => $message,
@@ -26,16 +27,17 @@ function handleError($message, $errors = []) {
     exit;
 }
 
-// Check if required field is set
+// Validate request
 if (!isset($_POST['collegeName'])) {
     handleError("Missing required field. College name is required.");
 }
 
+// Process input
 $collegeName = trim($_POST['collegeName']);
 $defaultPassword = $_POST['defaultPassword'] ?? 'wmsu123';
 $establishedYear = $_POST['establishedYear'] ?? null;
 
-// Validate input
+// Input validation
 if (empty($collegeName)) {
     handleError("College name cannot be empty");
 }
@@ -44,20 +46,20 @@ if (!empty($establishedYear) && !preg_match('/^\d{4}-\d{4}$/', $establishedYear)
     handleError("Invalid academic year format. Please use YYYY-YYYY format.");
 }
 
-// Get current user's subpage
+// Get current user context
 $subpage = $_SESSION['account']['subpage_assigned'] ?? 1;
 $pageID = 3;
 
-// 3. FIXED: File upload handling for Render
+// File upload handling
 $logoPath = null;
-$profileImgPath = '/defaults/profile.png'; // Default value
+$profileImgPath = '/defaults/profile.png';
 
 if (isset($_FILES['collegeLogo']) && $_FILES['collegeLogo']['error'] == 0) {
     $logoFile = $_FILES['collegeLogo'];
     
-    // Validate file
+    // File validation
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    $maxSize = 2 * 1024 * 1024; // 2MB
+    $maxSize = 2 * 1024 * 1024;
     
     if (!in_array($logoFile['type'], $allowedTypes)) {
         handleError("Invalid file type. Only JPG, PNG, and GIF are allowed.");
@@ -67,34 +69,38 @@ if (isset($_FILES['collegeLogo']) && $_FILES['collegeLogo']['error'] == 0) {
         handleError("File too large. Maximum size is 2MB.");
     }
 
-    // 4. FIXED: Render-compatible upload directory
+    // Configure upload paths
     $uploadBase = $_SERVER['DOCUMENT_ROOT'] . '/uploads/colleges/logos/';
     $webAccessiblePath = '/uploads/colleges/logos/';
     
-    // Create directory if needed
+    // Ensure directory exists
     if (!file_exists($uploadBase)) {
-        if (!mkdir($uploadBase, 0755, true)) {
-            // Fallback to temp directory if main upload fails
+        if (!mkdir($uploadBase, 0755, true) && !is_dir($uploadBase)) {
+            // Fallback to system temp directory
             $uploadBase = sys_get_temp_dir() . '/college_logos/';
             $webAccessiblePath = '/temp_uploads/';
-            if (!file_exists($uploadBase)) {
-                mkdir($uploadBase, 0755, true);
+            if (!file_exists($uploadBase) && !mkdir($uploadBase, 0755, true)) {
+                error_log("Failed to create upload directory");
+                // Continue without file upload
             }
         }
     }
 
-    $logoFileName = time() . '_' . preg_replace('/[^\w\.\-]/', '_', $logoFile['name']);
-    $logoTargetPath = $uploadBase . $logoFileName;
-    
-    if (move_uploaded_file($logoFile['tmp_name'], $logoTargetPath)) {
-        $logoPath = $webAccessiblePath . $logoFileName;
-        $profileImgPath = $logoPath;
-    } else {
-        error_log("Upload failed. Last error: " . json_encode(error_get_last()));
-        // System will use the default image path
+    // Process file upload
+    if (is_dir($uploadBase) && is_writable($uploadBase)) {
+        $logoFileName = time() . '_' . preg_replace('/[^\w\.\-]/', '_', $logoFile['name']);
+        $logoTargetPath = $uploadBase . $logoFileName;
+        
+        if (move_uploaded_file($logoFile['tmp_name'], $logoTargetPath)) {
+            $logoPath = $webAccessiblePath . $logoFileName;
+            $profileImgPath = $logoPath;
+        } else {
+            error_log("Upload failed: " . json_encode(error_get_last()));
+        }
     }
 }
 
+// Database operations
 try {
     $db = new Database();
     $conn = $db->connect();
@@ -106,13 +112,14 @@ try {
     // Start transaction
     $conn->beginTransaction();
     
-    // 5. FIXED: Check and add columns with proper defaults
-    $conn->exec("ALTER TABLE subpages ADD COLUMN IF NOT EXISTS established_year VARCHAR(20) NULL AFTER isCollege");
+    // Check if column exists before adding
+    $check = $conn->query("SHOW COLUMNS FROM subpages LIKE 'established_year'");
+    if ($check->rowCount() == 0) {
+        $conn->exec("ALTER TABLE subpages ADD COLUMN established_year VARCHAR(20) NULL AFTER isCollege");
+    }
     
     // Add college
-    $collegeAdded = $pagesObj->addCollege($collegeName, $logoPath, $pageID);
-    
-    if (!$collegeAdded) {
+    if (!$pagesObj->addCollege($collegeName, $logoPath, $pageID)) {
         throw new Exception("Failed to add college");
     }
     
@@ -127,20 +134,21 @@ try {
     
     $newSubpageId = $result['subpageID'];
     
-    // Update established_year if provided
+    // Update established year if provided
     if (!empty($establishedYear)) {
         $stmt = $conn->prepare("UPDATE subpages SET established_year = ? WHERE subpageID = ?");
         $stmt->execute([$establishedYear, $newSubpageId]);
     }
     
     // Add college name to page sections
-    $pagesObj->addNewCollegeName($pageID, 'College Profile', 'text', $collegeName, 'carousel-logo-text');
+    if (!$pagesObj->addNewCollegeName($pageID, 'College Profile', 'text', $collegeName, 'carousel-logo-text')) {
+        throw new Exception("Failed to add college name to sections");
+    }
     
-    // Create account for new college
+    // Create account for college
     $emailName = preg_replace('/^College of /i', '', $collegeName);
     $emailName = strtolower(preg_replace('/[^a-z0-9]/', '', $emailName)) . '@wmsu.edu.ph';
     
-    // 6. FIXED: Ensure all required account fields are set
     $accountObj->cleanAccount($emailName, $defaultPassword, 2, $newSubpageId);
     $accountObj->profileImg = $profileImgPath;
     
@@ -148,7 +156,7 @@ try {
         throw new Exception("Failed to create college account");
     }
     
-    // Add established year to page_sections if provided
+    // Add established year to page sections if provided
     if (!empty($establishedYear)) {
         $stmt = $conn->prepare("INSERT INTO page_sections 
                               (pageID, subpage, indicator, description, elemType, content) 
@@ -163,22 +171,30 @@ try {
         ]);
     }
     
+    // Commit transaction
     $conn->commit();
     
-    // Refresh session data
+    // Update session data
     if (isset($_SESSION['collegeData'])) {
         $_SESSION['collegeData'] = $loginObj->fetchCollegeData($subpage);
     }
     
+    // Success response
     echo json_encode([
         "success" => true,
-        "message" => "College department and content manager account added successfully."
+        "message" => "College department and content manager account added successfully.",
+        "collegeId" => $newSubpageId
     ]);
     
+} catch (PDOException $e) {
+    if (isset($conn) && $conn->inTransaction()) {
+        $conn->rollBack();
+    }
+    handleError("Database error occurred", ["database_error" => $e->getMessage()]);
 } catch (Exception $e) {
     if (isset($conn) && $conn->inTransaction()) {
         $conn->rollBack();
     }
-    handleError("Failed to add college department.", ["exception" => $e->getMessage()]);
+    handleError("Failed to add college department", ["exception" => $e->getMessage()]);
 }
 ?>
