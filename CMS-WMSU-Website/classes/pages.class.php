@@ -651,5 +651,18 @@ public function changeContent($sectionID, $subpage, $value, $indicator = null, $
             return [];
         }
     }
+    function getLastInsertedCollegeId($collegeName) {
+    $sql = "SELECT subpageID FROM subpages WHERE subPageName = ? ORDER BY subpageID DESC LIMIT 1";
+    $qry = $this->db->connect()->prepare($sql);
+    $qry->execute([$collegeName]);
+    $result = $qry->fetch(PDO::FETCH_ASSOC);
+    return $result ? $result['subpageID'] : false;
+}
+
+function updateEstablishedYear($subpageId, $year) {
+    $sql = "UPDATE subpages SET established_year = ? WHERE subpageID = ?";
+    $qry = $this->db->connect()->prepare($sql);
+    return $qry->execute([$year, $subpageId]);
+}
 }
 ?>
