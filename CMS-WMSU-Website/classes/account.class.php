@@ -10,6 +10,8 @@ require_once __DIR__ . "/db_connection.class.php";
         public $role;
         public $subpage_assigned;
 
+        public $profileImg;
+
         protected $db;
     
 
